@@ -85,6 +85,7 @@
         padding: 20px;
         margin-bottom: 30px;
         background: #f9f9f9;
+        position: relative;
       }
       .task-section h4 {
         margin-bottom: 10px;
@@ -95,6 +96,7 @@
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
+        justify-content: center;
       }
       .task {
         background: white;
@@ -102,10 +104,12 @@
         padding: 10px 15px;
         width: calc(50% - 6px);
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        animation: fadeInUp 0.6s ease;
       }
       .task:hover {
         transform: scale(1.02);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
       }
       .task label {
         display: block;
@@ -119,6 +123,7 @@
       }
       .subtask input {
         transform: scale(1.2);
+        cursor: pointer;
       }
       .progress-bar {
         height: 8px;
@@ -147,13 +152,28 @@
           transform: translateY(0);
         }
       }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
     </style>
   </head>
   <body>
+    <!-- صوت تشجيعي -->
+    <audio
+      id="clapSound"
+      src="https://cdn.pixabay.com/audio/2022/03/15/audio_197dce6b89.mp3"
+    ></audio>
+
     <!-- الواجهة الأولى -->
     <div class="container" id="homePage">
-      <img src="5776125144014639249.jpg" alt="شعار الجروب" class="logo" />
-      <!-- استبدلي الصورة -->
+      <img src="group-logo.png" alt="شعار الجروب" class="logo" />
       <h2>جروب أسئلة الجهاز المركزي</h2>
       <p class="subtitle">ابدأ دلوقتي وراقب تقدمك في كل محور 💪</p>
       <label for="username">✍️ اسمك:</label>
@@ -208,7 +228,6 @@
 
             const label = document.createElement("label");
             label.textContent = `نموذج ${i}`;
-
             task.appendChild(label);
 
             const subtasks = [
@@ -216,6 +235,7 @@
               "🗳️ حل الاستفتاءات",
               "⏱️ اختبار بوقت",
             ];
+            let subtaskCompleted = 0;
 
             subtasks.forEach((sub, index) => {
               const subtask = document.createElement("div");
@@ -232,11 +252,27 @@
               if (saved === "true") {
                 checkbox.checked = true;
                 completed++;
+                subtaskCompleted++;
               }
 
               checkbox.addEventListener("change", () => {
                 localStorage.setItem(key, checkbox.checked);
                 renderTasks(name);
+                if (!checkbox.checked) return;
+
+                // إعادة التحقق بعد التأشير
+                const allDone = subtasks.every((_, idx) => {
+                  return (
+                    localStorage.getItem(
+                      `${name}-${subject}-model-${i}-step-${idx}`
+                    ) === "true"
+                  );
+                });
+
+                if (allDone) {
+                  const audio = document.getElementById("clapSound");
+                  audio.play();
+                }
               });
 
               subtask.appendChild(span);
