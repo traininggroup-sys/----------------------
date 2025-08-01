@@ -25,11 +25,13 @@
         padding: 20px;
         border-radius: 12px;
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        animation: fadeIn 1s ease;
       }
       h2 {
         color: #00796b;
         margin: 0 0 10px;
         text-align: center;
+        animation: fadeInDown 0.8s ease;
       }
       .subtitle {
         text-align: center;
@@ -66,6 +68,7 @@
         border-radius: 50%;
         object-fit: cover;
         border: 3px solid #00796b;
+        animation: bounceIn 1s;
       }
       #homePage {
         display: block;
@@ -80,6 +83,7 @@
         border-radius: 12px;
         padding: 15px;
         background: #f9f9f9;
+        animation: fadeIn 1s ease;
       }
       .task-section h4 {
         margin-bottom: 10px;
@@ -96,6 +100,7 @@
         border-radius: 10px;
         padding: 10px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        animation: fadeInUp 0.6s ease;
       }
       .task label {
         font-weight: bold;
@@ -125,6 +130,14 @@
         transition: width 0.3s ease;
       }
 
+      .celebration {
+        text-align: center;
+        font-size: 28px;
+        color: #ff9800;
+        margin-top: 10px;
+        animation: pop 0.6s ease;
+      }
+
       @media (max-width: 600px) {
         .task-grid {
           grid-template-columns: 1fr;
@@ -135,6 +148,59 @@
         }
         h2 {
           font-size: 20px;
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes bounceIn {
+        0% {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        60% {
+          transform: scale(1.1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      @keyframes pop {
+        0% {
+          transform: scale(0.8);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
         }
       }
     </style>
@@ -212,6 +278,8 @@
               "⏱️ اختبار بوقت",
             ];
 
+            let isModelDone = true;
+
             subtasks.forEach((sub, index) => {
               const subtask = document.createElement("div");
               subtask.className = "subtask";
@@ -227,6 +295,8 @@
               if (saved === "true") {
                 checkbox.checked = true;
                 completed++;
+              } else {
+                isModelDone = false;
               }
 
               checkbox.addEventListener("change", () => {
@@ -253,6 +323,7 @@
                         console.log("لم يتم تشغيل الصوت تلقائياً", e)
                       );
                   }
+                  alert(`👏 أحسنت! أنهيت ${subject} - نموذج ${i}`);
                 }
               });
 
@@ -261,6 +332,13 @@
               task.appendChild(subtask);
               totalSubtasks++;
             });
+
+            if (isModelDone) {
+              const congrats = document.createElement("div");
+              congrats.className = "celebration";
+              congrats.textContent = "🎉 أحسنت! تم إنجاز هذا النموذج بالكامل";
+              task.appendChild(congrats);
+            }
 
             grid.appendChild(task);
           }
