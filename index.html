@@ -7,6 +7,7 @@
       href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
       * {
         box-sizing: border-box;
@@ -52,10 +53,14 @@
         border-radius: 8px;
         font-weight: bold;
         cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #005a4f;
       }
       .logo {
-        width: 100px;
-        height: 100px;
+        width: 120px;
+        height: 120px;
         display: block;
         margin: 0 auto 15px;
         border-radius: 50%;
@@ -82,8 +87,8 @@
         font-size: 18px;
       }
       .task-grid {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 10px;
       }
       .task {
@@ -119,6 +124,19 @@
         background-color: #00796b;
         transition: width 0.3s ease;
       }
+
+      @media (max-width: 600px) {
+        .task-grid {
+          grid-template-columns: 1fr;
+        }
+        .logo {
+          width: 100px;
+          height: 100px;
+        }
+        h2 {
+          font-size: 20px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -132,7 +150,7 @@
 
     <!-- الواجهة الأولى -->
     <div class="container" id="homePage">
-      <img src="group-logo.png" alt="شعار الجروب" class="logo" />
+      <img src="5776125144014639249.jpg" alt="شعار الجروب" class="logo" />
       <h2>جروب أسئلة الجهاز المركزي</h2>
       <p class="subtitle">ابدأ وخلّي كل نموذج عليه علامة ✅</p>
       <input type="text" id="username" placeholder="اكتب اسمك هنا" />
