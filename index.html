@@ -136,6 +136,47 @@
         margin-top: 10px;
         animation: pop 0.6s ease;
       }
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        max-width: 90%;
+      }
+      .modal-content p {
+        margin-bottom: 20px;
+        font-size: 18px;
+      }
+      .modal-content a {
+        display: inline-block;
+        background: #00796b;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+      }
+      .modal-content button {
+        background: transparent;
+        color: #00796b;
+        border: none;
+        font-size: 16px;
+        margin-top: 10px;
+        cursor: pointer;
+      }
+
       @media (max-width: 600px) {
         .task-grid {
           grid-template-columns: 1fr;
@@ -211,6 +252,16 @@
       />
     </audio>
 
+    <!-- مودال التحفيز -->
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <p id="modalMessage">رسالة تحفيزية</p>
+        <a id="modalLink" href="#" target="_blank">اذهب الآن</a>
+        <br />
+        <button onclick="closeModal()">رجوع</button>
+      </div>
+    </div>
+
     <!-- الواجهة الأولى -->
     <div class="container" id="homePage">
       <img src="5776125144014639249.jpg" alt="شعار الجروب" class="logo" />
@@ -232,16 +283,17 @@
     <script>
       const subjects = {
         "📘 اللغة العربية": 3,
-        "📗 اللغة الإنجليزية": 3,
-        "💻 الحاسب الآلي": 3,
-        "🌍 المعلومات العامة": 3,
       };
 
-      const stepMessages = [
-        "👏 يلا حل الاستفتاءات في جروب التدريب!",
-        "💪 شاطر، فاضلك بس الاختبار بوقت، ورينا همتك!",
-        "🎉 كده خلصت النموذج، ممتاز! شير معانا في الجروب إنك خلصته 💥",
-      ];
+      function openModal(message, link) {
+        document.getElementById("modalMessage").textContent = message;
+        document.getElementById("modalLink").href = link;
+        document.getElementById("modal").style.display = "flex";
+      }
+
+      function closeModal() {
+        document.getElementById("modal").style.display = "none";
+      }
 
       function startStudy() {
         const name = document.getElementById("username").value.trim();
@@ -290,8 +342,6 @@
               "⏱️ اختبار بوقت",
             ];
 
-            let isModelDone = true;
-
             subtasks.forEach((sub, index) => {
               const subtask = document.createElement("div");
               subtask.className = "subtask";
@@ -304,44 +354,30 @@
 
               const key = `${name}-${subject}-model-${i}-step-${index}`;
               const saved = localStorage.getItem(key);
-              if (saved === "true") {
-                checkbox.checked = true;
-                completed++;
-              } else {
-                isModelDone = false;
-              }
+              if (saved === "true") checkbox.checked = true;
 
               checkbox.addEventListener("change", () => {
                 localStorage.setItem(key, checkbox.checked);
                 renderTasks(name);
-                if (!checkbox.checked) return;
 
-                setTimeout(() => {
-                  alert(stepMessages[index]);
-                }, 100);
-
-                const allDone = subtasks.every((_, idx) => {
-                  return (
-                    localStorage.getItem(
-                      `${name}-${subject}-model-${i}-step-${idx}`
-                    ) === "true"
-                  );
-                });
-
-                if (allDone) {
-                  setTimeout(() => {
-                    const audio = document.getElementById("clapSound");
-                    if (audio) {
-                      audio.pause();
-                      audio.currentTime = 0;
-                      audio
-                        .play()
-                        .catch((e) =>
-                          console.log("فشل تشغيل الصوت تلقائياً", e)
-                        );
-                    }
-                    alert(`🎉 كده خلصت ${subject} - نموذج ${i}! برافو 👏`);
-                  }, 500);
+                // فتح مودال حسب الخطوة
+                if (
+                  checkbox.checked &&
+                  subject === "📘 اللغة العربية" &&
+                  i === 1
+                ) {
+                  if (index === 1) {
+                    openModal(
+                      "🗳️ ممتاز! هل ترغب في حل استفتاء نموذج 1؟",
+                      "https://t.me/c/2299629125/5/27280"
+                    );
+                  }
+                  if (index === 2) {
+                    openModal(
+                      "⏱️ حان وقت اختبار نموذج 1! جاهز؟",
+                      "https://t.me/c/2299629125/13/29933"
+                    );
+                  }
                 }
               });
 
@@ -350,13 +386,6 @@
               task.appendChild(subtask);
               totalSubtasks++;
             });
-
-            if (isModelDone) {
-              const congrats = document.createElement("div");
-              congrats.className = "celebration";
-              congrats.textContent = "🎉 أحسنت! تم إنجاز هذا النموذج بالكامل";
-              task.appendChild(congrats);
-            }
 
             grid.appendChild(task);
           }
@@ -374,8 +403,12 @@
       }
 
       window.onload = () => {
-        document.getElementById("homePage").style.display = "block";
-        document.getElementById("tasksPage").style.display = "none";
+        const savedName = localStorage.getItem("studentName");
+        if (savedName) {
+          document.getElementById("homePage").style.display = "none";
+          document.getElementById("tasksPage").style.display = "block";
+          renderTasks(savedName);
+        }
       };
     </script>
   </body>
