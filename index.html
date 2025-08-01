@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>جروب أسئلة الجهاز المركزي</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Cairo", sans-serif;
+        margin: 0;
+        background: linear-gradient(to bottom, #d0f0fd, #ffffff);
+        direction: rtl;
+      }
+      .container {
+        max-width: 800px;
+        margin: 40px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        text-align: center;
+        animation: fadeIn 1s ease;
+      }
+      h2 {
+        color: #00796b;
+        margin-bottom: 10px;
+      }
+      p.subtitle {
+        color: #555;
+        margin-bottom: 25px;
+        font-size: 18px;
+      }
+      label,
+      input,
+      button {
+        font-size: 16px;
+      }
+      input[type="text"] {
+        padding: 12px;
+        width: 100%;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-bottom: 20px;
+      }
+      button {
+        background-color: #00796b;
+        color: white;
+        padding: 12px;
+        width: 100%;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      button:hover {
+        background-color: #004d40;
+      }
+      .logo {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #00796b;
+      }
+      #homePage {
+        display: block;
+      }
+      #tasksPage {
+        display: none;
+      }
+
+      .task-section {
+        margin-top: 30px;
+        text-align: right;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+        background: #f9f9f9;
+      }
+      .task-section h4 {
+        margin-bottom: 10px;
+        color: #004d40;
+        font-size: 20px;
+      }
+      .task-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .task {
+        background: white;
+        border-radius: 10px;
+        padding: 10px 15px;
+        width: calc(50% - 6px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+      }
+      .task:hover {
+        transform: scale(1.02);
+      }
+      .task label {
+        display: block;
+        margin-bottom: 6px;
+      }
+      .subtask {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+      }
+      .subtask input {
+        transform: scale(1.2);
+      }
+      .progress-bar {
+        height: 8px;
+        border-radius: 5px;
+        margin-top: 8px;
+        background-color: #ccc;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background-color: #00796b;
+        transition: width 0.3s ease;
+      }
+      @media (max-width: 600px) {
+        .task {
+          width: 100%;
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- الواجهة الأولى -->
+    <div class="container" id="homePage">
+      <img src="group-logo.png" alt="شعار الجروب" class="logo" />
+      <!-- استبدلي الصورة -->
+      <h2>جروب أسئلة الجهاز المركزي</h2>
+      <p class="subtitle">ابدأ دلوقتي وراقب تقدمك في كل محور 💪</p>
+      <label for="username">✍️ اسمك:</label>
+      <input type="text" id="username" placeholder="مثال: أحمد" />
+      <button onclick="startStudy()">🚀 ابدأ المذاكرة</button>
+    </div>
+
+    <!-- الواجهة الثانية -->
+    <div class="container" id="tasksPage">
+      <h2>📚 تقدّمك الدراسي</h2>
+      <div id="sections"></div>
+    </div>
+
+    <script>
+      const subjects = {
+        "📘 اللغة العربية": 3,
+        "📗 اللغة الإنجليزية": 3,
+        "💻 الحاسب الآلي": 3,
+        "🌍 المعلومات العامة": 3,
+      };
+
+      function startStudy() {
+        const name = document.getElementById("username").value.trim();
+        if (!name) return alert("من فضلك أدخل اسمك");
+        localStorage.setItem("studentName", name);
+        document.getElementById("homePage").style.display = "none";
+        document.getElementById("tasksPage").style.display = "block";
+        renderTasks(name);
+      }
+
+      function renderTasks(name) {
+        const container = document.getElementById("sections");
+        container.innerHTML = "";
+
+        for (const [subject, count] of Object.entries(subjects)) {
+          const section = document.createElement("div");
+          section.className = "task-section";
+
+          const title = document.createElement("h4");
+          title.textContent = subject;
+          section.appendChild(title);
+
+          const grid = document.createElement("div");
+          grid.className = "task-grid";
+
+          let completed = 0;
+          let totalSubtasks = 0;
+
+          for (let i = 1; i <= count; i++) {
+            const task = document.createElement("div");
+            task.className = "task";
+
+            const label = document.createElement("label");
+            label.textContent = `نموذج ${i}`;
+
+            task.appendChild(label);
+
+            const subtasks = [
+              "📖 مذاكرة النموذج",
+              "🗳️ حل الاستفتاءات",
+              "⏱️ اختبار بوقت",
+            ];
+
+            subtasks.forEach((sub, index) => {
+              const subtask = document.createElement("div");
+              subtask.className = "subtask";
+
+              const span = document.createElement("span");
+              span.textContent = sub;
+
+              const checkbox = document.createElement("input");
+              checkbox.type = "checkbox";
+
+              const key = `${name}-${subject}-model-${i}-step-${index}`;
+              const saved = localStorage.getItem(key);
+              if (saved === "true") {
+                checkbox.checked = true;
+                completed++;
+              }
+
+              checkbox.addEventListener("change", () => {
+                localStorage.setItem(key, checkbox.checked);
+                renderTasks(name);
+              });
+
+              subtask.appendChild(span);
+              subtask.appendChild(checkbox);
+              task.appendChild(subtask);
+              totalSubtasks++;
+            });
+
+            grid.appendChild(task);
+          }
+
+          const progress = document.createElement("div");
+          progress.className = "progress-bar";
+          const fill = document.createElement("div");
+          fill.className = "progress-fill";
+          fill.style.width = `${(completed / totalSubtasks) * 100}%`;
+          progress.appendChild(fill);
+          section.appendChild(progress);
+          section.appendChild(grid);
+          container.appendChild(section);
+        }
+      }
+
+      window.onload = () => {
+        const savedName = localStorage.getItem("studentName");
+        if (savedName) {
+          document.getElementById("homePage").style.display = "none";
+          document.getElementById("tasksPage").style.display = "block";
+          renderTasks(savedName);
+        }
+      };
+    </script>
+  </body>
+</html>
