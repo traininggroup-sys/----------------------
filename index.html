@@ -25,13 +25,12 @@
         padding: 20px;
         border-radius: 12px;
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-        animation: fadeIn 1s ease;
+        animation: fadeIn 0.6s ease;
       }
       h2 {
         color: #00796b;
         margin: 0 0 10px;
         text-align: center;
-        animation: fadeInDown 0.8s ease;
       }
       .subtitle {
         text-align: center;
@@ -68,7 +67,6 @@
         border-radius: 50%;
         object-fit: cover;
         border: 3px solid #00796b;
-        animation: bounceIn 1s;
       }
       #homePage {
         display: block;
@@ -83,7 +81,6 @@
         border-radius: 12px;
         padding: 15px;
         background: #f9f9f9;
-        animation: fadeIn 1s ease;
       }
       .task-section h4 {
         margin-bottom: 10px;
@@ -100,7 +97,6 @@
         border-radius: 10px;
         padding: 10px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        animation: fadeInUp 0.6s ease;
       }
       .task label {
         font-weight: bold;
@@ -128,13 +124,6 @@
         height: 100%;
         background-color: #00796b;
         transition: width 0.3s ease;
-      }
-      .celebration {
-        text-align: center;
-        font-size: 22px;
-        color: #ff9800;
-        margin-top: 10px;
-        animation: pop 0.6s ease;
       }
       .modal {
         position: fixed;
@@ -176,7 +165,6 @@
         margin-top: 10px;
         cursor: pointer;
       }
-
       @media (max-width: 600px) {
         .task-grid {
           grid-template-columns: 1fr;
@@ -187,58 +175,6 @@
         }
         h2 {
           font-size: 20px;
-        }
-      }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
-      @keyframes fadeInDown {
-        from {
-          opacity: 0;
-          transform: translateY(-10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      @keyframes bounceIn {
-        0% {
-          transform: scale(0.8);
-          opacity: 0;
-        }
-        60% {
-          transform: scale(1.1);
-          opacity: 1;
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
-      @keyframes pop {
-        0% {
-          transform: scale(0.8);
-        }
-        50% {
-          transform: scale(1.2);
-        }
-        100% {
-          transform: scale(1);
         }
       }
     </style>
@@ -252,7 +188,7 @@
       />
     </audio>
 
-    <!-- مودال التحفيز -->
+    <!-- مودال -->
     <div id="modal" class="modal">
       <div class="modal-content">
         <p id="modalMessage">رسالة تحفيزية</p>
@@ -296,7 +232,8 @@
       }
 
       function startStudy() {
-        const name = document.getElementById("username").value.trim();
+        const nameInput = document.getElementById("username");
+        const name = nameInput.value.trim();
         if (!name) return alert("من فضلك أدخل اسمك");
         localStorage.setItem("studentName", name);
         document.getElementById("homePage").style.display = "none";
@@ -308,6 +245,7 @@
         localStorage.removeItem("studentName");
         document.getElementById("homePage").style.display = "block";
         document.getElementById("tasksPage").style.display = "none";
+        document.getElementById("username").value = "";
       }
 
       function renderTasks(name) {
@@ -359,8 +297,6 @@
               checkbox.addEventListener("change", () => {
                 localStorage.setItem(key, checkbox.checked);
                 renderTasks(name);
-
-                // فتح مودال حسب الخطوة
                 if (
                   checkbox.checked &&
                   subject === "📘 اللغة العربية" &&
@@ -405,9 +341,7 @@
       window.onload = () => {
         const savedName = localStorage.getItem("studentName");
         if (savedName) {
-          document.getElementById("homePage").style.display = "none";
-          document.getElementById("tasksPage").style.display = "block";
-          renderTasks(savedName);
+          document.getElementById("username").value = savedName;
         }
       };
     </script>
