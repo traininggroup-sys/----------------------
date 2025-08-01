@@ -129,15 +129,13 @@
         background-color: #00796b;
         transition: width 0.3s ease;
       }
-
       .celebration {
         text-align: center;
-        font-size: 28px;
+        font-size: 22px;
         color: #ff9800;
         margin-top: 10px;
         animation: pop 0.6s ease;
       }
-
       @media (max-width: 600px) {
         .task-grid {
           grid-template-columns: 1fr;
@@ -150,7 +148,6 @@
           font-size: 20px;
         }
       }
-
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -240,6 +237,12 @@
         "🌍 المعلومات العامة": 3,
       };
 
+      const stepMessages = [
+        "👏 يلا حل الاستفتاءات في جروب التدريب!",
+        "💪 شاطر، فاضلك بس الاختبار بوقت، ورينا همتك!",
+        "🎉 كده خلصت النموذج، ممتاز! شير معانا في الجروب إنك خلصته 💥",
+      ];
+
       function startStudy() {
         const name = document.getElementById("username").value.trim();
         if (!name) return alert("من فضلك أدخل اسمك");
@@ -250,7 +253,6 @@
       }
 
       function resetSession() {
-        // لا نحذف التقدم، فقط نعيد المستخدم لبداية
         localStorage.removeItem("studentName");
         document.getElementById("homePage").style.display = "block";
         document.getElementById("tasksPage").style.display = "none";
@@ -314,6 +316,10 @@
                 renderTasks(name);
                 if (!checkbox.checked) return;
 
+                setTimeout(() => {
+                  alert(stepMessages[index]);
+                }, 100);
+
                 const allDone = subtasks.every((_, idx) => {
                   return (
                     localStorage.getItem(
@@ -323,17 +329,19 @@
                 });
 
                 if (allDone) {
-                  const audio = document.getElementById("clapSound");
-                  if (audio) {
-                    audio.pause();
-                    audio.currentTime = 0;
-                    audio
-                      .play()
-                      .catch((e) =>
-                        console.log("لم يتم تشغيل الصوت تلقائياً", e)
-                      );
-                  }
-                  alert(`👏 أحسنت! أنهيت ${subject} - نموذج ${i}`);
+                  setTimeout(() => {
+                    const audio = document.getElementById("clapSound");
+                    if (audio) {
+                      audio.pause();
+                      audio.currentTime = 0;
+                      audio
+                        .play()
+                        .catch((e) =>
+                          console.log("فشل تشغيل الصوت تلقائياً", e)
+                        );
+                    }
+                    alert(`🎉 كده خلصت ${subject} - نموذج ${i}! برافو 👏`);
+                  }, 500);
                 }
               });
 
@@ -366,7 +374,6 @@
       }
 
       window.onload = () => {
-        // دايماً نبدأ من الواجهة الأولى
         document.getElementById("homePage").style.display = "block";
         document.getElementById("tasksPage").style.display = "none";
       };
