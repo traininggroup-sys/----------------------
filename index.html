@@ -73,7 +73,6 @@
 
       .module h2 {
         margin-top: 0;
-        color: #023e8a;
         border-bottom: 2px solid #ccc;
         padding-bottom: 10px;
         margin-bottom: 15px;
@@ -117,6 +116,19 @@
       .admin-actions {
         margin-top: 10px;
       }
+
+      .module[data-section="معلومات عامة"] h2 {
+        color: #0a9396;
+      }
+      .module[data-section="عربي"] h2 {
+        color: #ae2012;
+      }
+      .module[data-section="حاسب"] h2 {
+        color: #005f73;
+      }
+      .module[data-section="انجليزي"] h2 {
+        color: #3a0ca3;
+      }
     </style>
   </head>
   <body>
@@ -137,7 +149,8 @@
         <select id="module-select"></select>
         <div class="admin-actions">
           <button onclick="addModel()">➕ إضافة نموذج</button>
-          <button onclick="confirmRemoveModel()">🗑️ حذف آخر نموذج</button>
+          <select id="delete-model-select"></select>
+          <button onclick="confirmRemoveModel()">🗑️ حذف نموذج محدد</button>
         </div>
       </div>
 
@@ -148,6 +161,13 @@
     <script>
       const adminName = "نجلا";
       const tasks = ["مذاكرة النموذج", "حل الاستفتاءات", "حل الاختبار بوقت"];
+      const prayers = [
+        "🤲 اللهم وفقني في هذا العلم وانفعني به",
+        "🤲 اللهم اجعل هذا المجهود في ميزان حسناتي",
+        "🤲 اللهم لا سهل إلا ما جعلته سهلًا",
+        "🤲 رب زدني علمًا ويسر لي أمري",
+        "🤲 اللهم ثبت قلبي على الحفظ والفهم",
+      ];
       let username = "";
       let userKey = "";
       let userData = {};
@@ -186,14 +206,17 @@
 
       const generateModules = () => {
         const container = document.getElementById("content");
+        const deleteSelect = document.getElementById("delete-model-select");
         container.innerHTML = "";
+        deleteSelect.innerHTML = "";
 
         for (const [section, count] of Object.entries(moduleCounts)) {
           const moduleDiv = document.createElement("div");
           moduleDiv.className = "module";
+          moduleDiv.dataset.section = section;
 
           const title = document.createElement("h2");
-          title.textContent = section;
+          title.innerHTML = `<i class="fa-solid fa-book"></i> ${section}`;
           moduleDiv.appendChild(title);
 
           for (let i = 1; i <= count; i++) {
@@ -202,9 +225,7 @@
             modelTitle.style.margin = "10px 0 5px";
             moduleDiv.appendChild(modelTitle);
 
-            let completed = 0;
             const modelTaskKeys = [];
-
             tasks.forEach((task, idx) => {
               const taskDiv = document.createElement("div");
               taskDiv.className = "task";
@@ -217,7 +238,6 @@
               if (userData[taskKey]) {
                 checkbox.checked = true;
                 taskDiv.classList.add("completed");
-                completed++;
               }
 
               checkbox.addEventListener("change", () => {
@@ -227,7 +247,9 @@
                 if (
                   tasks.every((_, tIdx) => userData[`${section}_${i}_${tIdx}`])
                 ) {
-                  alert("دعاء: اللهم وفقني وثبتني وبارك لي في وقتي وجهدي 🤲");
+                  const randomPrayer =
+                    prayers[Math.floor(Math.random() * prayers.length)];
+                  alert(randomPrayer);
                 }
                 showMotivation();
               });
@@ -239,6 +261,11 @@
               taskDiv.appendChild(checkbox);
               moduleDiv.appendChild(taskDiv);
             });
+
+            const option = document.createElement("option");
+            option.value = `${section}_${i}`;
+            option.textContent = `${section} - نموذج ${i}`;
+            deleteSelect.appendChild(option);
           }
 
           container.appendChild(moduleDiv);
@@ -269,14 +296,17 @@
       };
 
       const confirmRemoveModel = () => {
-        const section = document.getElementById("module-select").value;
-        if (moduleCounts[section] > 1) {
-          if (confirm(`هل أنت متأكدة من حذف آخر نموذج من قسم ${section}؟`)) {
+        const selected = document.getElementById("delete-model-select").value;
+        if (!selected) return;
+        const [section, indexStr] = selected.split("_");
+        const index = parseInt(indexStr);
+        if (moduleCounts[section] >= index) {
+          if (
+            confirm(`هل أنت متأكدة من حذف نموذج ${index} من قسم ${section}؟`)
+          ) {
             moduleCounts[section]--;
             generateModules();
           }
-        } else {
-          alert("لا يمكن حذف جميع النماذج!");
         }
       };
     </script>
