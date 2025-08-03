@@ -130,7 +130,7 @@
   </head>
   <body>
     <section class="start-screen" id="start-screen">
-      <img src="5776125144014639249.jpg" alt="شعار الجروب" />
+      <img src="logo.jpg" alt="شعار الجروب" />
       <h1>جروب أسئلة الجهاز المركزي</h1>
       <input
         id="nameInput"
@@ -175,11 +175,19 @@
         "🗣️ انجليزي": 16,
       };
 
+      window.onload = () => {
+        const savedName = localStorage.getItem("centralUserName");
+        if (savedName) {
+          document.getElementById("nameInput").value = savedName;
+        }
+      };
+
       const startApp = () => {
         const name = document.getElementById("nameInput").value.trim();
         if (!name) return;
 
         username = name;
+        localStorage.setItem("centralUserName", username);
         userKey = `centralUser_${username}`;
         userData = JSON.parse(localStorage.getItem(userKey)) || {};
 
