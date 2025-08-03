@@ -68,11 +68,15 @@
         padding: 15px;
         margin-bottom: 20px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border: 1px solid #ccc;
       }
 
       .module h2 {
         margin-top: 0;
         color: #023e8a;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
       }
 
       .task {
@@ -109,6 +113,10 @@
         background: #eef;
         border-radius: 10px;
       }
+
+      .admin-actions {
+        margin-top: 10px;
+      }
     </style>
   </head>
   <body>
@@ -127,7 +135,10 @@
       <div id="admin-tools">
         <h3>لوحة التحكم للمشرفة (نجلا)</h3>
         <select id="module-select"></select>
-        <button onclick="addModel()">➕ إضافة نموذج</button>
+        <div class="admin-actions">
+          <button onclick="addModel()">➕ إضافة نموذج</button>
+          <button onclick="confirmRemoveModel()">🗑️ حذف آخر نموذج</button>
+        </div>
       </div>
 
       <div id="content"></div>
@@ -186,6 +197,14 @@
           moduleDiv.appendChild(title);
 
           for (let i = 1; i <= count; i++) {
+            const modelTitle = document.createElement("h4");
+            modelTitle.textContent = `نموذج ${i}`;
+            modelTitle.style.margin = "10px 0 5px";
+            moduleDiv.appendChild(modelTitle);
+
+            let completed = 0;
+            const modelTaskKeys = [];
+
             tasks.forEach((task, idx) => {
               const taskDiv = document.createElement("div");
               taskDiv.className = "task";
@@ -193,20 +212,28 @@
               const checkbox = document.createElement("input");
               checkbox.type = "checkbox";
               const taskKey = `${section}_${i}_${idx}`;
+              modelTaskKeys.push(taskKey);
+
               if (userData[taskKey]) {
                 checkbox.checked = true;
                 taskDiv.classList.add("completed");
+                completed++;
               }
 
               checkbox.addEventListener("change", () => {
                 userData[taskKey] = checkbox.checked;
                 localStorage.setItem(userKey, JSON.stringify(userData));
                 taskDiv.classList.toggle("completed", checkbox.checked);
+                if (
+                  tasks.every((_, tIdx) => userData[`${section}_${i}_${tIdx}`])
+                ) {
+                  alert("دعاء: اللهم وفقني وثبتني وبارك لي في وقتي وجهدي 🤲");
+                }
                 showMotivation();
               });
 
               const label = document.createElement("label");
-              label.textContent = `${task} - نموذج ${i}`;
+              label.textContent = task;
 
               taskDiv.appendChild(label);
               taskDiv.appendChild(checkbox);
@@ -239,6 +266,18 @@
         const section = document.getElementById("module-select").value;
         moduleCounts[section]++;
         generateModules();
+      };
+
+      const confirmRemoveModel = () => {
+        const section = document.getElementById("module-select").value;
+        if (moduleCounts[section] > 1) {
+          if (confirm(`هل أنت متأكدة من حذف آخر نموذج من قسم ${section}؟`)) {
+            moduleCounts[section]--;
+            generateModules();
+          }
+        } else {
+          alert("لا يمكن حذف جميع النماذج!");
+        }
       };
     </script>
   </body>
