@@ -15,22 +15,31 @@
       body {
         font-family: "Cairo", sans-serif;
         margin: 0;
-        background: #f0f0f0;
         direction: rtl;
+        background: linear-gradient(135deg, #e0f7fa, #e1bee7);
+        animation: gradientShift 10s ease infinite alternate;
+      }
+      @keyframes gradientShift {
+        0% {
+          background: linear-gradient(135deg, #e0f7fa, #e1bee7);
+        }
+        100% {
+          background: linear-gradient(135deg, #ffe082, #80d8ff);
+        }
       }
       .container {
-        max-width: 800px;
-        margin: 0 auto;
+        max-width: 900px;
+        margin: 30px auto;
         background: white;
         padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
-        animation: fadeIn 0.6s ease;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 0.8s ease;
       }
       @keyframes fadeIn {
         from {
           opacity: 0;
-          transform: translateY(10px);
+          transform: translateY(20px);
         }
         to {
           opacity: 1;
@@ -38,7 +47,7 @@
         }
       }
       h2 {
-        color: #00796b;
+        color: #6a1b9a;
         margin: 0 0 10px;
         text-align: center;
       }
@@ -47,27 +56,45 @@
         color: #555;
         margin-bottom: 20px;
       }
+      .motivator {
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        color: #00796b;
+        margin-bottom: 15px;
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
       input[type="text"] {
         padding: 10px;
         width: 100%;
         border: 1px solid #ccc;
-        border-radius: 6px;
+        border-radius: 8px;
         margin-bottom: 10px;
         font-size: 16px;
       }
       button {
-        background-color: #00796b;
+        background-color: #6a1b9a;
         color: white;
         padding: 12px;
         width: 100%;
         border: none;
-        border-radius: 8px;
+        border-radius: 10px;
         font-weight: bold;
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: all 0.3s;
       }
       button:hover {
-        background-color: #005a4f;
+        background-color: #4a148c;
+        transform: scale(1.03);
       }
       .logo {
         width: 120px;
@@ -76,7 +103,8 @@
         margin: 0 auto 15px;
         border-radius: 50%;
         object-fit: cover;
-        border: 3px solid #00796b;
+        border: 4px solid #6a1b9a;
+        box-shadow: 0 0 20px rgba(106, 27, 154, 0.5);
       }
       #homePage {
         display: block;
@@ -84,18 +112,38 @@
       #tasksPage {
         display: none;
       }
-
+      .success-msg {
+        background: #c8e6c9;
+        color: #2e7d32;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 10px 0;
+        font-weight: bold;
+        animation: bounce 0.6s ease;
+        text-align: center;
+      }
+      @keyframes bounce {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
       .task-section {
         margin-top: 20px;
-        border: 1px solid #eee;
+        border: 2px solid #eee;
         border-radius: 12px;
         padding: 15px;
-        background: #f9f9f9;
+        background: #fafafa;
       }
       .task-section h4 {
         margin-bottom: 10px;
-        color: #004d40;
-        font-size: 18px;
+        color: #4a148c;
+        font-size: 20px;
       }
       .task-grid {
         display: grid;
@@ -107,18 +155,10 @@
         border-radius: 10px;
         padding: 10px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        animation: pulse 0.3s;
+        transition: transform 0.3s;
       }
-      @keyframes pulse {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.02);
-        }
-        100% {
-          transform: scale(1);
-        }
+      .task:hover {
+        transform: translateY(-3px);
       }
       .task label {
         font-weight: bold;
@@ -144,59 +184,22 @@
       }
       .progress-fill {
         height: 100%;
-        background-color: #00796b;
+        background-color: #6a1b9a;
         transition: width 0.3s ease;
       }
-      .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-      }
-      .modal-content {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
+      #fullSubjectMsg {
+        background: #ffd54f;
+        padding: 12px;
         text-align: center;
-        max-width: 90%;
-      }
-      .modal-content p {
-        margin-bottom: 20px;
-        font-size: 18px;
-      }
-      .modal-content a {
-        display: inline-block;
-        background: #00796b;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 8px;
-        text-decoration: none;
         font-weight: bold;
-      }
-      .modal-content button {
-        background: transparent;
-        color: #00796b;
-        border: none;
-        font-size: 16px;
-        margin-top: 10px;
-        cursor: pointer;
+        color: #bf360c;
+        border-radius: 10px;
+        margin-top: 20px;
+        animation: fadeIn 1s ease-in;
       }
       @media (max-width: 600px) {
         .task-grid {
           grid-template-columns: 1fr;
-        }
-        .logo {
-          width: 100px;
-          height: 100px;
-        }
-        h2 {
-          font-size: 20px;
         }
       }
     </style>
@@ -209,57 +212,31 @@
       />
     </audio>
 
-    <div id="modal" class="modal">
-      <div class="modal-content">
-        <p id="modalMessage">رسالة تحفيزية</p>
-        <a id="modalLink" href="#" target="_blank">اذهب الآن</a>
-        <br />
-        <button onclick="handleCancel()">رجوع</button>
-      </div>
-    </div>
-
     <div class="container" id="homePage">
       <img src="5776125144014639249.jpg" alt="شعار الجروب" class="logo" />
       <h2>جروب أسئلة الجهاز المركزي</h2>
-      <p class="subtitle">ابدأ وخلّي كل نموذج عليه علامة ✅</p>
+      <p class="subtitle">ابدأ رحلتك وخلي كل نموذج عليه علامة ✅</p>
+      <p class="motivator">خطوة واحدة بتقربك من هدفك... يلا نبدأ! 💪</p>
       <input type="text" id="username" placeholder="اكتب اسمك هنا" />
       <button onclick="startStudy()">ابدأ</button>
     </div>
 
     <div class="container" id="tasksPage">
-      <h2>تقدمك الدراسي</h2>
+      <h2>تقدمك الدراسي 🎯</h2>
       <div id="sections"></div>
-      <div style="text-align: center; margin-top: 20px">
-        <button onclick="resetSession()">تسجيل خروج</button>
-      </div>
+      <div id="fullSubjectMsg"></div>
     </div>
 
     <script>
       const subjects = {
-        "📘 اللغة العربية": 3,
+        "📘 اللغة العربية": 17,
+        "📗 اللغة الإنجليزية": 16,
+        "💻 الحاسب الآلي": 22,
+        "🌍 المعلومات العامة": 23,
       };
 
-      let currentCancelKey = null;
-
-      function openModal(message, link, key) {
-        document.getElementById("modalMessage").textContent = message;
-        document.getElementById("modalLink").href = link;
-        document.getElementById("modal").style.display = "flex";
-        currentCancelKey = key;
-      }
-
-      function handleCancel() {
-        if (currentCancelKey) {
-          localStorage.setItem(currentCancelKey, false);
-          currentCancelKey = null;
-        }
-        document.getElementById("modal").style.display = "none";
-        renderTasks(localStorage.getItem("studentName"));
-      }
-
       function startStudy() {
-        const nameInput = document.getElementById("username");
-        const name = nameInput.value.trim();
+        const name = document.getElementById("username").value.trim();
         if (!name) return alert("من فضلك أدخل اسمك");
         localStorage.setItem("studentName", name);
         document.getElementById("homePage").style.display = "none";
@@ -267,16 +244,11 @@
         renderTasks(name);
       }
 
-      function resetSession() {
-        localStorage.removeItem("studentName");
-        document.getElementById("homePage").style.display = "block";
-        document.getElementById("tasksPage").style.display = "none";
-        document.getElementById("username").value = "";
-      }
-
       function renderTasks(name) {
         const container = document.getElementById("sections");
+        const msgBox = document.getElementById("fullSubjectMsg");
         container.innerHTML = "";
+        msgBox.innerHTML = "";
 
         for (const [subject, count] of Object.entries(subjects)) {
           const section = document.createElement("div");
@@ -305,11 +277,6 @@
               "🗳️ حل الاستفتاءات",
               "⏱️ اختبار بوقت",
             ];
-            const links = [
-              "",
-              "https://t.me/c/2299629125/5/27280",
-              "https://t.me/c/2299629125/13/29933",
-            ];
 
             subtasks.forEach((sub, index) => {
               const subtask = document.createElement("div");
@@ -323,41 +290,26 @@
 
               const key = `${name}-${subject}-model-${i}-step-${index}`;
               const saved = localStorage.getItem(key);
-              if (saved === "true") checkbox.checked = true;
+              if (saved === "true") {
+                checkbox.checked = true;
+                completed++;
+              }
 
               checkbox.addEventListener("change", () => {
                 localStorage.setItem(key, checkbox.checked);
-                if (!checkbox.checked) return renderTasks(name);
+                renderTasks(name);
+                if (!checkbox.checked) return;
 
-                if (index === 1 || index === 2) {
-                  openModal(
-                    index === 1
-                      ? `✅ يلا دلوقتي حل استفتاء نموذج ${i}`
-                      : `⏱️ حان وقت اختبار نموذج ${i}`,
-                    links[index],
-                    key
-                  );
-                } else {
-                  renderTasks(name);
-                }
-
-                const allDone = subtasks.every(
-                  (_, idx) =>
+                const allDone = subtasks.every((_, idx) => {
+                  return (
                     localStorage.getItem(
                       `${name}-${subject}-model-${i}-step-${idx}`
                     ) === "true"
-                );
+                  );
+                });
+
                 if (allDone) {
-                  const audio = document.getElementById("clapSound");
-                  if (audio) {
-                    audio.pause();
-                    audio.currentTime = 0;
-                    audio
-                      .play()
-                      .catch((e) =>
-                        console.log("لم يتم تشغيل الصوت تلقائياً", e)
-                      );
-                  }
+                  document.getElementById("clapSound").play();
                 }
               });
 
@@ -379,6 +331,10 @@
           section.appendChild(progress);
           section.appendChild(grid);
           container.appendChild(section);
+
+          if (completed === totalSubtasks) {
+            msgBox.innerHTML += `<div class='success-msg'>🎉 مبروك! أنهيت كل نماذج ${subject} بنجاح! استعد لباقي المحاور!</div>`;
+          }
         }
       }
 
@@ -386,6 +342,8 @@
         const savedName = localStorage.getItem("studentName");
         if (savedName) {
           document.getElementById("username").value = savedName;
+          document.getElementById("homePage").style.display = "block";
+          document.getElementById("tasksPage").style.display = "none";
         }
       };
     </script>
