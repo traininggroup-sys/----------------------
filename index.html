@@ -201,7 +201,6 @@
           <button onclick="confirmRemoveModel()">🗑️ حذف آخر نموذج</button>
         </div>
       </div>
-
       <div id="content"></div>
       <div class="motivator" id="motivator"></div>
     </main>
@@ -314,9 +313,10 @@
             checkbox.addEventListener("change", () => {
               userData[taskKey] = checkbox.checked;
               localStorage.setItem(userKey, JSON.stringify(userData));
+
               if (checkbox.checked) {
                 fetch(
-                  "https://script.google.com/macros/s/AKfycbxqQ6_LR8pLkDZih6dijU7P2ohDPz6mGuCHKQA8474/exec",
+                  "https://script.google.com/macros/s/AKfycbzjK9rFHOGNb0gq0d7uhlZMbgJTvsxbq4XIBU160u22cZusp_XI1M0ufsL82NUPOZjW/exec",
                   {
                     method: "POST",
                     body: JSON.stringify({
