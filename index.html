@@ -2,66 +2,67 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>جروب أسئلة الجهاز المركزي</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap"
       rel="stylesheet"
     />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-      * {
-        box-sizing: border-box;
-      }
       body {
         font-family: "Cairo", sans-serif;
         margin: 0;
-        direction: rtl;
-        background: linear-gradient(135deg, #e0f7fa, #e1bee7);
-        animation: gradientShift 10s ease infinite alternate;
+        padding: 0;
+        background: linear-gradient(to bottom right, #e1f5fe, #ede7f6);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
-      @keyframes gradientShift {
-        0% {
-          background: linear-gradient(135deg, #e0f7fa, #e1bee7);
-        }
-        100% {
-          background: linear-gradient(135deg, #ffe082, #80d8ff);
-        }
+      .card {
+        background: #fff;
+        padding: 30px;
+        border-radius: 20px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+        animation: slideFade 0.7s ease forwards;
       }
-      .container {
-        max-width: 900px;
-        margin: 30px auto;
-        background: white;
-        padding: 20px;
-        border-radius: 16px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-        animation: fadeIn 0.8s ease;
-      }
-      @keyframes fadeIn {
+      @keyframes slideFade {
         from {
           opacity: 0;
-          transform: translateY(20px);
+          transform: translateY(30px);
         }
         to {
           opacity: 1;
           transform: translateY(0);
         }
       }
-      h2 {
-        color: #6a1b9a;
-        margin: 0 0 10px;
-        text-align: center;
+      .logo {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #6a1b9a;
+        margin-bottom: 20px;
+        box-shadow: 0 0 15px rgba(106, 27, 154, 0.3);
+      }
+      h1 {
+        font-size: 22px;
+        margin-bottom: 10px;
+        color: #4527a0;
       }
       .subtitle {
-        text-align: center;
-        color: #555;
-        margin-bottom: 20px;
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 15px;
       }
       .motivator {
-        text-align: center;
-        font-size: 18px;
-        font-weight: bold;
+        font-size: 17px;
         color: #00796b;
-        margin-bottom: 15px;
+        font-weight: bold;
+        margin-bottom: 25px;
         animation: pulse 2s infinite;
       }
       @keyframes pulse {
@@ -70,245 +71,43 @@
           transform: scale(1);
         }
         50% {
-          transform: scale(1.05);
+          transform: scale(1.03);
         }
       }
       input[type="text"] {
-        padding: 10px;
+        padding: 12px;
         width: 100%;
         border: 1px solid #ccc;
-        border-radius: 8px;
-        margin-bottom: 10px;
+        border-radius: 10px;
         font-size: 16px;
+        margin-bottom: 15px;
       }
       button {
         background-color: #6a1b9a;
         color: white;
-        padding: 12px;
-        width: 100%;
+        padding: 12px 20px;
         border: none;
-        border-radius: 10px;
+        border-radius: 12px;
+        font-size: 16px;
         font-weight: bold;
         cursor: pointer;
-        transition: all 0.3s;
+        width: 100%;
+        transition: background-color 0.3s, transform 0.2s;
       }
       button:hover {
         background-color: #4a148c;
-        transform: scale(1.03);
-      }
-      .logo {
-        width: 120px;
-        height: 120px;
-        display: block;
-        margin: 0 auto 15px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 4px solid #6a1b9a;
-        box-shadow: 0 0 20px rgba(106, 27, 154, 0.5);
-      }
-      #homePage {
-        display: block;
-      }
-      #tasksPage {
-        display: none;
-      }
-      .success-msg {
-        background: #c8e6c9;
-        color: #2e7d32;
-        border-radius: 10px;
-        padding: 10px;
-        margin: 10px 0;
-        font-weight: bold;
-        animation: bounce 0.6s ease;
-        text-align: center;
-      }
-      .popup {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        background: #ffeb3b;
-        padding: 12px;
-        border-radius: 12px;
-        font-weight: bold;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        z-index: 9999;
-        animation: fadeInUp 0.5s ease;
-      }
-      @keyframes fadeInUp {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      .popup a {
-        color: #d84315;
-        text-decoration: none;
+        transform: scale(1.02);
       }
     </style>
   </head>
   <body>
-    <audio id="clapSound" preload="auto">
-      <source
-        src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_197dce6b89.mp3?filename=small-applause-1-110123.mp3"
-        type="audio/mpeg"
-      />
-    </audio>
-
-    <div class="container" id="homePage">
+    <div class="card">
       <img src="5776125144014639249.jpg" alt="شعار الجروب" class="logo" />
-      <h2>جروب أسئلة الجهاز المركزي</h2>
+      <h1>جروب أسئلة لجهاز نجوز المركزي</h1>
       <p class="subtitle">ابدأ رحلتك وخلي كل نموذج عليه علامة ✅</p>
-      <p class="motivator">خطوة واحدة بتقربك من هدفك... يلا نبدأ! 💪</p>
-      <input type="text" id="username" placeholder="اكتب اسمك هنا" />
-      <button onclick="startStudy()">ابدأ</button>
+      <p class="motivator">خطوة واحدة بتقربك من هدفك 💪 يلا نبدأ!</p>
+      <input type="text" placeholder="اكتب اسمك هنا" />
+      <button>ابدأ</button>
     </div>
-
-    <div class="container" id="tasksPage">
-      <h2>تقدمك الدراسي 🎯</h2>
-      <div id="sections"></div>
-      <div id="fullSubjectMsg"></div>
-    </div>
-
-    <div id="popupBox" class="popup" style="display: none"></div>
-
-    <script>
-      const subjects = {
-        "📘 اللغة العربية": 17,
-        "📗 اللغة الإنجليزية": 16,
-        "💻 الحاسب الآلي": 22,
-        "🌍 المعلومات العامة": 23,
-      };
-
-      const popups = {
-        "📘 اللغة العربية-1-1":
-          'يلا روح حل الاستفتاءات <a href="https://t.me/c/2299629125/5/27280" target="_blank">من هنا</a>',
-        "📘 اللغة العربية-1-2":
-          'يلا اختبر نفسك بوقت <a href="https://t.me/c/2299629125/13/29933" target="_blank">من هنا</a>',
-      };
-
-      function showPopup(message) {
-        const popup = document.getElementById("popupBox");
-        popup.innerHTML = message;
-        popup.style.display = "block";
-        setTimeout(() => (popup.style.display = "none"), 5000);
-      }
-
-      function startStudy() {
-        const name = document.getElementById("username").value.trim();
-        if (!name) return alert("من فضلك أدخل اسمك");
-        localStorage.setItem("studentName", name);
-        document.getElementById("homePage").style.display = "none";
-        document.getElementById("tasksPage").style.display = "block";
-        renderTasks(name);
-      }
-
-      function renderTasks(name) {
-        const container = document.getElementById("sections");
-        const msgBox = document.getElementById("fullSubjectMsg");
-        container.innerHTML = "";
-        msgBox.innerHTML = "";
-
-        for (const [subject, count] of Object.entries(subjects)) {
-          const section = document.createElement("div");
-          section.className = "task-section";
-
-          const title = document.createElement("h4");
-          title.textContent = subject;
-          section.appendChild(title);
-
-          let completed = 0;
-          let totalSubtasks = 0;
-
-          for (let i = 1; i <= count; i++) {
-            const task = document.createElement("div");
-            task.className = "task";
-
-            const label = document.createElement("label");
-            label.textContent = `نموذج ${i}`;
-            task.appendChild(label);
-
-            const subtasks = [
-              "📖 مذاكرة النموذج",
-              "🗳️ حل الاستفتاءات",
-              "⏱️ اختبار بوقت",
-            ];
-
-            subtasks.forEach((sub, index) => {
-              const subtask = document.createElement("div");
-              subtask.className = "subtask";
-
-              const span = document.createElement("span");
-              span.innerHTML = sub;
-
-              const checkbox = document.createElement("input");
-              checkbox.type = "checkbox";
-
-              const key = `${name}-${subject}-model-${i}-step-${index}`;
-              const popupKey = `${subject}-${i}-${index}`;
-              const saved = localStorage.getItem(key);
-              if (saved === "true") {
-                checkbox.checked = true;
-                completed++;
-              }
-
-              checkbox.addEventListener("change", () => {
-                localStorage.setItem(key, checkbox.checked);
-                renderTasks(name);
-                if (!checkbox.checked) return;
-
-                if (popups[popupKey]) {
-                  showPopup(popups[popupKey]);
-                }
-
-                const allDone = subtasks.every((_, idx) => {
-                  return (
-                    localStorage.getItem(
-                      `${name}-${subject}-model-${i}-step-${idx}`
-                    ) === "true"
-                  );
-                });
-
-                if (allDone) {
-                  document.getElementById("clapSound").play();
-                }
-              });
-
-              subtask.appendChild(span);
-              subtask.appendChild(checkbox);
-              task.appendChild(subtask);
-              totalSubtasks++;
-            });
-
-            section.appendChild(task);
-          }
-
-          const progress = document.createElement("div");
-          progress.className = "progress-bar";
-          const fill = document.createElement("div");
-          fill.className = "progress-fill";
-          fill.style.width = `${(completed / totalSubtasks) * 100}%`;
-          progress.appendChild(fill);
-          section.appendChild(progress);
-          container.appendChild(section);
-
-          if (completed === totalSubtasks) {
-            msgBox.innerHTML += `<div class='success-msg'>🎉 مبروك! أنهيت كل نماذج ${subject} بنجاح! استعد لباقي المحاور!</div>`;
-          }
-        }
-      }
-
-      window.onload = () => {
-        const savedName = localStorage.getItem("studentName");
-        if (savedName) {
-          document.getElementById("username").value = savedName;
-          document.getElementById("homePage").style.display = "block";
-          document.getElementById("tasksPage").style.display = "none";
-        }
-      };
-    </script>
   </body>
 </html>
