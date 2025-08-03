@@ -42,106 +42,72 @@
         height: 100px;
         object-fit: cover;
         border-radius: 50%;
-        border: 3px solid white;
+        border: 3px solid #fff;
         margin-bottom: 15px;
-      }
-
-      .start-screen input {
-        padding: 10px;
-        font-size: 16px;
-        border-radius: 5px;
-        border: none;
-        margin-bottom: 15px;
-        width: 250px;
-        text-align: center;
       }
 
       .start-btn {
         padding: 12px 30px;
         font-size: 18px;
-        background-color: #00a896;
+        background-color: #0096c7;
         border: none;
-        border-radius: 25px;
+        border-radius: 30px;
         color: white;
         cursor: pointer;
-        transition: background 0.3s;
-      }
-
-      .start-btn:hover {
-        background-color: #028090;
       }
 
       main {
         display: none;
         padding: 20px;
-        background-color: #fefefe;
+        background-color: #fafafa;
       }
 
-      .section {
-        margin-bottom: 40px;
-        border: 2px dashed #ccc;
+      .module {
+        background: white;
         border-radius: 10px;
-        padding: 20px;
-      }
-
-      .section h2 {
-        color: #004e64;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .section h2 i {
-        color: #0077b6;
-      }
-
-      .model-box {
-        background-color: #ffffff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        margin-top: 10px;
         padding: 15px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+
+      .module h2 {
+        margin-top: 0;
+        color: #023e8a;
       }
 
       .task {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 8px 0;
-        border-bottom: 1px solid #eee;
+        padding: 10px 0;
+        border-bottom: 1px dashed #ccc;
+      }
+
+      .task input[type="checkbox"] {
+        transform: scale(1.3);
+        accent-color: #00b4d8;
       }
 
       .task.completed {
-        background-color: #e0f7d3;
+        background-color: #d9fdd3;
         border-radius: 5px;
       }
 
-      .progress-bar {
-        margin: 10px 0 20px;
-      }
-
-      .progress-value {
-        background-color: #f0f0f0;
-        border-radius: 10px;
-        overflow: hidden;
-        height: 20px;
-      }
-
-      .progress-value span {
-        display: block;
-        height: 100%;
-        background-color: #0077b6;
-        color: white;
-        text-align: center;
-        line-height: 20px;
-        transition: width 0.4s ease;
-      }
-
       .motivator {
+        margin-top: 30px;
+        font-size: 20px;
+        text-align: center;
         font-weight: bold;
-        color: #1b4332;
-        margin-top: 10px;
+        color: #2e7d32;
+      }
+
+      #admin-tools {
+        display: none;
+        margin: 20px 0;
+        padding: 15px;
+        border: 2px dashed #888;
+        background: #eef;
+        border-radius: 10px;
       }
     </style>
   </head>
@@ -149,132 +115,130 @@
     <section class="start-screen" id="start-screen">
       <img src="logo.jpg" alt="شعار الجروب" />
       <h1>جروب أسئلة الجهاز المركزي</h1>
-      <input type="text" id="usernameInput" placeholder="اكتب اسمك هنا" />
+      <input
+        id="nameInput"
+        placeholder="ادخل اسمك"
+        style="padding: 10px; margin: 10px; border-radius: 10px; border: none"
+      />
       <button class="start-btn" onclick="startApp()">ابدأ المذاكرة الآن</button>
     </section>
 
-    <main id="main"></main>
+    <main id="main">
+      <div id="admin-tools">
+        <h3>لوحة التحكم للمشرفة (نجلا)</h3>
+        <select id="module-select"></select>
+        <button onclick="addModel()">➕ إضافة نموذج</button>
+      </div>
+
+      <div id="content"></div>
+      <div class="motivator" id="motivator"></div>
+    </main>
 
     <script>
-      const modules = {
-        "معلومات عامة": { count: 1, icon: "fa-lightbulb" },
-        عربي: { count: 1, icon: "fa-book-open" },
-        حاسب: { count: 1, icon: "fa-laptop-code" },
-        انجليزي: { count: 1, icon: "fa-language" },
-      };
-
+      const adminName = "نجلا";
       const tasks = ["مذاكرة النموذج", "حل الاستفتاءات", "حل الاختبار بوقت"];
       let username = "";
       let userKey = "";
       let userData = {};
+      let moduleCounts = {
+        "معلومات عامة": 23,
+        عربي: 17,
+        حاسب: 22,
+        انجليزي: 16,
+      };
 
       const startApp = () => {
-        const name = document.getElementById("usernameInput").value.trim();
-        if (!name) return alert("من فضلك أدخل الاسم");
+        const name = document.getElementById("nameInput").value.trim();
+        if (!name) return;
+
         username = name;
         userKey = `centralUser_${username}`;
         userData = JSON.parse(localStorage.getItem(userKey)) || {};
+
         document.getElementById("start-screen").style.display = "none";
         document.getElementById("main").style.display = "block";
-        renderSections();
+
+        if (username === adminName) {
+          document.getElementById("admin-tools").style.display = "block";
+          const moduleSelect = document.getElementById("module-select");
+          moduleSelect.innerHTML = "";
+          for (const section in moduleCounts) {
+            const opt = document.createElement("option");
+            opt.value = section;
+            opt.textContent = section;
+            moduleSelect.appendChild(opt);
+          }
+        }
+
+        generateModules();
       };
 
-      const renderSections = () => {
-        const main = document.getElementById("main");
-        main.innerHTML = "";
+      const generateModules = () => {
+        const container = document.getElementById("content");
+        container.innerHTML = "";
 
-        Object.entries(modules).forEach(([section, { count, icon }]) => {
-          const sectionDiv = document.createElement("div");
-          sectionDiv.className = "section";
+        for (const [section, count] of Object.entries(moduleCounts)) {
+          const moduleDiv = document.createElement("div");
+          moduleDiv.className = "module";
 
-          const heading = document.createElement("h2");
-          heading.innerHTML = `<i class="fa-solid ${icon}"></i> ${section}`;
-          sectionDiv.appendChild(heading);
-
-          const progress = document.createElement("div");
-          progress.className = "progress-bar";
-          const progressInner = document.createElement("div");
-          progressInner.className = "progress-value";
-          const span = document.createElement("span");
-          span.textContent = "0%";
-          progressInner.appendChild(span);
-          progress.appendChild(progressInner);
-          sectionDiv.appendChild(progress);
-
-          let completedInSection = 0;
+          const title = document.createElement("h2");
+          title.textContent = section;
+          moduleDiv.appendChild(title);
 
           for (let i = 1; i <= count; i++) {
-            const modelBox = document.createElement("div");
-            modelBox.className = "model-box";
-            const title = document.createElement("h3");
-            title.textContent = `نموذج ${i}`;
-            modelBox.appendChild(title);
-
-            let modelCompleted = 0;
-
             tasks.forEach((task, idx) => {
               const taskDiv = document.createElement("div");
               taskDiv.className = "task";
-              const label = document.createElement("label");
-              label.textContent = task;
+
               const checkbox = document.createElement("input");
               checkbox.type = "checkbox";
               const taskKey = `${section}_${i}_${idx}`;
-
               if (userData[taskKey]) {
                 checkbox.checked = true;
                 taskDiv.classList.add("completed");
-                modelCompleted++;
-                completedInSection++;
               }
 
               checkbox.addEventListener("change", () => {
                 userData[taskKey] = checkbox.checked;
                 localStorage.setItem(userKey, JSON.stringify(userData));
                 taskDiv.classList.toggle("completed", checkbox.checked);
-                updateSectionProgress(sectionDiv, section, count);
-                showMotivation(modelBox, section, i);
+                showMotivation();
               });
+
+              const label = document.createElement("label");
+              label.textContent = `${task} - نموذج ${i}`;
 
               taskDiv.appendChild(label);
               taskDiv.appendChild(checkbox);
-              modelBox.appendChild(taskDiv);
+              moduleDiv.appendChild(taskDiv);
             });
-
-            const motivator = document.createElement("div");
-            motivator.className = "motivator";
-            modelBox.appendChild(motivator);
-
-            sectionDiv.appendChild(modelBox);
           }
 
-          updateSectionProgress(sectionDiv, section, count);
-          main.appendChild(sectionDiv);
-        });
+          container.appendChild(moduleDiv);
+        }
+
+        showMotivation();
       };
 
-      const updateSectionProgress = (sectionDiv, section, modelCount) => {
-        const checkboxes = sectionDiv.querySelectorAll(
-          'input[type="checkbox"]'
-        );
-        const checked = [...checkboxes].filter((c) => c.checked).length;
-        const total = modelCount * tasks.length;
-        const percent = Math.round((checked / total) * 100);
-        const span = sectionDiv.querySelector(".progress-value span");
-        span.style.width = `${percent}%`;
-        span.textContent = `${percent}%`;
-      };
+      const showMotivation = () => {
+        const done = Object.values(userData).filter(Boolean).length;
+        const motivator = document.getElementById("motivator");
 
-      const showMotivation = (modelBox, section, modelNum) => {
-        const motivator = modelBox.querySelector(".motivator");
-        const keys = tasks.map((_, idx) => `${section}_${modelNum}_${idx}`);
-        const done = keys.every((k) => userData[k]);
-        if (done) {
-          motivator.textContent =
-            "✅ تم إنجاز النموذج بالكامل، أحسنت! ربنا يوفقك ويبارك في وقتك.";
+        if (done === 0) {
+          motivator.textContent = "ابدأ أول خطوة وهتلاقي الطريق سهل! 💪";
+        } else if (done % 10 === 0) {
+          motivator.textContent = `👏 ممتاز يا ${username}! خلصت ${done} خطوة! استمر!`;
+        } else if (done > 50) {
+          motivator.textContent = `🔥 انت بطل بجد يا ${username}، قربت تخلص كل النماذج!`;
         } else {
           motivator.textContent = "";
         }
+      };
+
+      const addModel = () => {
+        const section = document.getElementById("module-select").value;
+        moduleCounts[section]++;
+        generateModules();
       };
     </script>
   </body>
