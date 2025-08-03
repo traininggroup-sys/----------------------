@@ -80,15 +80,12 @@
       }
 
       .model-title {
-        background-color: #d0ebff;
-        padding: 8px 15px;
+        background-color: #dbeafe;
+        color: #1e3a8a;
+        padding: 8px 12px;
         border-radius: 8px;
-        color: #005c99;
-        font-size: 18px;
-        font-weight: bold;
-        display: inline-block;
         margin: 10px 0 5px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        font-weight: bold;
       }
 
       .task {
@@ -160,20 +157,22 @@
     <script>
       const adminName = "نجلا";
       const tasks = ["مذاكرة النموذج", "حل الاستفتاءات", "حل الاختبار بوقت"];
-      const duas = [
+      const prayers = [
         "اللهم وفقني وثبتني وبارك لي في وقتي وجهدي 🤲",
-        "يا رب يسّر لي أمري وذكّرني ما نسيت 🌟",
         "اللهم اجعل هذا العلم حجة لي لا علي 💡",
-        "اللهم اجعل النجاح حليفي وسهّل علي كل صعب 🕊️",
+        "يا رب سهل لي ولا تعسر أمري ✨",
+        "اللهم ارزقني الفهم السليم والحفظ القوي 📚",
+        "اللهم اجعل نهايته توفيق وسعادة 🕊️",
       ];
+
       let username = "";
       let userKey = "";
       let userData = {};
       let moduleCounts = {
-        "معلومات عامة": 23,
-        عربي: 17,
-        حاسب: 22,
-        انجليزي: 16,
+        "📘 معلومات عامة": 23,
+        "📙 عربي": 17,
+        "💻 حاسب": 22,
+        "🗣️ انجليزي": 16,
       };
 
       const startApp = () => {
@@ -211,13 +210,13 @@
           moduleDiv.className = "module";
 
           const title = document.createElement("h2");
-          title.innerHTML = `<i class="fa-solid fa-book-open-reader"></i> ${section}`;
+          title.textContent = section;
           moduleDiv.appendChild(title);
 
           for (let i = 1; i <= count; i++) {
             const modelTitle = document.createElement("div");
             modelTitle.className = "model-title";
-            modelTitle.innerHTML = `<i class="fa-solid fa-file-lines"></i> نموذج ${i}`;
+            modelTitle.innerHTML = `📄 نموذج ${i}`;
             moduleDiv.appendChild(modelTitle);
 
             tasks.forEach((task, idx) => {
@@ -227,7 +226,6 @@
               const checkbox = document.createElement("input");
               checkbox.type = "checkbox";
               const taskKey = `${section}_${i}_${idx}`;
-
               if (userData[taskKey]) {
                 checkbox.checked = true;
                 taskDiv.classList.add("completed");
@@ -237,13 +235,16 @@
                 userData[taskKey] = checkbox.checked;
                 localStorage.setItem(userKey, JSON.stringify(userData));
                 taskDiv.classList.toggle("completed", checkbox.checked);
-                if (
-                  tasks.every((_, tIdx) => userData[`${section}_${i}_${tIdx}`])
-                ) {
-                  alert(
-                    "📣 دعاء: " + duas[Math.floor(Math.random() * duas.length)]
-                  );
+
+                const allCompleted = tasks.every(
+                  (_, tIdx) => userData[`${section}_${i}_${tIdx}`]
+                );
+                if (allCompleted) {
+                  const randomPrayer =
+                    prayers[Math.floor(Math.random() * prayers.length)];
+                  alert(`دعاء: ${randomPrayer}`);
                 }
+
                 showMotivation();
               });
 
