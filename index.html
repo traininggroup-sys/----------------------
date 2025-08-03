@@ -10,104 +10,207 @@
     />
     <style>
       body {
-        font-family: "Cairo", sans-serif;
         margin: 0;
-        padding: 0;
-        background: linear-gradient(to bottom right, #e1f5fe, #ede7f6);
-        min-height: 100vh;
+        font-family: "Cairo", sans-serif;
+        background: linear-gradient(135deg, #f0f8ff, #e0f7fa);
+        color: #333;
+      }
+
+      .start-screen {
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-      }
-      .card {
-        background: #fff;
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-        max-width: 400px;
-        width: 100%;
+        height: 100vh;
+        background-image: url("study-bg.jpg");
+        background-size: cover;
+        background-position: center;
         text-align: center;
-        animation: slideFade 0.7s ease forwards;
+        padding: 20px;
       }
-      @keyframes slideFade {
-        from {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      .logo {
-        width: 90px;
-        height: 90px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 4px solid #6a1b9a;
-        margin-bottom: 20px;
-        box-shadow: 0 0 15px rgba(106, 27, 154, 0.3);
-      }
-      h1 {
-        font-size: 22px;
+
+      .start-screen h1 {
+        font-size: 36px;
+        color: #fff;
         margin-bottom: 10px;
-        color: #4527a0;
+        text-shadow: 2px 2px 5px #00000055;
       }
-      .subtitle {
-        font-size: 16px;
-        color: #666;
+
+      .start-screen img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #fff;
         margin-bottom: 15px;
       }
-      .motivator {
-        font-size: 17px;
-        color: #00796b;
-        font-weight: bold;
-        margin-bottom: 25px;
-        animation: pulse 2s infinite;
-      }
-      @keyframes pulse {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.03);
-        }
-      }
-      input[type="text"] {
-        padding: 12px;
-        width: 100%;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        font-size: 16px;
-        margin-bottom: 15px;
-      }
-      button {
-        background-color: #6a1b9a;
-        color: white;
-        padding: 12px 20px;
+
+      .start-btn {
+        padding: 12px 30px;
+        font-size: 18px;
+        background-color: #0096c7;
         border: none;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: bold;
+        border-radius: 30px;
+        color: white;
         cursor: pointer;
-        width: 100%;
-        transition: background-color 0.3s, transform 0.2s;
+        transition: 0.3s;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
       }
-      button:hover {
-        background-color: #4a148c;
-        transform: scale(1.02);
+
+      .start-btn:hover {
+        background-color: #0077b6;
+      }
+
+      main {
+        display: none;
+        padding: 20px;
+        background-color: #fafafa;
+      }
+
+      .module {
+        background: white;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+
+      .module h2 {
+        margin-top: 0;
+        color: #023e8a;
+      }
+
+      .task {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px dashed #ccc;
+      }
+
+      .task input[type="checkbox"] {
+        transform: scale(1.3);
+        accent-color: #00b4d8;
+      }
+
+      .task.completed {
+        background-color: #d9fdd3;
+        border-radius: 5px;
+      }
+
+      .motivator {
+        margin-top: 30px;
+        font-size: 20px;
+        text-align: center;
+        font-weight: bold;
+        color: #2e7d32;
       }
     </style>
   </head>
   <body>
-    <div class="card">
-      <img src="5776125144014639249.jpg" alt="شعار الجروب" class="logo" />
-      <h1>جروب أسئلة لجهاز نجوز المركزي</h1>
-      <p class="subtitle">ابدأ رحلتك وخلي كل نموذج عليه علامة ✅</p>
-      <p class="motivator">خطوة واحدة بتقربك من هدفك 💪 يلا نبدأ!</p>
-      <input type="text" placeholder="اكتب اسمك هنا" />
-      <button>ابدأ</button>
-    </div>
+    <section class="start-screen" id="start-screen">
+      <img src="logo.jpg" alt="شعار الجروب" />
+      <h1>جروب أسئلة الجهاز المركزي</h1>
+      <button class="start-btn" onclick="startApp()">ابدأ المذاكرة الآن</button>
+    </section>
+
+    <main id="main">
+      <div id="content"></div>
+      <div class="motivator" id="motivator"></div>
+    </main>
+
+    <script>
+      const modules = {
+        "معلومات عامة": 23,
+        عربي: 17,
+        حاسب: 22,
+        انجليزي: 16,
+      };
+
+      const tasks = ["مذاكرة النموذج", "حل الاستفتاءات", "حل الاختبار بوقت"];
+
+      let username = "";
+      let userKey = "";
+      let userData = {};
+
+      const startApp = () => {
+        const name = prompt("ادخل اسمك:");
+        if (!name) return;
+
+        username = name;
+        userKey = `centralUser_${username}`;
+        userData = JSON.parse(localStorage.getItem(userKey)) || {};
+
+        document.getElementById("start-screen").style.display = "none";
+        document.getElementById("main").style.display = "block";
+
+        generateModules();
+      };
+
+      const generateModules = () => {
+        const container = document.getElementById("content");
+        const motivator = document.getElementById("motivator");
+        let totalTasks = 0;
+
+        for (const [section, count] of Object.entries(modules)) {
+          const moduleDiv = document.createElement("div");
+          moduleDiv.className = "module";
+
+          const title = document.createElement("h2");
+          title.textContent = section;
+          moduleDiv.appendChild(title);
+
+          for (let i = 1; i <= count; i++) {
+            tasks.forEach((task, idx) => {
+              const taskDiv = document.createElement("div");
+              taskDiv.className = "task";
+
+              const checkbox = document.createElement("input");
+              checkbox.type = "checkbox";
+              const taskKey = `${section}_${i}_${idx}`;
+              if (userData[taskKey]) {
+                checkbox.checked = true;
+                taskDiv.classList.add("completed");
+              }
+
+              checkbox.addEventListener("change", () => {
+                userData[taskKey] = checkbox.checked;
+                localStorage.setItem(userKey, JSON.stringify(userData));
+                taskDiv.classList.toggle("completed", checkbox.checked);
+                showMotivation();
+              });
+
+              const label = document.createElement("label");
+              label.textContent = `${task} - نموذج ${i}`;
+
+              taskDiv.appendChild(label);
+              taskDiv.appendChild(checkbox);
+              moduleDiv.appendChild(taskDiv);
+
+              totalTasks++;
+            });
+          }
+
+          container.appendChild(moduleDiv);
+        }
+
+        showMotivation();
+      };
+
+      const showMotivation = () => {
+        const done = Object.values(userData).filter(Boolean).length;
+        const motivator = document.getElementById("motivator");
+
+        if (done === 0) {
+          motivator.textContent = "ابدأ أول خطوة وهتلاقي الطريق سهل! 💪";
+        } else if (done % 10 === 0) {
+          motivator.textContent = `👏 ممتاز يا ${username}! خلصت ${done} خطوة! استمر!`;
+        } else if (done > 50) {
+          motivator.textContent = `🔥 انت بطل بجد يا ${username}، قربت تخلص كل النماذج!`;
+        } else {
+          motivator.textContent = "";
+        }
+      };
+    </script>
   </body>
 </html>
