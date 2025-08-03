@@ -73,9 +73,22 @@
 
       .module h2 {
         margin-top: 0;
+        color: #023e8a;
         border-bottom: 2px solid #ccc;
         padding-bottom: 10px;
         margin-bottom: 15px;
+      }
+
+      .model-title {
+        background-color: #d0ebff;
+        padding: 8px 15px;
+        border-radius: 8px;
+        color: #005c99;
+        font-size: 18px;
+        font-weight: bold;
+        display: inline-block;
+        margin: 10px 0 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       }
 
       .task {
@@ -116,19 +129,6 @@
       .admin-actions {
         margin-top: 10px;
       }
-
-      .module[data-section="معلومات عامة"] h2 {
-        color: #0a9396;
-      }
-      .module[data-section="عربي"] h2 {
-        color: #ae2012;
-      }
-      .module[data-section="حاسب"] h2 {
-        color: #005f73;
-      }
-      .module[data-section="انجليزي"] h2 {
-        color: #3a0ca3;
-      }
     </style>
   </head>
   <body>
@@ -149,8 +149,7 @@
         <select id="module-select"></select>
         <div class="admin-actions">
           <button onclick="addModel()">➕ إضافة نموذج</button>
-          <select id="delete-model-select"></select>
-          <button onclick="confirmRemoveModel()">🗑️ حذف نموذج محدد</button>
+          <button onclick="confirmRemoveModel()">🗑️ حذف آخر نموذج</button>
         </div>
       </div>
 
@@ -161,12 +160,11 @@
     <script>
       const adminName = "نجلا";
       const tasks = ["مذاكرة النموذج", "حل الاستفتاءات", "حل الاختبار بوقت"];
-      const prayers = [
-        "🤲 اللهم وفقني في هذا العلم وانفعني به",
-        "🤲 اللهم اجعل هذا المجهود في ميزان حسناتي",
-        "🤲 اللهم لا سهل إلا ما جعلته سهلًا",
-        "🤲 رب زدني علمًا ويسر لي أمري",
-        "🤲 اللهم ثبت قلبي على الحفظ والفهم",
+      const duas = [
+        "اللهم وفقني وثبتني وبارك لي في وقتي وجهدي 🤲",
+        "يا رب يسّر لي أمري وذكّرني ما نسيت 🌟",
+        "اللهم اجعل هذا العلم حجة لي لا علي 💡",
+        "اللهم اجعل النجاح حليفي وسهّل علي كل صعب 🕊️",
       ];
       let username = "";
       let userKey = "";
@@ -206,26 +204,22 @@
 
       const generateModules = () => {
         const container = document.getElementById("content");
-        const deleteSelect = document.getElementById("delete-model-select");
         container.innerHTML = "";
-        deleteSelect.innerHTML = "";
 
         for (const [section, count] of Object.entries(moduleCounts)) {
           const moduleDiv = document.createElement("div");
           moduleDiv.className = "module";
-          moduleDiv.dataset.section = section;
 
           const title = document.createElement("h2");
-          title.innerHTML = `<i class="fa-solid fa-book"></i> ${section}`;
+          title.innerHTML = `<i class="fa-solid fa-book-open-reader"></i> ${section}`;
           moduleDiv.appendChild(title);
 
           for (let i = 1; i <= count; i++) {
-            const modelTitle = document.createElement("h4");
-            modelTitle.textContent = `نموذج ${i}`;
-            modelTitle.style.margin = "10px 0 5px";
+            const modelTitle = document.createElement("div");
+            modelTitle.className = "model-title";
+            modelTitle.innerHTML = `<i class="fa-solid fa-file-lines"></i> نموذج ${i}`;
             moduleDiv.appendChild(modelTitle);
 
-            const modelTaskKeys = [];
             tasks.forEach((task, idx) => {
               const taskDiv = document.createElement("div");
               taskDiv.className = "task";
@@ -233,7 +227,6 @@
               const checkbox = document.createElement("input");
               checkbox.type = "checkbox";
               const taskKey = `${section}_${i}_${idx}`;
-              modelTaskKeys.push(taskKey);
 
               if (userData[taskKey]) {
                 checkbox.checked = true;
@@ -247,9 +240,9 @@
                 if (
                   tasks.every((_, tIdx) => userData[`${section}_${i}_${tIdx}`])
                 ) {
-                  const randomPrayer =
-                    prayers[Math.floor(Math.random() * prayers.length)];
-                  alert(randomPrayer);
+                  alert(
+                    "📣 دعاء: " + duas[Math.floor(Math.random() * duas.length)]
+                  );
                 }
                 showMotivation();
               });
@@ -261,11 +254,6 @@
               taskDiv.appendChild(checkbox);
               moduleDiv.appendChild(taskDiv);
             });
-
-            const option = document.createElement("option");
-            option.value = `${section}_${i}`;
-            option.textContent = `${section} - نموذج ${i}`;
-            deleteSelect.appendChild(option);
           }
 
           container.appendChild(moduleDiv);
@@ -296,17 +284,14 @@
       };
 
       const confirmRemoveModel = () => {
-        const selected = document.getElementById("delete-model-select").value;
-        if (!selected) return;
-        const [section, indexStr] = selected.split("_");
-        const index = parseInt(indexStr);
-        if (moduleCounts[section] >= index) {
-          if (
-            confirm(`هل أنت متأكدة من حذف نموذج ${index} من قسم ${section}؟`)
-          ) {
+        const section = document.getElementById("module-select").value;
+        if (moduleCounts[section] > 1) {
+          if (confirm(`هل أنت متأكدة من حذف آخر نموذج من قسم ${section}؟`)) {
             moduleCounts[section]--;
             generateModules();
           }
+        } else {
+          alert("لا يمكن حذف جميع النماذج!");
         }
       };
     </script>
