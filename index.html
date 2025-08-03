@@ -122,85 +122,31 @@
         animation: bounce 0.6s ease;
         text-align: center;
       }
-      @keyframes bounce {
-        0% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.1);
-        }
-        100% {
-          transform: scale(1);
-        }
-      }
-      .task-section {
-        margin-top: 20px;
-        border: 2px solid #eee;
-        border-radius: 12px;
-        padding: 15px;
-        background: #fafafa;
-      }
-      .task-section h4 {
-        margin-bottom: 10px;
-        color: #4a148c;
-        font-size: 20px;
-      }
-      .task-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-      .task {
-        background: white;
-        border-radius: 10px;
-        padding: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        transition: transform 0.3s;
-      }
-      .task:hover {
-        transform: translateY(-3px);
-      }
-      .task label {
-        font-weight: bold;
-        margin-bottom: 6px;
-        display: block;
-      }
-      .subtask {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 6px;
-      }
-      .subtask input {
-        transform: scale(1.2);
-        cursor: pointer;
-      }
-      .progress-bar {
-        height: 8px;
-        border-radius: 5px;
-        margin-top: 10px;
-        background-color: #ccc;
-        overflow: hidden;
-      }
-      .progress-fill {
-        height: 100%;
-        background-color: #6a1b9a;
-        transition: width 0.3s ease;
-      }
-      #fullSubjectMsg {
-        background: #ffd54f;
+      .popup {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #ffeb3b;
         padding: 12px;
-        text-align: center;
+        border-radius: 12px;
         font-weight: bold;
-        color: #bf360c;
-        border-radius: 10px;
-        margin-top: 20px;
-        animation: fadeIn 1s ease-in;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        z-index: 9999;
+        animation: fadeInUp 0.5s ease;
       }
-      @media (max-width: 600px) {
-        .task-grid {
-          grid-template-columns: 1fr;
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
         }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .popup a {
+        color: #d84315;
+        text-decoration: none;
       }
     </style>
   </head>
@@ -227,6 +173,8 @@
       <div id="fullSubjectMsg"></div>
     </div>
 
+    <div id="popupBox" class="popup" style="display: none"></div>
+
     <script>
       const subjects = {
         "📘 اللغة العربية": 17,
@@ -234,6 +182,20 @@
         "💻 الحاسب الآلي": 22,
         "🌍 المعلومات العامة": 23,
       };
+
+      const popups = {
+        "📘 اللغة العربية-1-1":
+          'يلا روح حل الاستفتاءات <a href="https://t.me/c/2299629125/5/27280" target="_blank">من هنا</a>',
+        "📘 اللغة العربية-1-2":
+          'يلا اختبر نفسك بوقت <a href="https://t.me/c/2299629125/13/29933" target="_blank">من هنا</a>',
+      };
+
+      function showPopup(message) {
+        const popup = document.getElementById("popupBox");
+        popup.innerHTML = message;
+        popup.style.display = "block";
+        setTimeout(() => (popup.style.display = "none"), 5000);
+      }
 
       function startStudy() {
         const name = document.getElementById("username").value.trim();
@@ -258,9 +220,6 @@
           title.textContent = subject;
           section.appendChild(title);
 
-          const grid = document.createElement("div");
-          grid.className = "task-grid";
-
           let completed = 0;
           let totalSubtasks = 0;
 
@@ -283,12 +242,13 @@
               subtask.className = "subtask";
 
               const span = document.createElement("span");
-              span.textContent = sub;
+              span.innerHTML = sub;
 
               const checkbox = document.createElement("input");
               checkbox.type = "checkbox";
 
               const key = `${name}-${subject}-model-${i}-step-${index}`;
+              const popupKey = `${subject}-${i}-${index}`;
               const saved = localStorage.getItem(key);
               if (saved === "true") {
                 checkbox.checked = true;
@@ -299,6 +259,10 @@
                 localStorage.setItem(key, checkbox.checked);
                 renderTasks(name);
                 if (!checkbox.checked) return;
+
+                if (popups[popupKey]) {
+                  showPopup(popups[popupKey]);
+                }
 
                 const allDone = subtasks.every((_, idx) => {
                   return (
@@ -319,7 +283,7 @@
               totalSubtasks++;
             });
 
-            grid.appendChild(task);
+            section.appendChild(task);
           }
 
           const progress = document.createElement("div");
@@ -329,7 +293,6 @@
           fill.style.width = `${(completed / totalSubtasks) * 100}%`;
           progress.appendChild(fill);
           section.appendChild(progress);
-          section.appendChild(grid);
           container.appendChild(section);
 
           if (completed === totalSubtasks) {
