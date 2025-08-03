@@ -20,7 +20,8 @@
         color: #333;
       }
 
-      .start-screen {
+      .start-screen,
+      .module-select-screen {
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -54,6 +55,41 @@
         border-radius: 30px;
         color: white;
         cursor: pointer;
+      }
+
+      .module-grid {
+        display: none;
+        padding: 40px 20px;
+        background-color: #f0f8ff;
+        text-align: center;
+      }
+
+      .module-grid h2 {
+        margin-bottom: 30px;
+      }
+
+      .module-button {
+        background-color: #fff;
+        border: 2px solid #ccc;
+        border-radius: 15px;
+        padding: 20px;
+        font-size: 20px;
+        margin: 15px;
+        width: 200px;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .module-button:hover {
+        transform: translateY(-5px);
+        background-color: #d9fdd3;
+      }
+
+      .module-button i {
+        display: block;
+        font-size: 30px;
+        margin-bottom: 10px;
       }
 
       main {
@@ -126,11 +162,21 @@
       .admin-actions {
         margin-top: 10px;
       }
+
+      .back-btn {
+        background: #aaa;
+        color: white;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-bottom: 20px;
+      }
     </style>
   </head>
   <body>
     <section class="start-screen" id="start-screen">
-      <img src="logo.jpg" alt="شعار الجروب" />
+      <img src="5776125144014639249.jpg" alt="شعار الجروب" />
       <h1>جروب أسئلة الجهاز المركزي</h1>
       <input
         id="nameInput"
@@ -140,7 +186,13 @@
       <button class="start-btn" onclick="startApp()">ابدأ المذاكرة الآن</button>
     </section>
 
+    <section class="module-grid" id="module-grid">
+      <h2>اختر المحور لبدء المذاكرة</h2>
+      <div id="modules-container"></div>
+    </section>
+
     <main id="main">
+      <button class="back-btn" onclick="goBack()">🔙 رجوع</button>
       <div id="admin-tools">
         <h3>لوحة التحكم للمشرفة (نجلا)</h3>
         <select id="module-select"></select>
@@ -166,6 +218,7 @@
       ];
 
       let username = "";
+      let selectedSection = "";
       let userKey = "";
       let userData = {};
       let moduleCounts = {
@@ -175,99 +228,116 @@
         "🗣️ انجليزي": 16,
       };
 
-      window.onload = () => {
-        const savedName = localStorage.getItem("centralUserName");
-        if (savedName) {
-          document.getElementById("nameInput").value = savedName;
-        }
-      };
-
       const startApp = () => {
-        const name = document.getElementById("nameInput").value.trim();
+        const nameInput = document.getElementById("nameInput");
+        const name =
+          nameInput.value.trim() || localStorage.getItem("savedName");
         if (!name) return;
 
         username = name;
-        localStorage.setItem("centralUserName", username);
+        nameInput.value = name;
+        localStorage.setItem("savedName", name);
+
         userKey = `centralUser_${username}`;
         userData = JSON.parse(localStorage.getItem(userKey)) || {};
 
         document.getElementById("start-screen").style.display = "none";
+        document.getElementById("module-grid").style.display = "block";
+
+        const modulesContainer = document.getElementById("modules-container");
+        modulesContainer.innerHTML = "";
+        for (const section in moduleCounts) {
+          const btn = document.createElement("button");
+          btn.className = "module-button";
+          btn.innerHTML = `<i class='fas fa-book-open'></i>${section}`;
+          btn.onclick = () => openModule(section);
+          modulesContainer.appendChild(btn);
+        }
+      };
+
+      const openModule = (section) => {
+        selectedSection = section;
+        document.getElementById("module-grid").style.display = "none";
         document.getElementById("main").style.display = "block";
 
         if (username === adminName) {
           document.getElementById("admin-tools").style.display = "block";
           const moduleSelect = document.getElementById("module-select");
           moduleSelect.innerHTML = "";
-          for (const section in moduleCounts) {
+          for (const sec in moduleCounts) {
             const opt = document.createElement("option");
-            opt.value = section;
-            opt.textContent = section;
+            opt.value = sec;
+            opt.textContent = sec;
+            if (sec === section) opt.selected = true;
             moduleSelect.appendChild(opt);
           }
         }
 
-        generateModules();
+        generateModules(section);
       };
 
-      const generateModules = () => {
+      const goBack = () => {
+        document.getElementById("main").style.display = "none";
+        document.getElementById("module-grid").style.display = "block";
+      };
+
+      const generateModules = (section) => {
         const container = document.getElementById("content");
         container.innerHTML = "";
 
-        for (const [section, count] of Object.entries(moduleCounts)) {
-          const moduleDiv = document.createElement("div");
-          moduleDiv.className = "module";
+        const count = moduleCounts[section];
+        const moduleDiv = document.createElement("div");
+        moduleDiv.className = "module";
 
-          const title = document.createElement("h2");
-          title.textContent = section;
-          moduleDiv.appendChild(title);
+        const title = document.createElement("h2");
+        title.textContent = section;
+        moduleDiv.appendChild(title);
 
-          for (let i = 1; i <= count; i++) {
-            const modelTitle = document.createElement("div");
-            modelTitle.className = "model-title";
-            modelTitle.innerHTML = `📄 نموذج ${i}`;
-            moduleDiv.appendChild(modelTitle);
+        for (let i = 1; i <= count; i++) {
+          const modelTitle = document.createElement("div");
+          modelTitle.className = "model-title";
+          modelTitle.innerHTML = `📄 نموذج ${i}`;
+          moduleDiv.appendChild(modelTitle);
 
-            tasks.forEach((task, idx) => {
-              const taskDiv = document.createElement("div");
-              taskDiv.className = "task";
+          tasks.forEach((task, idx) => {
+            const taskDiv = document.createElement("div");
+            taskDiv.className = "task";
 
-              const checkbox = document.createElement("input");
-              checkbox.type = "checkbox";
-              const taskKey = `${section}_${i}_${idx}`;
-              if (userData[taskKey]) {
-                checkbox.checked = true;
-                taskDiv.classList.add("completed");
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            const taskKey = `${section}_${i}_${idx}`;
+            if (userData[taskKey]) {
+              checkbox.checked = true;
+              taskDiv.classList.add("completed");
+            }
+
+            checkbox.addEventListener("change", () => {
+              userData[taskKey] = checkbox.checked;
+              localStorage.setItem(userKey, JSON.stringify(userData));
+              taskDiv.classList.toggle("completed", checkbox.checked);
+
+              const allCompleted = tasks.every(
+                (_, tIdx) => userData[`${section}_${i}_${tIdx}`]
+              );
+              if (allCompleted) {
+                const randomPrayer =
+                  prayers[Math.floor(Math.random() * prayers.length)];
+                alert(`دعاء: ${randomPrayer}`);
               }
 
-              checkbox.addEventListener("change", () => {
-                userData[taskKey] = checkbox.checked;
-                localStorage.setItem(userKey, JSON.stringify(userData));
-                taskDiv.classList.toggle("completed", checkbox.checked);
-
-                const allCompleted = tasks.every(
-                  (_, tIdx) => userData[`${section}_${i}_${tIdx}`]
-                );
-                if (allCompleted) {
-                  const randomPrayer =
-                    prayers[Math.floor(Math.random() * prayers.length)];
-                  alert(`دعاء: ${randomPrayer}`);
-                }
-
-                showMotivation();
-              });
-
-              const label = document.createElement("label");
-              label.textContent = task;
-
-              taskDiv.appendChild(label);
-              taskDiv.appendChild(checkbox);
-              moduleDiv.appendChild(taskDiv);
+              showMotivation();
             });
-          }
 
-          container.appendChild(moduleDiv);
+            const label = document.createElement("label");
+            label.textContent = task;
+
+            taskDiv.appendChild(label);
+            taskDiv.appendChild(checkbox);
+            moduleDiv.appendChild(taskDiv);
+          });
         }
 
+        container.appendChild(moduleDiv);
         showMotivation();
       };
 
@@ -289,7 +359,7 @@
       const addModel = () => {
         const section = document.getElementById("module-select").value;
         moduleCounts[section]++;
-        generateModules();
+        generateModules(section);
       };
 
       const confirmRemoveModel = () => {
@@ -297,7 +367,7 @@
         if (moduleCounts[section] > 1) {
           if (confirm(`هل أنت متأكدة من حذف آخر نموذج من قسم ${section}؟`)) {
             moduleCounts[section]--;
-            generateModules();
+            generateModules(section);
           }
         } else {
           alert("لا يمكن حذف جميع النماذج!");
