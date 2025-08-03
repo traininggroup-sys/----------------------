@@ -314,6 +314,25 @@
             checkbox.addEventListener("change", () => {
               userData[taskKey] = checkbox.checked;
               localStorage.setItem(userKey, JSON.stringify(userData));
+              if (checkbox.checked) {
+                fetch(
+                  "https://script.google.com/macros/s/AKfycbxqQ6_LR8pLkDZih6dijU7P2ohDPz6mGuCHKQA8474/exec",
+                  {
+                    method: "POST",
+                    body: JSON.stringify({
+                      name: username,
+                      section: section,
+                      model: i,
+                      task: task,
+                      completed: true,
+                    }),
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                  }
+                );
+              }
+
               taskDiv.classList.toggle("completed", checkbox.checked);
 
               const allCompleted = tasks.every(
