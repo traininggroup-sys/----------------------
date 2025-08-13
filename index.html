@@ -2,307 +2,678 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <title>متابعة الإنجاز</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>جروب أسئلة الجهاز المركزي</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
     <style>
       body {
-        font-family: Arial, sans-serif;
-        background: #f8f9fa;
         margin: 0;
-        padding: 0;
+        font-family: "Cairo", sans-serif;
+        background: linear-gradient(to right, #f5f5f5, #eaeaea);
+        color: #333;
       }
-      header {
-        background: #007bff;
-        color: white;
-        padding: 15px;
+      .start-screen,
+      .module-select-screen {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background: #004e64;
         text-align: center;
-        font-size: 20px;
+        padding: 20px;
       }
-      .section {
-        margin: 20px;
-        background: white;
+      .start-screen h1 {
+        font-size: 32px;
+        color: #fff;
+        margin-bottom: 10px;
+      }
+      .start-screen img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        margin-bottom: 15px;
+      }
+      .start-btn {
+        padding: 12px 30px;
+        font-size: 18px;
+        background: #0096c7;
+        border: none;
+        border-radius: 30px;
+        color: #fff;
+        cursor: pointer;
+      }
+      .module-grid {
+        display: none;
+        padding: 40px 20px;
+        background: #f0f8ff;
+        text-align: center;
+      }
+      .module-grid h2 {
+        margin-bottom: 20px;
+      }
+      .modules-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        justify-content: center;
+      }
+      .module-button {
+        position: relative;
+        background: #fff;
+        border: 2px solid #ccc;
+        border-radius: 15px;
+        padding: 20px 18px;
+        font-size: 18px;
+        min-width: 220px;
+        cursor: pointer;
+        transition: 0.3s;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .module-button:hover {
+        transform: translateY(-5px);
+        background: #d9fdd3;
+      }
+      .module-button i {
+        display: block;
+        font-size: 28px;
+        margin-bottom: 8px;
+      }
+      .module-check {
+        position: absolute;
+        top: 10px;
+        left: 12px;
+        font-size: 18px;
+        color: #22c55e;
+        display: none;
+      }
+      .module-button.done .module-check {
+        display: block;
+      }
+      main {
+        display: none;
+        padding: 20px;
+        background: #fafafa;
+      }
+      .module {
+        background: #fff;
         border-radius: 10px;
         padding: 15px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border: 1px solid #ccc;
       }
-      h2 {
-        color: #007bff;
-        font-size: 18px;
+      .module h2 {
+        margin-top: 0;
+        color: #023e8a;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 10px;
+        margin-bottom: 12px;
+      }
+      .model-title {
+        background: #dbeafe;
+        color: #1e3a8a;
+        padding: 8px 12px;
+        border-radius: 8px;
+        margin: 14px 0 8px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+      .open-btn {
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 1px solid #0096c7;
+        background: #e6f7fb;
+        cursor: pointer;
+        font-size: 14px;
       }
       .task {
         display: flex;
         align-items: center;
-        margin: 5px 0;
-        padding: 8px;
-        border-radius: 6px;
-        transition: background 0.3s;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px dashed #ccc;
       }
-      .task:hover {
-        background: #f1f1f1;
+      .task input[type="checkbox"] {
+        transform: scale(1.2);
+        accent-color: #00b4d8;
       }
-      .task a {
-        text-decoration: none;
-        color: #333;
-        flex: 1;
+      .task.completed {
+        background: #d9fdd3;
+        border-radius: 5px;
       }
-      .task input {
-        margin-left: 10px;
+      .motivator {
+        margin-top: 18px;
+        font-size: 18px;
+        text-align: center;
+        font-weight: bold;
+        color: #2e7d32;
       }
+      #admin-tools {
+        display: none;
+        margin: 16px 0;
+        padding: 12px;
+        border: 2px dashed #888;
+        background: #eef;
+        border-radius: 10px;
+      }
+      .admin-actions {
+        margin-top: 10px;
+      }
+      .back-btn {
+        background: #aaa;
+        color: #fff;
+        padding: 8px 15px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-bottom: 12px;
+      }
+      /* Progress bar */
       .progress-container {
+        width: 100%;
         background: #ddd;
         border-radius: 20px;
+        height: 24px;
+        margin: 10px 0 16px;
         overflow: hidden;
-        margin: 20px;
       }
       .progress-bar {
-        height: 20px;
-        background: #28a745;
-        width: 0;
-        transition: width 0.3s;
-      }
-      /* نافذة الدعاء */
-      .dua-popup {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: #e6f4ea;
-        color: #2f6627;
-        border-radius: 10px;
-        padding: 10px 15px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        font-size: 14px;
-        display: none;
-        animation: fadeIn 0.5s;
-        max-width: 250px;
-      }
-      .dua-popup .icon {
-        font-size: 18px;
-        margin-left: 5px;
-      }
-      .dua-popup small {
-        display: block;
-        margin-top: 5px;
-        color: #555;
-        font-size: 12px;
-      }
-      /* احتفال كبير */
-      .celebration {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
-        padding: 20px;
-        border-radius: 15px;
+        height: 100%;
+        width: 0%;
+        background: #00b4d8;
         text-align: center;
-        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
-        display: none;
-        z-index: 999;
+        color: #fff;
+        font-weight: bold;
+        transition: width 0.4s ease;
       }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
+      /* Celebration banner */
+      .celebrate-banner {
+        position: fixed;
+        top: -80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(90deg, #22c55e, #06b6d4, #3b82f6);
+        color: #fff;
+        padding: 14px 20px;
+        border-radius: 999px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        z-index: 9999;
+        white-space: nowrap;
+        font-weight: 700;
+      }
+      .celebrate-banner.show {
+        top: 20px;
+        transition: top 0.5s ease;
+      }
+      /* Confetti */
+      .confetti {
+        position: fixed;
+        top: -10px;
+        font-size: 22px;
+        animation: fall linear forwards;
+        z-index: 9998;
+      }
+      @keyframes fall {
         to {
-          opacity: 1;
-          transform: translateY(0);
+          transform: translateY(110vh) rotate(720deg);
+          opacity: 0.9;
         }
       }
     </style>
   </head>
   <body>
-    <header>📊 متابعة الإنجاز</header>
+    <section class="start-screen" id="start-screen">
+      <img src="5776125144014639249.jpg" alt="شعار الجروب" />
+      <h1>جروب أسئلة الجهاز المركزي</h1>
+      <input
+        id="nameInput"
+        placeholder="ادخل اسمك"
+        style="padding: 10px; margin: 10px; border-radius: 10px; border: none"
+      />
+      <button class="start-btn" onclick="startApp()">ابدأ المذاكرة الآن</button>
+    </section>
 
-    <div class="progress-container">
-      <div class="progress-bar" id="progress-bar"></div>
-    </div>
+    <section class="module-grid" id="module-grid">
+      <h2>اختر المحور لبدء المذاكرة</h2>
+      <div class="modules-wrap" id="modules-container"></div>
+    </section>
 
-    <div id="sections"></div>
+    <main id="main">
+      <button class="back-btn" onclick="goBack()">🔙 رجوع</button>
 
-    <!-- دعاء صغير -->
-    <div class="dua-popup" id="dua-popup">
-      <span class="icon">📚</span>
-      <span id="dua-text"></span>
-      <small>جروب المشتركين للتدريب مبسوط بإنجازك 🤗</small>
-    </div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progress-bar">0%</div>
+      </div>
 
-    <!-- احتفال كبير -->
-    <div class="celebration" id="celebration">
-      <h2>🎉 مبروك!</h2>
-      <p id="celebration-text"></p>
+      <div id="admin-tools">
+        <h3>لوحة التحكم للمشرفة (نجلا)</h3>
+        <select id="module-select"></select>
+        <div class="admin-actions">
+          <button onclick="addModel()">➕ إضافة عنصر</button>
+          <button onclick="confirmRemoveModel()">🗑️ حذف آخر عنصر</button>
+        </div>
+      </div>
+
+      <div id="content"></div>
+      <div class="motivator" id="motivator"></div>
+    </main>
+
+    <!-- Celebration banner -->
+    <div id="celebrateBanner" class="celebrate-banner">
+      🏆 برافوو! إنجاز رهيب!
     </div>
 
     <script>
-      // قائمة الأدعية
-      const duas = [
-        {
-          icon: "📚",
-          text: "اللهم علّمني ما ينفعني وانفعني بما علّمتني وزدني علمًا",
-        },
-        { icon: "🌟", text: "اللهم افتح لي أبواب حكمتك وانشر عليّ رحمتك" },
-        { icon: "✨", text: "اللهم اجعل هذا العلم حجة لي لا عليّ" },
-        { icon: "💖", text: "اللهم صلّ وسلم على نبينا محمد" },
+      const adminName = "نجلا";
+      const tasks = ["مذاكرة/مشاهدة", "حل الاستفتاءات", "حل الاختبار بوقت"];
+      const prayers = [
+        "اللهم وفقني وثبتني وبارك لي في وقتي وجهدي 🤲",
+        "اللهم اجعل هذا العلم حجة لي لا علي 💡",
+        "يا رب سهل لي ولا تعسر أمري ✨",
+        "اللهم ارزقني الفهم السليم والحفظ القوي 📚",
+        "اللهم اجعل نهايته توفيق وسعادة 🕊️",
       ];
 
-      // بيانات المحاور
-      const sectionsData = [
-        {
-          title: "المعلومات العامة",
-          items: Array.from({ length: 22 }, (_, i) => ({
-            name: `نموذج ${i + 1}`,
-          })),
-        },
-        {
-          title: "الحاسب",
+      let username = "";
+      let selectedSection = "";
+      let userKey = "";
+      let userData = {};
+      let completedSections = {}; // { section: true }
+
+      const moduleData = {
+        "📘 معلومات عامة": { type: "models", count: 22, icon: "fa-lightbulb" },
+        "💻 حاسب": {
+          type: "list",
+          icon: "fa-computer",
+          // عناصر الحاسب بالاسم والرابط (كما أرسلتي)
           items: [
-            { name: "فيديو رقم 1", url: "https://youtu.be/aTGmvmeDJf8" },
-            { name: "فيديو رقم 2", url: "https://youtu.be/9tye0LUQfYI" },
-            { name: "فيديو رقم 3", url: "https://youtu.be/N3Z5p65om0o" },
-            { name: "فيديو رقم 4", url: "https://youtu.be/_HwWcpqTdHI" },
-            { name: "فيديو رقم 6", url: "https://youtu.be/1DbFtQZpsW0" },
-            { name: "برنامج Excel", url: "https://youtu.be/JzsTom7tTx8" },
-            { name: "فيديو رقم 7", url: "https://youtu.be/jUBGca5qRnM" },
-            { name: "فيديو رقم 8", url: "https://youtu.be/q3Zz99bThyQ" },
-            { name: "فيديو رقم 9", url: "https://youtu.be/_Ea_z_Ft4bs" },
+            { title: "فيديو رقم 1", url: "https://youtu.be/aTGmvmeDJf8" },
+            { title: "فيديو رقم 2", url: "https://youtu.be/9tye0LUQfYI" },
+            { title: "فيديو رقم 3", url: "https://youtu.be/N3Z5p65om0o" },
+            { title: "فيديو رقم 4", url: "https://youtu.be/_HwWcpqTdHI" },
+            // ٥ محذوف
+            { title: "فيديو رقم 6", url: "https://youtu.be/1DbFtQZpsW0" },
+            { title: "برنامج Excel", url: "https://youtu.be/JzsTom7tTx8" },
+            { title: "فيديو رقم 7", url: "https://youtu.be/jUBGca5qRnM" },
+            { title: "فيديو رقم 8", url: "https://youtu.be/q3Zz99bThyQ" },
+            { title: "فيديو رقم 9", url: "https://youtu.be/_Ea_z_Ft4bs" },
             {
-              name: "شرح اختبار علي Excel",
+              title: "شرح اختبار علي Excel",
               url: "https://youtu.be/qn5rs-4mFJo",
             },
-            { name: "فيديو رقم 10", url: "https://youtu.be/hRAdE691Mg4" },
-            { name: "فيديو رقم 11", url: "https://youtu.be/LNlw1VhnDWM" },
-            { name: "فيديو رقم 12", url: "https://youtu.be/mdgj-gbvOIg" },
-            { name: "برنامج Excel", url: "https://youtu.be/GI8RU0FXXO4" },
-            { name: "فيديو رقم 13", url: "https://youtu.be/sTGkL7xYwCE" },
-            { name: "برنامج Access", url: "https://youtu.be/SOFszLmW_X8" },
+            { title: "فيديو رقم 10", url: "https://youtu.be/hRAdE691Mg4" },
+            { title: "فيديو رقم 11", url: "https://youtu.be/LNlw1VhnDWM" },
+            { title: "فيديو رقم 12", url: "https://youtu.be/mdgj-gbvOIg" },
+            { title: "برنامج Excel", url: "https://youtu.be/GI8RU0FXXO4" },
+            { title: "فيديو رقم 13", url: "https://youtu.be/sTGkL7xYwCE" },
+            { title: "برنامج Access", url: "https://youtu.be/SOFszLmW_X8" },
             {
-              name: "برنامج PowerPoint جزء 1",
+              title: "برنامج PowerPoint جزء ١",
               url: "https://youtu.be/53ydwEIFrog",
             },
             {
-              name: "برنامج PowerPoint جزء 2",
+              title: "برنامج PowerPoint جزء ٢",
               url: "https://youtu.be/yCvhQdWY0ac",
             },
-            { name: "فيديو رقم 14", url: "https://youtu.be/8ypgm2RJ804" },
-            { name: "أهم الاختصارات", url: "https://youtu.be/lhjovAocMMw" },
-            { name: "اسئلة مجمعة", url: "https://youtu.be/BgYzh47Icm0" },
-            { name: "النموذج 1", url: "https://youtu.be/evZEGltYYXs" },
-            { name: "النموذج 2", url: "https://youtu.be/U_jAqbzbjRA" },
-            { name: "النموذج 3", url: "https://youtu.be/IkT_6INmCyY" },
-            { name: "فيديو رقم 15", url: "https://youtu.be/9AY9POUJYLc" },
+            { title: "فيديو رقم 14", url: "https://youtu.be/8ypgm2RJ804" },
+            { title: "أهم الاختصارات", url: "https://youtu.be/lhjovAocMMw" },
+            { title: "اسئلة مجمعة", url: "https://youtu.be/BgYzh47Icm0" },
+            { title: "النموذج 1", url: "https://youtu.be/evZEGltYYXs" },
+            { title: "النموذج 2", url: "https://youtu.be/U_jAqbzbjRA" },
+            { title: "النموذج 3", url: "https://youtu.be/IkT_6INmCyY" },
+            { title: "فيديو رقم 15", url: "https://youtu.be/9AY9POUJYLc" },
             {
-              name: "مراجعة للحاسب جزء 1",
+              title: "مراجعة للحاسب جزء ١",
               url: "https://youtu.be/2V0fQEpAeiM",
             },
             {
-              name: "مراجعة للحاسب جزء 2",
+              title: "مراجعة للحاسب جزء ٢",
               url: "https://youtu.be/W1Qcsu6hy4U",
             },
-            { name: "نموذج رقم 9", url: "https://youtu.be/VtOe_dx5qn8" },
+            { title: "نموذج رقم 9", url: "https://youtu.be/VtOe_dx5qn8" },
             {
-              name: "شرح حساب عدد الخلايا في Excel",
+              title: "شرح حساب عدد الخلايا في Excel",
               url: "https://youtu.be/-uIb6ZpFEi4",
             },
             {
-              name: "شرح سؤال لعمل تخطيط هيكلي",
+              title: "شرح سؤال لعمل تخطيط هيكلي نختار إيه",
               url: "https://youtu.be/Odgj-G4pHUQ",
             },
+            // بعد الفيديوهات: نضيف نماذج إضافية بلا روابط لتكملة 22 نموذج
+            // لو حبيتي تشيليهم لاحقاً سهل جداً
+            ...Array.from({ length: 22 - 4 }, (_, i) => ({
+              // عندنا بالفعل 4 نماذج مذكورة (1,2,3,9)
+              title: `نموذج إضافي ${i + 1}`,
+              url: "",
+            })),
           ],
         },
-        {
-          title: "الإنجليزي",
-          items: Array.from({ length: 16 }, (_, i) => ({
-            name: `نموذج ${i + 1}`,
-          })),
-        },
-        {
-          title: "العربي",
-          items: Array.from({ length: 17 }, (_, i) => ({
-            name: `نموذج ${i + 1}`,
-          })),
-        },
-      ];
+        "🗣️ انجليزي": { type: "models", count: 16, icon: "fa-language" },
+        "📙 عربي": { type: "models", count: 17, icon: "fa-book" },
+      };
 
-      // إنشاء الواجهة
-      const container = document.getElementById("sections");
-      let totalItems = 0,
-        completedItems = 0;
+      // ====== APP CORE ======
+      const startApp = () => {
+        const nameInput = document.getElementById("nameInput");
+        const name =
+          nameInput.value.trim() || localStorage.getItem("savedName");
+        if (!name) return;
+        username = name;
+        nameInput.value = name;
+        localStorage.setItem("savedName", name);
 
-      sectionsData.forEach((section) => {
-        const secDiv = document.createElement("div");
-        secDiv.className = "section";
-        const h2 = document.createElement("h2");
-        h2.textContent = section.title;
-        secDiv.appendChild(h2);
+        userKey = `centralUser_${username}`;
+        userData = JSON.parse(localStorage.getItem(userKey)) || {};
+        completedSections = JSON.parse(
+          localStorage.getItem(`${userKey}_completedSections`) || "{}"
+        );
 
-        section.items.forEach((item) => {
-          totalItems++;
+        document.getElementById("start-screen").style.display = "none";
+        document.getElementById("module-grid").style.display = "block";
+
+        renderModuleButtons();
+      };
+
+      function renderModuleButtons() {
+        const wrap = document.getElementById("modules-container");
+        wrap.innerHTML = "";
+        for (const section in moduleData) {
+          const btn = document.createElement("button");
+          btn.className =
+            "module-button" + (completedSections[section] ? " done" : "");
+          btn.innerHTML = `<i class='fas fa-book-open'></i>${section}<span class="module-check">✅</span>`;
+          btn.onclick = () => openModule(section);
+          wrap.appendChild(btn);
+        }
+      }
+
+      const openModule = (section) => {
+        selectedSection = section;
+        document.getElementById("module-grid").style.display = "none";
+        document.getElementById("main").style.display = "block";
+
+        if (username === adminName) {
+          document.getElementById("admin-tools").style.display = "block";
+          const moduleSelect = document.getElementById("module-select");
+          moduleSelect.innerHTML = "";
+          for (const sec in moduleData) {
+            const opt = document.createElement("option");
+            opt.value = sec;
+            opt.textContent = sec;
+            if (sec === section) opt.selected = true;
+            moduleSelect.appendChild(opt);
+          }
+        }
+
+        generateModules(section);
+        updateProgressBar(); // مبدئي
+      };
+
+      const goBack = () => {
+        document.getElementById("main").style.display = "none";
+        document.getElementById("module-grid").style.display = "block";
+        renderModuleButtons();
+      };
+
+      // ====== RENDER SECTION ======
+      const generateModules = (section) => {
+        const container = document.getElementById("content");
+        container.innerHTML = "";
+
+        const data = moduleData[section];
+        const moduleDiv = document.createElement("div");
+        moduleDiv.className = "module";
+
+        const title = document.createElement("h2");
+        title.textContent = section;
+        moduleDiv.appendChild(title);
+
+        if (data.type === "models") {
+          for (let i = 1; i <= data.count; i++) {
+            addBlock(moduleDiv, section, `model_${i}`, `📄 نموذج ${i}`);
+          }
+        } else if (data.type === "list") {
+          data.items.forEach((item, idx) => {
+            addBlock(
+              moduleDiv,
+              section,
+              `item_${idx + 1}`,
+              (item.url ? "🎬 " : "📄 ") + item.title,
+              item.url
+            );
+          });
+        }
+
+        container.appendChild(moduleDiv);
+        showMotivation();
+      };
+
+      // block with tasks + optional open button
+      function addBlock(parent, section, id, titleText, url = "") {
+        const header = document.createElement("div");
+        header.className = "model-title";
+        const left = document.createElement("span");
+        left.textContent = titleText;
+        header.appendChild(left);
+
+        if (url) {
+          const openBtn = document.createElement("button");
+          openBtn.className = "open-btn";
+          openBtn.textContent = "فتح الفيديو";
+          openBtn.onclick = () => window.open(url, "_blank");
+          header.appendChild(openBtn);
+        }
+        parent.appendChild(header);
+
+        tasks.forEach((task, idx) => {
           const taskDiv = document.createElement("div");
           taskDiv.className = "task";
 
           const checkbox = document.createElement("input");
           checkbox.type = "checkbox";
+          const taskKey = `${section}_${id}_${idx}`;
+          if (userData[taskKey]) {
+            checkbox.checked = true;
+            taskDiv.classList.add("completed");
+          }
 
           checkbox.addEventListener("change", () => {
+            userData[taskKey] = checkbox.checked;
+            localStorage.setItem(userKey, JSON.stringify(userData));
+            taskDiv.classList.toggle("completed", checkbox.checked);
+
             if (checkbox.checked) {
-              completedItems++;
-              showDua();
-              checkSectionComplete(section.title);
-            } else {
-              completedItems--;
+              // تسجيل خارجي (اختياري)
+              fetch(
+                "https://script.google.com/macros/s/AKfycbzjK9rFHOGNb0gq0d7uhlZMbgJTvsxbq4XIBU160u22cZusp_XI1M0ufsL82NUPOZjW/exec",
+                {
+                  method: "POST",
+                  body: JSON.stringify({
+                    name: username,
+                    section,
+                    model: id,
+                    task,
+                    completed: true,
+                  }),
+                  headers: { "Content-Type": "application/json" },
+                }
+              ).catch(() => {});
             }
-            updateProgress();
+
+            showMotivation();
+            updateProgressBar();
+            checkSectionCompletion(section);
           });
 
-          const link = document.createElement("a");
-          link.textContent = item.name;
-          if (item.url) link.href = item.url;
-          if (item.url) link.target = "_blank";
+          const label = document.createElement("label");
+          label.textContent = task;
 
+          taskDiv.appendChild(label);
           taskDiv.appendChild(checkbox);
-          taskDiv.appendChild(link);
-          secDiv.appendChild(taskDiv);
+          parent.appendChild(taskDiv);
         });
-
-        container.appendChild(secDiv);
-      });
-
-      // تحديث البار
-      function updateProgress() {
-        const percent = (completedItems / totalItems) * 100;
-        document.getElementById("progress-bar").style.width = percent + "%";
       }
 
-      // إظهار دعاء صغير
-      function showDua() {
-        const duaPopup = document.getElementById("dua-popup");
-        const randomDua = duas[Math.floor(Math.random() * duas.length)];
-        document.getElementById("dua-text").textContent = randomDua.text;
-        duaPopup.querySelector(".icon").textContent = randomDua.icon;
-        duaPopup.style.display = "block";
-        setTimeout(() => {
-          duaPopup.style.display = "none";
-        }, 3000);
+      // ====== PROGRESS + MOTIVATION ======
+      function updateProgressBar() {
+        const bar = document.getElementById("progress-bar");
+        const { completed, total } = getSectionProgress(selectedSection);
+        const pct = total ? Math.round((completed / total) * 100) : 0;
+        bar.style.width = pct + "%";
+        bar.textContent = pct + "%";
       }
 
-      // الاحتفال عند إكمال المحور
-      function checkSectionComplete(sectionTitle) {
-        const sectionDiv = [...document.querySelectorAll(".section")].find(
-          (sec) => sec.querySelector("h2").textContent === sectionTitle
-        );
-        const checkboxes = sectionDiv.querySelectorAll(
-          "input[type='checkbox']"
-        );
-        if ([...checkboxes].every((cb) => cb.checked)) {
-          const celebration = document.getElementById("celebration");
-          document.getElementById(
-            "celebration-text"
-          ).textContent = `أنهيت محور ${sectionTitle} بالكامل!`;
-          celebration.style.display = "block";
-          setTimeout(() => {
-            celebration.style.display = "none";
-          }, 4000);
+      function getSectionProgress(section) {
+        const data = moduleData[section];
+        let itemsCount = 0;
+        if (data.type === "models") itemsCount = data.count;
+        else if (data.type === "list") itemsCount = data.items.length;
+
+        const totalTasks = itemsCount * tasks.length;
+
+        // count completed keys for this section
+        let completed = 0;
+        for (const [k, v] of Object.entries(userData)) {
+          if (v && k.startsWith(section + "_")) completed++;
+        }
+        return { completed, total: totalTasks };
+      }
+
+      const showMotivation = () => {
+        const done = Object.values(userData).filter(Boolean).length;
+        const motivator = document.getElementById("motivator");
+        if (done === 0)
+          motivator.textContent = "ابدأ أول خطوة وهتلاقي الطريق سهل! 💪";
+        else if (done % 10 === 0)
+          motivator.textContent = `👏 ممتاز يا ${username}! خلصت ${done} خطوة! استمر!`;
+        else if (done > 50)
+          motivator.textContent = `🔥 انت بطل بجد يا ${username}، قربت تخلص كل المحتوى!`;
+        else motivator.textContent = "";
+      };
+
+      // ====== COMPLETION CHECK + CELEBRATION ======
+      function checkSectionCompletion(section) {
+        const { completed, total } = getSectionProgress(section);
+        if (total > 0 && completed >= total && !completedSections[section]) {
+          // أول مرة يكتمل
+          completedSections[section] = true;
+          localStorage.setItem(
+            `${userKey}_completedSections`,
+            JSON.stringify(completedSections)
+          );
+          celebrate(section);
         }
       }
+
+      function celebrate(section) {
+        showBanner(`🏆 برافوو يا ${username}! خلصت محور "${section}" كامل!`);
+        playApplause();
+        launchConfetti(120, 5000);
+      }
+
+      // Banner
+      function showBanner(text) {
+        const b = document.getElementById("celebrateBanner");
+        b.textContent = text;
+        b.classList.add("show");
+        setTimeout(() => {
+          b.classList.remove("show");
+        }, 5000);
+      }
+
+      // Simple applause via Web Audio
+      function playApplause() {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = "triangle";
+          o.frequency.value = 440;
+          o.connect(g);
+          g.connect(ctx.destination);
+          g.gain.setValueAtTime(0.0001, ctx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.05);
+          g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+          o.start();
+          o.stop(ctx.currentTime + 0.4);
+
+          // طبقة تانية
+          const o2 = ctx.createOscillator();
+          const g2 = ctx.createGain();
+          o2.type = "square";
+          o2.frequency.value = 660;
+          o2.connect(g2);
+          g2.connect(ctx.destination);
+          g2.gain.setValueAtTime(0.0001, ctx.currentTime);
+          g2.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.05);
+          g2.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+          o2.start();
+          o2.stop(ctx.currentTime + 0.4);
+        } catch (e) {}
+      }
+
+      // Confetti (emoji)
+      function launchConfetti(count = 100, duration = 4000) {
+        const emojis = ["🎉", "🎈", "✨", "🎊", "⭐"];
+        const W = window.innerWidth;
+        for (let i = 0; i < count; i++) {
+          const span = document.createElement("span");
+          span.className = "confetti";
+          span.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+          span.style.left = Math.random() * W + "px";
+          span.style.animationDuration = 2 + Math.random() * 3 + "s";
+          span.style.transform = `translateY(-10px) rotate(${
+            Math.random() * 360
+          }deg)`;
+          document.body.appendChild(span);
+          setTimeout(() => span.remove(), duration);
+        }
+      }
+
+      // ====== ADMIN OPTIONAL ======
+      const addModel = () => {
+        const section = document.getElementById("module-select").value;
+        const data = moduleData[section];
+        if (data.type === "models") data.count++;
+        else if (data.type === "list")
+          data.items.push({
+            title: `عنصر جديد ${data.items.length + 1}`,
+            url: "",
+          });
+        generateModules(section);
+        updateProgressBar();
+      };
+
+      const confirmRemoveModel = () => {
+        const section = document.getElementById("module-select").value;
+        const data = moduleData[section];
+        if (data.type === "models" && data.count > 1) {
+          if (confirm(`هل أنت متأكدة من حذف آخر نموذج من قسم ${section}؟`))
+            data.count--;
+        } else if (data.type === "list" && data.items.length > 1) {
+          if (confirm(`هل أنت متأكدة من حذف آخر عنصر من قسم ${section}؟`))
+            data.items.pop();
+        } else {
+          alert("لا يمكن حذف جميع العناصر!");
+        }
+        generateModules(section);
+        updateProgressBar();
+      };
     </script>
   </body>
 </html>
