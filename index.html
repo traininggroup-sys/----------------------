@@ -2,279 +2,1029 @@
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <title>متابعة الإنجاز</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>جروب أسئلة الجهاز المركزي</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
     <style>
+      :root {
+        --bg-grad1: #f5f5f5;
+        --bg-grad2: #eaeaea;
+        --brand: #004e64;
+        --accent: #0096c7;
+        --accent-2: #00b4d8;
+        --ink: #333;
+        --muted: #777;
+        --ok: #22c55e;
+        --warn: #f59e0b;
+        --card: #ffffff;
+        --line: #dcdcdc;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
       body {
-        font-family: Arial, sans-serif;
-        background: #f8f9fa;
+        height: 100%;
+      }
+      body {
         margin: 0;
-        padding: 0;
+        font-family: "Cairo", sans-serif;
+        color: var(--ink);
+        background: linear-gradient(to right, var(--bg-grad1), var(--bg-grad2));
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
-      header {
-        background: #007bff;
-        color: white;
-        padding: 15px;
+
+      /* Screens */
+      .screen {
+        display: none;
+        min-height: 100vh;
+        width: 100%;
+      }
+      .screen.active {
+        display: block;
+      }
+
+      /* Start screen */
+      .start-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: var(--brand);
         text-align: center;
-        font-size: 20px;
+        padding: 24px;
       }
-      .section {
-        margin: 20px;
-        background: white;
-        border-radius: 10px;
-        padding: 15px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      .start-screen h1 {
+        color: #fff;
+        margin: 10px 0 6px;
+        font-size: 28px;
       }
-      h2 {
-        color: #007bff;
+      .start-screen img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #fff;
+        margin-bottom: 14px;
+      }
+      .start-input {
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: none;
+        outline: none;
+        width: min(260px, 80vw);
+        margin: 8px 0;
+      }
+      .btn {
+        cursor: pointer;
+        border: none;
+        border-radius: 999px;
+        padding: 12px 22px;
+        font-weight: 700;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-ghost {
+        background: #fff;
+        color: var(--brand);
+        border: 2px solid #fff;
+      }
+      .btn:active {
+        transform: scale(0.98);
+      }
+      .row-gap {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 8px;
+      }
+
+      /* Module grid */
+      .module-grid {
+        padding: 34px 16px;
+        background: #f0f8ff;
+      }
+      .module-grid h2 {
+        text-align: center;
+        margin: 0 0 18px;
+      }
+      .modules-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        justify-content: center;
+      }
+      .module-button {
+        position: relative;
+        background: #fff;
+        border: 2px solid #ccc;
+        border-radius: 15px;
+        padding: 18px;
         font-size: 18px;
+        min-width: 220px;
+        cursor: pointer;
+        transition: 0.25s;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+      }
+      .module-button:hover {
+        transform: translateY(-4px);
+        background: #d9fdd3;
+      }
+      .module-button i {
+        display: block;
+        font-size: 26px;
+        margin-bottom: 8px;
+      }
+      .module-check {
+        position: absolute;
+        top: 10px;
+        left: 12px;
+        font-size: 18px;
+        color: var(--ok);
+        display: none;
+      }
+      .module-button.done .module-check {
+        display: block;
+      }
+
+      /* Main (section details) */
+      main {
+        padding: 18px;
+        background: #fafafa;
+      }
+      .bar-top {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+      .back-btn {
+        background: #aaa;
+        color: #fff;
+        padding: 8px 14px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .link-btn {
+        background: #fff;
+        border: 1px solid var(--accent);
+        color: var(--accent);
+        padding: 8px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+      }
+      .module {
+        background: #fff;
+        border-radius: 12px;
+        padding: 14px;
+        margin-bottom: 18px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border: 1px solid #ccc;
+      }
+      .module h2 {
+        margin: 0 0 10px;
+        color: #023e8a;
+        border-bottom: 2px solid #ccc;
+        padding-bottom: 10px;
+      }
+      .model-title {
+        background: #dbeafe;
+        color: #1e3a8a;
+        padding: 8px 12px;
+        border-radius: 8px;
+        margin: 14px 0 8px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+      .open-btn {
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 1px solid var(--accent);
+        background: #e6f7fb;
+        cursor: pointer;
+        font-size: 14px;
       }
       .task {
         display: flex;
         align-items: center;
-        margin: 5px 0;
-        padding: 8px;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px dashed #ccc;
+      }
+      .task input[type="checkbox"] {
+        transform: scale(1.2);
+        accent-color: var(--accent-2);
+      }
+      .task.completed {
+        background: #d9fdd3;
         border-radius: 6px;
-        transition: background 0.3s;
       }
-      .task:hover {
-        background: #f1f1f1;
+      .motivator {
+        text-align: center;
+        font-weight: 700;
+        color: #2e7d32;
+        margin-top: 10px;
+        min-height: 26px;
       }
-      .task a {
-        text-decoration: none;
-        color: #333;
-        flex: 1;
+
+      /* Progress bar */
+      .progress-area {
+        width: 100%;
+        margin: 8px 0 14px;
       }
-      .task input {
-        margin-left: 10px;
+      .progress-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 5px;
       }
       .progress-container {
-        background: #ddd;
+        width: 100%;
+        background: #e5e7eb;
         border-radius: 20px;
+        height: 24px;
         overflow: hidden;
-        margin: 20px;
       }
       .progress-bar {
-        height: 20px;
-        background: #28a745;
-        width: 0;
-        transition: width 0.3s;
-      }
-      /* الدعاء الصغير */
-      .dua-popup {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: #e6f4ea;
-        color: #2f6627;
-        border-radius: 10px;
-        padding: 10px 15px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        font-size: 14px;
-        display: none;
-        animation: fadeIn 0.5s;
+        height: 100%;
+        width: 0%;
+        background: var(--accent-2);
         text-align: center;
-        max-width: 250px;
-        z-index: 1000;
+        color: #fff;
+        font-weight: 700;
+        will-change: width;
       }
-      .dua-popup .icon {
-        font-size: 18px;
-        margin-left: 5px;
-      }
-      .dua-popup small {
-        display: block;
-        margin-top: 5px;
-        color: #555;
-        font-size: 12px;
-      }
-      /* الاحتفال الكبير */
-      .celebration {
+
+      /* Celebration banner + confetti */
+      .celebrate-banner {
         position: fixed;
-        top: 50%;
+        top: -80px;
         left: 50%;
-        transform: translate(-50%, -50%);
-        background: white;
-        padding: 20px;
-        border-radius: 15px;
-        text-align: center;
-        box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
+        transform: translateX(-50%);
+        background: linear-gradient(90deg, #22c55e, #06b6d4, #3b82f6);
+        color: #fff;
+        padding: 14px 20px;
+        border-radius: 999px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        z-index: 9999;
+        white-space: nowrap;
+        font-weight: 700;
+      }
+      .celebrate-banner.show {
+        top: 20px;
+        transition: top 0.5s ease;
+      }
+      .confetti {
+        position: fixed;
+        top: -10px;
+        font-size: 22px;
+        animation: fall linear forwards;
+        z-index: 9998;
+        pointer-events: none;
+      }
+      @keyframes fall {
+        to {
+          transform: translateY(110vh) rotate(720deg);
+          opacity: 0.9;
+        }
+      }
+
+      /* Dua toast (small, bottom) */
+      .dua-toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        max-width: 300px;
+        background: #eef8f0;
+        color: #1f6f3f;
+        border: 1px solid #ccead5;
+        border-radius: 12px;
+        padding: 10px 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
         display: none;
         z-index: 9999;
+        font-size: 14px;
       }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translate(-50%, -40%);
-        }
-        to {
-          opacity: 1;
-          transform: translate(-50%, -50%);
-        }
+      .dua-toast .head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .dua-toast small {
+        display: block;
+        margin-top: 6px;
+        color: #4b5563;
+      }
+
+      /* Leaderboard */
+      .leaderboard {
+        padding: 22px;
+      }
+      .lb-card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+        max-width: 900px;
+        margin: 0 auto;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+      }
+      .lb-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+      }
+      .lb-list {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+      }
+      .lb-list th,
+      .lb-list td {
+        padding: 10px 8px;
+        border-bottom: 1px solid #eee;
+        text-align: center;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        border: 1px solid #e5e7eb;
+        background: #f8fafc;
+      }
+      .medal {
+        font-size: 18px;
+      }
+      .subtle {
+        color: #6b7280;
+        font-size: 12px;
+      }
+      .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #4338ca;
+        font-size: 12px;
+      }
+
+      /* Hide while rendering to avoid flicker */
+      .invisible {
+        visibility: hidden;
       }
     </style>
   </head>
   <body>
-    <header>📊 متابعة الإنجاز</header>
+    <!-- Screen 1: Start -->
+    <section id="screen-start" class="screen start-screen active">
+      <img src="5776125144014639249.jpg" alt="شعار الجروب" />
+      <h1>جروب أسئلة الجهاز المركزي</h1>
+      <input id="nameInput" class="start-input" placeholder="ادخل اسمك" />
+      <div class="row-gap">
+        <button class="btn btn-primary" id="btnStart">
+          ابدأ المذاكرة الآن
+        </button>
+        <button class="btn btn-ghost" id="btnGoLB">لوحة المتصدرين 🏆</button>
+      </div>
+    </section>
 
-    <div class="progress-container">
-      <div class="progress-bar" id="progress-bar"></div>
+    <!-- Screen 2: Modules -->
+    <section id="screen-modules" class="screen module-grid">
+      <h2>اختر المحور لبدء المذاكرة</h2>
+      <div class="row-gap">
+        <button class="btn link-btn" id="btnBackToStart">الرجوع</button>
+        <button class="btn link-btn" id="btnLeaderboard1">
+          لوحة المتصدرين 🏆
+        </button>
+      </div>
+      <div class="modules-wrap" id="modules-container"></div>
+    </section>
+
+    <!-- Screen 3: Section details -->
+    <main id="screen-main" class="screen">
+      <div class="bar-top">
+        <button class="back-btn" id="btnBackToModules">🔙 رجوع</button>
+        <button class="link-btn" id="btnLeaderboard2">لوحة المتصدرين 🏆</button>
+      </div>
+
+      <div class="progress-area">
+        <div class="progress-label">
+          <span id="progress-title">نسبة إنجاز المحور</span>
+          <span id="progress-count">0 / 0</span>
+        </div>
+        <div class="progress-container">
+          <div class="progress-bar" id="progress-bar">0%</div>
+        </div>
+      </div>
+
+      <div id="content" class="invisible"></div>
+      <div class="motivator" id="motivator"></div>
+    </main>
+
+    <!-- Screen 4: Leaderboard -->
+    <section id="screen-lb" class="screen leaderboard">
+      <div class="lb-card">
+        <div class="lb-head">
+          <div>
+            <h2 style="margin: 0">لوحة المتصدرين 🏆</h2>
+            <div class="subtle">
+              يتم حساب النسبة من المهام المكتملة لكل المحاور
+            </div>
+          </div>
+          <div class="row-gap">
+            <button class="btn link-btn" id="btnLBBackStart">الرجوع</button>
+            <button class="btn link-btn" id="btnLBBackModules">المحاور</button>
+          </div>
+        </div>
+        <table class="lb-list" id="lbTable">
+          <thead>
+            <tr>
+              <th>الترتيب</th>
+              <th>الاسم</th>
+              <th>التقدم</th>
+              <th>أوسمة</th>
+              <th>آخر تحديث</th>
+            </tr>
+          </thead>
+          <tbody id="lbBody"></tbody>
+        </table>
+        <div class="subtle" style="margin-top: 8px">
+          💡 يتم الترتيب تلقائيًا—أكمل مهام أكثر لتتقدم!
+        </div>
+      </div>
+    </section>
+
+    <!-- Celebration banner -->
+    <div id="celebrateBanner" class="celebrate-banner">
+      🏆 برافوو! إنجاز رهيب!
     </div>
 
-    <div id="sections"></div>
-
-    <!-- دعاء صغير -->
-    <div class="dua-popup" id="dua-popup">
-      <span class="icon">📚</span>
-      <span id="dua-text"></span>
+    <!-- Dua toast -->
+    <div id="duaToast" class="dua-toast">
+      <div class="head">
+        <span id="duaIcon">📚</span><span>دعاء تحفيزي</span>
+      </div>
+      <div id="duaText"></div>
       <small>جروب المشتركين للتدريب مبسوط بإنجازك 🤗</small>
     </div>
 
-    <!-- احتفال كبير -->
-    <div class="celebration" id="celebration">
-      <h2>🎉 مبروك!</h2>
-      <p id="celebration-text"></p>
-    </div>
-
     <script>
-      // قائمة الأدعية
-      const duas = [
+      /* ================== DATA ================== */
+      const adminName = "نجلا";
+      const TASKS = ["مذاكرة/مشاهدة", "حل الاستفتاءات", "حل الاختبار بوقت"];
+
+      // الأدعية المصغّرة بعد كل عنصر/نموذج (مع أيقونات لطيفة)
+      const DUAS = [
         {
           icon: "📚",
           text: "اللهم علّمني ما ينفعني وانفعني بما علّمتني وزدني علمًا",
         },
         { icon: "🌟", text: "اللهم افتح لي أبواب حكمتك وانشر عليّ رحمتك" },
         { icon: "✨", text: "اللهم اجعل هذا العلم حجة لي لا عليّ" },
-        { icon: "💖", text: "اللهم صلّ وسلم على نبينا محمد" },
+        { icon: "💖", text: "اللهم صلِّ وسلم على نبينا محمد" },
+        { icon: "🕊️", text: "اللهم ارزقني الفهم السليم والحفظ القوي" },
       ];
 
-      // بيانات المحاور
-      const sectionsData = [
-        {
-          title: "المعلومات العامة",
-          items: Array.from({ length: 22 }, (_, i) => ({
-            name: `نموذج ${i + 1}`,
-          })),
-        },
-        {
-          title: "الحاسب",
+      const moduleData = {
+        "📘 معلومات عامة": { type: "models", count: 22, icon: "fa-lightbulb" },
+        "💻 حاسب": {
+          type: "list",
+          icon: "fa-computer",
           items: [
-            { name: "فيديو رقم 1", url: "https://youtu.be/aTGmvmeDJf8" },
-            { name: "فيديو رقم 2", url: "https://youtu.be/9tye0LUQfYI" },
-            { name: "فيديو رقم 3", url: "https://youtu.be/N3Z5p65om0o" },
-            { name: "فيديو رقم 4", url: "https://youtu.be/_HwWcpqTdHI" },
-            { name: "فيديو رقم 6", url: "https://youtu.be/1DbFtQZpsW0" },
-            { name: "فيديو رقم 7", url: "https://youtu.be/jUBGca5qRnM" },
-            { name: "فيديو رقم 8", url: "https://youtu.be/q3Zz99bThyQ" },
-            { name: "فيديو رقم 9", url: "https://youtu.be/_Ea_z_Ft4bs" },
-            { name: "فيديو رقم 10", url: "https://youtu.be/hRAdE691Mg4" },
-            { name: "فيديو رقم 11", url: "https://youtu.be/LNlw1VhnDWM" },
-            { name: "فيديو رقم 12", url: "https://youtu.be/mdgj-gbvOIg" },
-            { name: "فيديو رقم 13", url: "https://youtu.be/sTGkL7xYwCE" },
-            { name: "فيديو رقم 14", url: "https://youtu.be/8ypgm2RJ804" },
-            { name: "فيديو رقم 15", url: "https://youtu.be/9AY9POUJYLc" },
-            { name: "برنامج Access", url: "https://youtu.be/SOFszLmW_X8" },
-            { name: "برنامج PowerPoint", url: "https://youtu.be/53ydwEIFrog" },
-            { name: "برنامج Excel", url: "https://youtu.be/JzsTom7tTx8" },
-            ...Array.from({ length: 22 }, (_, i) => ({
-              name: `نموذج ${i + 1}`,
+            { title: "فيديو رقم 1", url: "https://youtu.be/aTGmvmeDJf8" },
+            { title: "فيديو رقم 2", url: "https://youtu.be/9tye0LUQfYI" },
+            { title: "فيديو رقم 3", url: "https://youtu.be/N3Z5p65om0o" },
+            { title: "فيديو رقم 4", url: "https://youtu.be/_HwWcpqTdHI" },
+            { title: "فيديو رقم 6", url: "https://youtu.be/1DbFtQZpsW0" },
+            { title: "برنامج Excel", url: "https://youtu.be/JzsTom7tTx8" },
+            { title: "فيديو رقم 7", url: "https://youtu.be/jUBGca5qRnM" },
+            { title: "فيديو رقم 8", url: "https://youtu.be/q3Zz99bThyQ" },
+            { title: "فيديو رقم 9", url: "https://youtu.be/_Ea_z_Ft4bs" },
+            {
+              title: "شرح اختبار علي Excel",
+              url: "https://youtu.be/qn5rs-4mFJo",
+            },
+            { title: "فيديو رقم 10", url: "https://youtu.be/hRAdE691Mg4" },
+            { title: "فيديو رقم 11", url: "https://youtu.be/LNlw1VhnDWM" },
+            { title: "فيديو رقم 12", url: "https://youtu.be/mdgj-gbvOIg" },
+            { title: "برنامج Excel", url: "https://youtu.be/GI8RU0FXXO4" },
+            { title: "فيديو رقم 13", url: "https://youtu.be/sTGkL7xYwCE" },
+            { title: "برنامج Access", url: "https://youtu.be/SOFszLmW_X8" },
+            {
+              title: "برنامج PowerPoint جزء ١",
+              url: "https://youtu.be/53ydwEIFrog",
+            },
+            {
+              title: "برنامج PowerPoint جزء ٢",
+              url: "https://youtu.be/yCvhQdWY0ac",
+            },
+            { title: "فيديو رقم 14", url: "https://youtu.be/8ypgm2RJ804" },
+            { title: "أهم الاختصارات", url: "https://youtu.be/lhjovAocMMw" },
+            { title: "اسئلة مجمعة", url: "https://youtu.be/BgYzh47Icm0" },
+            { title: "النموذج 1", url: "https://youtu.be/evZEGltYYXs" },
+            { title: "النموذج 2", url: "https://youtu.be/U_jAqbzbjRA" },
+            { title: "النموذج 3", url: "https://youtu.be/IkT_6INmCyY" },
+            { title: "فيديو رقم 15", url: "https://youtu.be/9AY9POUJYLc" },
+            {
+              title: "مراجعة للحاسب جزء ١",
+              url: "https://youtu.be/2V0fQEpAeiM",
+            },
+            {
+              title: "مراجعة للحاسب جزء ٢",
+              url: "https://youtu.be/W1Qcsu6hy4U",
+            },
+            { title: "نموذج رقم 9", url: "https://youtu.be/VtOe_dx5qn8" },
+            {
+              title: "شرح حساب عدد الخلايا في Excel",
+              url: "https://youtu.be/-uIb6ZpFEi4",
+            },
+            {
+              title: "شرح سؤال لعمل تخطيط هيكلي نختار إيه",
+              url: "https://youtu.be/Odgj-G4pHUQ",
+            },
+            // تكملة نماذج إضافية (بدون روابط) للوصول لمجموعة نماذج كبيرة للحاسب
+            ...Array.from({ length: 22 - 4 }, (_, i) => ({
+              title: `نموذج إضافي ${i + 1}`,
+              url: "",
             })),
           ],
         },
-        {
-          title: "الإنجليزي",
-          items: Array.from({ length: 16 }, (_, i) => ({
-            name: `نموذج ${i + 1}`,
-          })),
-        },
-        {
-          title: "العربي",
-          items: Array.from({ length: 17 }, (_, i) => ({
-            name: `نموذج ${i + 1}`,
-          })),
-        },
-      ];
+        "🗣️ انجليزي": { type: "models", count: 16, icon: "fa-language" },
+        "📙 عربي": { type: "models", count: 17, icon: "fa-book" },
+      };
 
-      // إنشاء الواجهة
-      const container = document.getElementById("sections");
-      let totalItems = 0,
-        completedItems = 0;
+      /* ================== STATE ================== */
+      const qs = (s) => document.querySelector(s);
+      const qsa = (s) => Array.from(document.querySelectorAll(s));
 
-      sectionsData.forEach((section) => {
-        const secDiv = document.createElement("div");
-        secDiv.className = "section";
-        const h2 = document.createElement("h2");
-        h2.textContent = section.title;
-        secDiv.appendChild(h2);
+      let username = "",
+        userKey = "";
+      let userData = {}; // { section_id_taskIndex : boolean }
+      let completedSections = {}; // { section : true }
+      let selectedSection = "";
 
-        section.items.forEach((item) => {
-          totalItems++;
+      const STORAGE = {
+        userKey: (name) => `centralUser_${name}`,
+        doneSectionsKey: (name) => `centralUser_${name}_completedSections`,
+        leaderboard: "centralLeaderboard",
+      };
+
+      /* ================== INIT + NAV ================== */
+      const screens = {
+        start: qs("#screen-start"),
+        modules: qs("#screen-modules"),
+        main: qs("#screen-main"),
+        lb: qs("#screen-lb"),
+      };
+      function showScreen(name) {
+        Object.values(screens).forEach((s) => s.classList.remove("active"));
+        screens[name].classList.add("active");
+      }
+
+      // Safe LS helpers
+      function safeGet(key, fallback) {
+        try {
+          const v = localStorage.getItem(key);
+          return v ? JSON.parse(v) : fallback;
+        } catch {
+          return fallback;
+        }
+      }
+      function safeSet(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch {}
+      }
+
+      // Start
+      qs("#btnStart").addEventListener("click", () => {
+        const input = qs("#nameInput");
+        const name =
+          (input.value || "").trim() || localStorage.getItem("savedName");
+        if (!name) return;
+        username = name;
+        localStorage.setItem("savedName", name);
+        userKey = STORAGE.userKey(username);
+        userData = safeGet(userKey, {});
+        completedSections = safeGet(STORAGE.doneSectionsKey(username), {});
+        renderModuleButtons();
+        showScreen("modules");
+      });
+
+      qs("#btnGoLB").addEventListener("click", () => {
+        username =
+          (qs("#nameInput").value || "").trim() ||
+          localStorage.getItem("savedName") ||
+          "";
+        if (username) {
+          userKey = STORAGE.userKey(username);
+          userData = safeGet(userKey, {});
+          completedSections = safeGet(STORAGE.doneSectionsKey(username), {});
+        }
+        renderLeaderboard();
+        showScreen("lb");
+      });
+
+      qs("#btnBackToStart").addEventListener("click", () =>
+        showScreen("start")
+      );
+      qs("#btnLeaderboard1").addEventListener("click", () => {
+        renderLeaderboard();
+        showScreen("lb");
+      });
+      qs("#btnLeaderboard2").addEventListener("click", () => {
+        renderLeaderboard();
+        showScreen("lb");
+      });
+      qs("#btnLBBackStart").addEventListener("click", () =>
+        showScreen("start")
+      );
+      qs("#btnLBBackModules").addEventListener("click", () =>
+        showScreen("modules")
+      );
+      qs("#btnBackToModules").addEventListener("click", () => {
+        renderModuleButtons();
+        showScreen("modules");
+      });
+
+      /* ================== MODULES GRID ================== */
+      function renderModuleButtons() {
+        const wrap = qs("#modules-container");
+        wrap.innerHTML = "";
+        for (const section in moduleData) {
+          const btn = document.createElement("button");
+          btn.className =
+            "module-button" + (completedSections[section] ? " done" : "");
+          btn.innerHTML = `<i class='fas fa-book-open'></i>${section}<span class="module-check">✅</span>`;
+          btn.onclick = () => openModule(section);
+          wrap.appendChild(btn);
+        }
+      }
+
+      function openModule(section) {
+        selectedSection = section;
+        showScreen("main");
+        renderSection(section);
+        updateProgressBar();
+      }
+
+      /* ================== SECTION RENDER ================== */
+      function renderSection(section) {
+        const data = moduleData[section];
+        const container = qs("#content");
+        container.classList.add("invisible");
+        container.innerHTML = "";
+
+        const card = document.createElement("div");
+        card.className = "module";
+
+        const title = document.createElement("h2");
+        title.textContent = section;
+        card.appendChild(title);
+
+        if (data.type === "models") {
+          for (let i = 1; i <= data.count; i++) {
+            addBlock(card, section, `model_${i}`, `📄 نموذج ${i}`);
+          }
+        } else if (data.type === "list") {
+          data.items.forEach((item, idx) => {
+            addBlock(
+              card,
+              section,
+              `item_${idx + 1}`,
+              (item.url ? "🎬 " : "📄 ") + item.title,
+              item.url
+            );
+          });
+        }
+
+        container.appendChild(card);
+
+        // reveal after DOM ready to avoid flicker
+        requestAnimationFrame(() => container.classList.remove("invisible"));
+        showMotivation();
+      }
+
+      // block with tasks + optional open button
+      function addBlock(parent, section, id, titleText, url = "") {
+        const header = document.createElement("div");
+        header.className = "model-title";
+        const left = document.createElement("span");
+        left.textContent = titleText;
+        header.appendChild(left);
+        if (url) {
+          const openBtn = document.createElement("button");
+          openBtn.className = "open-btn";
+          openBtn.textContent = "فتح الفيديو";
+          openBtn.onclick = () => window.open(url, "_blank");
+          header.appendChild(openBtn);
+        }
+        parent.appendChild(header);
+
+        TASKS.forEach((task, idx) => {
           const taskDiv = document.createElement("div");
           taskDiv.className = "task";
 
           const checkbox = document.createElement("input");
           checkbox.type = "checkbox";
+          const taskKey = `${section}_${id}_${idx}`;
+          if (userData[taskKey]) {
+            checkbox.checked = true;
+            taskDiv.classList.add("completed");
+          }
 
           checkbox.addEventListener("change", () => {
+            userData[taskKey] = checkbox.checked;
+            safeSet(userKey, userData);
+            taskDiv.classList.toggle("completed", checkbox.checked);
+
             if (checkbox.checked) {
-              completedItems++;
-              showDua();
-              checkSectionComplete(section.title);
-            } else {
-              completedItems--;
+              // دعاء صغير محفّز
+              showDuaToast();
+              // إرسال اختياري (محمي بـ catch)
+              fetch(
+                "https://script.google.com/macros/s/AKfycbzjK9rFHOGNb0gq0d7uhlZMbgJTvsxbq4XIBU160u22cZusp_XI1M0ufsL82NUPOZjW/exec",
+                {
+                  method: "POST",
+                  body: JSON.stringify({
+                    name: username,
+                    section,
+                    model: id,
+                    task,
+                    completed: true,
+                  }),
+                  headers: { "Content-Type": "application/json" },
+                }
+              ).catch(() => {});
             }
-            updateProgress();
+
+            showMotivation();
+            updateProgressBar();
+            checkSectionCompletion(section);
+            updateLeaderboardSnapshot(); // حدّث بيانات المستخدم للـ LB
           });
 
-          const link = document.createElement("a");
-          link.textContent = item.name;
-          if (item.url) link.href = item.url;
-          if (item.url) link.target = "_blank";
+          const label = document.createElement("label");
+          label.textContent = task;
 
+          taskDiv.appendChild(label);
           taskDiv.appendChild(checkbox);
-          taskDiv.appendChild(link);
-          secDiv.appendChild(taskDiv);
+          parent.appendChild(taskDiv);
         });
-
-        container.appendChild(secDiv);
-      });
-
-      // تحديث شريط التقدم
-      function updateProgress() {
-        const percent = (completedItems / totalItems) * 100;
-        document.getElementById("progress-bar").style.width = percent + "%";
       }
 
-      // إظهار الدعاء الصغير في المنتصف
-      function showDua() {
-        const duaPopup = document.getElementById("dua-popup");
-        const randomDua = duas[Math.floor(Math.random() * duas.length)];
-        document.getElementById("dua-text").textContent = randomDua.text;
-        duaPopup.querySelector(".icon").textContent = randomDua.icon;
-        duaPopup.style.display = "block";
-        setTimeout(() => {
-          duaPopup.style.display = "none";
-        }, 3000);
+      /* ================== PROGRESS + MOTIVATION ================== */
+      function getSectionProgress(section) {
+        const data = moduleData[section];
+        let itemsCount = 0;
+        if (data.type === "models") itemsCount = data.count;
+        else if (data.type === "list") itemsCount = data.items.length;
+
+        const totalTasks = itemsCount * TASKS.length;
+        let completed = 0;
+        for (const [k, v] of Object.entries(userData)) {
+          if (v && k.startsWith(section + "_")) completed++;
+        }
+        return { completed, total: totalTasks };
       }
 
-      // الاحتفال عند إكمال المحور
-      function checkSectionComplete(sectionTitle) {
-        const sectionDiv = [...document.querySelectorAll(".section")].find(
-          (sec) => sec.querySelector("h2").textContent === sectionTitle
-        );
-        const checkboxes = sectionDiv.querySelectorAll(
-          "input[type='checkbox']"
-        );
-        if ([...checkboxes].every((cb) => cb.checked)) {
-          const celebration = document.getElementById("celebration");
-          document.getElementById(
-            "celebration-text"
-          ).textContent = `أنهيت محور ${sectionTitle} بالكامل!`;
-          celebration.style.display = "block";
-          setTimeout(() => {
-            celebration.style.display = "none";
-          }, 4000);
+      function updateProgressBar() {
+        const bar = qs("#progress-bar");
+        const pc = qs("#progress-count");
+        const { completed, total } = getSectionProgress(selectedSection);
+        const pct = total ? Math.round((completed / total) * 100) : 0;
+        // smoother width change
+        requestAnimationFrame(() => (bar.style.width = pct + "%"));
+        bar.textContent = pct + "%";
+        pc.textContent = `${completed} / ${total}`;
+      }
+
+      function showMotivation() {
+        const done = Object.values(userData).filter(Boolean).length;
+        const el = qs("#motivator");
+        if (done === 0) el.textContent = "ابدأ أول خطوة وهتلاقي الطريق سهل! 💪";
+        else if (done % 10 === 0)
+          el.textContent = `👏 ممتاز يا ${username}! خلصت ${done} خطوة! استمر!`;
+        else if (done > 50)
+          el.textContent = `🔥 انت بطل بجد يا ${username}، قربت تخلص كل المحتوى!`;
+        else el.textContent = "";
+      }
+
+      function checkSectionCompletion(section) {
+        const { completed, total } = getSectionProgress(section);
+        if (total > 0 && completed >= total && !completedSections[section]) {
+          completedSections[section] = true;
+          safeSet(STORAGE.doneSectionsKey(username), completedSections);
+          celebrate(section);
         }
       }
+
+      function celebrate(section) {
+        showBanner(`🏆 برافوو يا ${username}! خلصت محور "${section}" كامل!`);
+        playApplause();
+        launchConfetti(120, 5000);
+        updateLeaderboardSnapshot(); // المحور اكتمل → حدّث الـ LB
+      }
+
+      function showBanner(text) {
+        const b = qs("#celebrateBanner");
+        b.textContent = text;
+        b.classList.add("show");
+        setTimeout(() => b.classList.remove("show"), 5000);
+      }
+
+      function playApplause() {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const o = ctx.createOscillator(),
+            g = ctx.createGain();
+          o.type = "triangle";
+          o.frequency.value = 440;
+          o.connect(g);
+          g.connect(ctx.destination);
+          g.gain.setValueAtTime(0.0001, ctx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.05);
+          g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+          o.start();
+          o.stop(ctx.currentTime + 0.4);
+          const o2 = ctx.createOscillator(),
+            g2 = ctx.createGain();
+          o2.type = "square";
+          o2.frequency.value = 660;
+          o2.connect(g2);
+          g2.connect(ctx.destination);
+          g2.gain.setValueAtTime(0.0001, ctx.currentTime);
+          g2.gain.exponentialRampToValueAtTime(0.15, ctx.currentTime + 0.05);
+          g2.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+          o2.start();
+          o2.stop(ctx.currentTime + 0.4);
+        } catch {}
+      }
+
+      function launchConfetti(count = 100, duration = 4000) {
+        const emojis = ["🎉", "🎈", "✨", "🎊", "⭐"],
+          W = window.innerWidth;
+        for (let i = 0; i < count; i++) {
+          const s = document.createElement("span");
+          s.className = "confetti";
+          s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+          s.style.left = Math.random() * W + "px";
+          s.style.animationDuration = 2 + Math.random() * 3 + "s";
+          s.style.transform = `translateY(-10px) rotate(${
+            Math.random() * 360
+          }deg)`;
+          document.body.appendChild(s);
+          setTimeout(() => s.remove(), duration);
+        }
+      }
+
+      /* ================== DUA TOAST ================== */
+      function showDuaToast() {
+        const toast = qs("#duaToast");
+        const d = DUAS[Math.floor(Math.random() * DUAS.length)];
+        qs("#duaIcon").textContent = d.icon;
+        qs("#duaText").textContent =
+          d.text + " — جروب المشتركين للتدريب مبسوط بإنجازك 🎉";
+        toast.style.display = "block";
+        clearTimeout(showDuaToast._t);
+        showDuaToast._t = setTimeout(
+          () => (toast.style.display = "none"),
+          3200
+        );
+      }
+
+      /* ================== LEADERBOARD ================== */
+      // حساب التقدم الكلي عبر جميع المحاور
+      function computeOverallProgress(userName) {
+        const data = safeGet(STORAGE.userKey(userName), {});
+        // total possible:
+        let grandTotal = 0;
+        let done = 0;
+
+        for (const section in moduleData) {
+          const md = moduleData[section];
+          const items = md.type === "models" ? md.count : md.items.length;
+          const totalTasks = items * TASKS.length;
+          grandTotal += totalTasks;
+          // count for this section
+          for (const [k, v] of Object.entries(data)) {
+            if (v && k.startsWith(section + "_")) done++;
+          }
+        }
+        const pct = grandTotal ? Math.round((done / grandTotal) * 100) : 0;
+        return { done, grandTotal, pct };
+      }
+
+      // حفظ لقطة المستخدم الحالية في مصفوفة اللوحة
+      function updateLeaderboardSnapshot() {
+        if (!username) return;
+        const snap = safeGet(STORAGE.leaderboard, []);
+        const { done, grandTotal, pct } = computeOverallProgress(username);
+        const now = new Date().toISOString();
+
+        const idx = snap.findIndex((x) => x.name === username);
+        const entry = {
+          name: username,
+          done,
+          total: grandTotal,
+          pct,
+          updatedAt: now,
+        };
+        if (idx >= 0) snap[idx] = entry;
+        else snap.push(entry);
+        safeSet(STORAGE.leaderboard, snap);
+      }
+
+      function renderLeaderboard() {
+        // حدّث لقطة المستخدم الحالي (لو موجود)
+        if ((localStorage.getItem("savedName") || "").trim()) {
+          username = localStorage.getItem("savedName");
+          updateLeaderboardSnapshot();
+        }
+
+        const tbody = qs("#lbBody");
+        tbody.innerHTML = "";
+        const rows = safeGet(STORAGE.leaderboard, []);
+
+        // ترتيب تنازلي حسب النسبة، ثم حسب عدد المهام
+        rows.sort((a, b) => b.pct - a.pct || b.done - a.done);
+
+        rows.forEach((r, i) => {
+          const tr = document.createElement("tr");
+          const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "—";
+          const badge =
+            r.pct >= 90
+              ? "🎖️ بطل متفوّق"
+              : r.pct >= 70
+              ? "⭐ متقدم"
+              : r.pct >= 40
+              ? "💪 مثابر"
+              : "🚀 بداية قوية";
+
+          tr.innerHTML = `
+          <td><span class="medal">${medal}</span></td>
+          <td>${r.name}</td>
+          <td>
+            <div class="badge"><strong>${
+              r.pct
+            }%</strong><span class="subtle">(${r.done}/${r.total})</span></div>
+          </td>
+          <td><span class="pill">${badge}</span></td>
+          <td class="subtle">${formatTime(r.updatedAt)}</td>
+        `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function formatTime(iso) {
+        if (!iso) return "—";
+        const d = new Date(iso);
+        const dd = String(d.getDate()).padStart(2, "0");
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const yyyy = d.getFullYear();
+        const hh = String(d.getHours()).padStart(2, "0");
+        const min = String(d.getMinutes()).padStart(2, "0");
+        return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+      }
+
+      /* ================== AUTO-LOAD NAME ================== */
+      (function bootstrap() {
+        const saved = localStorage.getItem("savedName");
+        if (saved) {
+          qs("#nameInput").value = saved;
+          username = saved;
+          userKey = STORAGE.userKey(username);
+          userData = safeGet(userKey, {});
+          completedSections = safeGet(STORAGE.doneSectionsKey(username), {});
+        }
+      })();
     </script>
   </body>
 </html>
