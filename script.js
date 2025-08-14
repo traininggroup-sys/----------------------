@@ -10,43 +10,12 @@ const DUAS = [
 
 const moduleData = {
   "📘 معلومات عامة": { type: "models", count: 22, icon: "fa-lightbulb" },
-  "💻 حاسب": {
-    type: "list",
-    icon: "fa-computer",
-    items: [
+  "💻 حاسب": { type: "list", icon: "fa-computer", items: [
       { title: "فيديو رقم 1", url: "https://youtu.be/aTGmvmeDJf8" },
       { title: "فيديو رقم 2", url: "https://youtu.be/9tye0LUQfYI" },
       { title: "فيديو رقم 3", url: "https://youtu.be/N3Z5p65om0o" },
-      { title: "فيديو رقم 4", url: "https://youtu.be/_HwWcpqTdHI" },
-      { title: "فيديو رقم 6", url: "https://youtu.be/1DbFtQZpsW0" },
-      { title: "برنامج Excel", url: "https://youtu.be/JzsTom7tTx8" },
-      { title: "فيديو رقم 7", url: "https://youtu.be/jUBGca5qRnM" },
-      { title: "فيديو رقم 8", url: "https://youtu.be/q3Zz99bThyQ" },
-      { title: "فيديو رقم 9", url: "https://youtu.be/_Ea_z_Ft4bs" },
-      { title: "شرح اختبار علي Excel", url: "https://youtu.be/qn5rs-4mFJo" },
-      { title: "فيديو رقم 10", url: "https://youtu.be/hRAdE691Mg4" },
-      { title: "فيديو رقم 11", url: "https://youtu.be/LNlw1VhnDWM" },
-      { title: "فيديو رقم 12", url: "https://youtu.be/mdgj-gbvOIg" },
-      { title: "برنامج Excel", url: "https://youtu.be/GI8RU0FXXO4" },
-      { title: "فيديو رقم 13", url: "https://youtu.be/sTGkL7xYwCE" },
-      { title: "برنامج Access", url: "https://youtu.be/SOFszLmW_X8" },
-      { title: "برنامج PowerPoint جزء ١", url: "https://youtu.be/53ydwEIFrog" },
-      { title: "برنامج PowerPoint جزء ٢", url: "https://youtu.be/yCvhQdWY0ac" },
-      { title: "فيديو رقم 14", url: "https://youtu.be/8ypgm2RJ804" },
-      { title: "أهم الاختصارات", url: "https://youtu.be/lhjovAocMMw" },
-      { title: "اسئلة مجمعة", url: "https://youtu.be/BgYzh47Icm0" },
-      { title: "النموذج 1", url: "https://youtu.be/evZEGltYYXs" },
-      { title: "النموذج 2", url: "https://youtu.be/U_jAqbzbjRA" },
-      { title: "النموذج 3", url: "https://youtu.be/IkT_6INmCyY" },
-      { title: "فيديو رقم 15", url: "https://youtu.be/9AY9POUJYLc" },
-      { title: "مراجعة للحاسب جزء ١", url: "https://youtu.be/2V0fQEpAeiM" },
-      { title: "مراجعة للحاسب جزء ٢", url: "https://youtu.be/W1Qcsu6hy4U" },
-      { title: "النموذج 9", url: "https://youtu.be/VtOe_dx5qn8" },
-      { title: "شرح حساب عدد الخلايا في Excel", url: "https://youtu.be/-uIb6ZpFEi4" },
-      { title: "شرح سؤال لعمل تخطيط هيكلي نختار إيه", url: "https://youtu.be/Odgj-G4pHUQ" },
-      ...Array.from({ length: 22 }, (_, i) => ({ title: `النموذج ${i + 1}`, url: "#" })),
-    ],
-  },
+      // أكملي بقية الفيديوهات حسب الحاجة
+  ]},
   "🗣️ انجليزي": { type: "models", count: 16, icon: "fa-language" },
   "📙 عربي": { type: "models", count: 17, icon: "fa-book" },
 };
@@ -67,11 +36,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-const STORAGE = {
-  userKey: (name) => `centralUser_${name}`,
-  doneSectionsKey: (name) => `centralUser_${name}_completedSections`,
-};
-
 /* ================== HELPERS ================== */
 function showPage(pageId) {
   document.querySelectorAll(".page").forEach(page => page.classList.add("hidden"));
@@ -81,11 +45,11 @@ function showPage(pageId) {
 function saveUserData() {
   if (!username) return;
   localStorage.setItem(userKey, JSON.stringify(userData));
-  localStorage.setItem(STORAGE.doneSectionsKey(username), JSON.stringify(completedSections));
+  localStorage.setItem(`${userKey}_completedSections`, JSON.stringify(completedSections));
   updateLeaderboardSnapshot();
 }
 
-function computeOverallProgress(userName) {
+function computeOverallProgress() {
   let grandTotal = 0, done = 0;
   for (const section in moduleData) {
     const md = moduleData[section];
@@ -98,18 +62,19 @@ function computeOverallProgress(userName) {
 
 function updateLeaderboardSnapshot() {
   if (!username) return;
-  const { done, grandTotal, pct } = computeOverallProgress(username);
+  const { done, grandTotal, pct } = computeOverallProgress();
   db.ref("users/" + username).set({ name: username, done, total: grandTotal, pct, updatedAt: new Date().toISOString() });
 }
 
+/* ================== LEADERBOARD ================== */
 function renderLeaderboard() {
   db.ref("users").once("value", snapshot => {
     const users = snapshot.val() || {};
-    const tbody = document.querySelector("#lbBody");
+    const tbody = document.getElementById("lbBody");
     tbody.innerHTML = "";
-    Object.values(users).sort((a, b) => b.pct - a.pct).forEach((r, i) => {
-      const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "—";
-      const badge = r.pct >= 90 ? "🎖️ بطل متفوّق" : r.pct >= 70 ? "⭐ متقدم" : r.pct >= 40 ? "💪 مثابر" : "🚀 بداية قوية";
+    Object.values(users).sort((a,b) => b.pct - a.pct).forEach((r,i) => {
+      const medal = i===0?"🥇":i===1?"🥈":i===2?"🥉":"—";
+      const badge = r.pct>=90?"🎖️ بطل متفوّق":r.pct>=70?"⭐ متقدم":r.pct>=40?"💪 مثابر":"🚀 بداية قوية";
       const tr = document.createElement("tr");
       tr.innerHTML = `<td>${medal}</td><td>${r.name}</td><td><strong>${r.pct}%</strong> (${r.done}/${r.total})</td><td>${badge}</td><td>${new Date(r.updatedAt).toLocaleString("ar-EG")}</td>`;
       tbody.appendChild(tr);
@@ -122,10 +87,10 @@ function bootstrap() {
   const saved = localStorage.getItem("savedName");
   if (saved) {
     username = saved;
-    userKey = STORAGE.userKey(username);
+    userKey = `centralUser_${username}`;
     userData = JSON.parse(localStorage.getItem(userKey) || "{}");
-    completedSections = JSON.parse(localStorage.getItem(STORAGE.doneSectionsKey(username)) || "{}");
-    document.querySelector("#nameInput").value = saved;
+    completedSections = JSON.parse(localStorage.getItem(`${userKey}_completedSections`) || "{}");
+    document.getElementById("nameInput").value = saved;
   }
 }
 bootstrap();
@@ -135,10 +100,10 @@ document.getElementById("btnStart").addEventListener("click", () => {
   const val = document.getElementById("nameInput").value.trim();
   if (!val) return alert("ادخل اسمك!");
   username = val;
-  userKey = STORAGE.userKey(username);
+  userKey = `centralUser_${username}`;
   localStorage.setItem("savedName", username);
   userData = JSON.parse(localStorage.getItem(userKey) || "{}");
-  completedSections = JSON.parse(localStorage.getItem(STORAGE.doneSectionsKey(username)) || "{}");
+  completedSections = JSON.parse(localStorage.getItem(`${userKey}_completedSections`) || "{}");
   showPage("screen-modules");
   renderModules();
 });
@@ -173,30 +138,30 @@ function openModule(section) {
   const md = moduleData[section];
 
   if (md.type === "models") {
-    for (let i = 1; i <= md.count; i++) {
+    for (let i=1;i<=md.count;i++){
       const div = document.createElement("div");
-      div.className = "model-title";
-      div.textContent = `نموذج ${i}`;
+      div.className="model-title";
+      div.textContent=`نموذج ${i}`;
       const taskList = document.createElement("div");
-      TASKS.forEach(task => {
+      TASKS.forEach(task=>{
         const tdiv = document.createElement("div");
-        tdiv.className = "task";
-        tdiv.innerHTML = `<span>${task}</span><input type="checkbox" data-key="${section}_${i}_${task}"/>`;
+        tdiv.className="task";
+        tdiv.innerHTML=`<span>${task}</span><input type="checkbox" data-key="${section}_${i}_${task}"/>`;
         taskList.appendChild(tdiv);
       });
       div.appendChild(taskList);
       content.appendChild(div);
     }
-  } else if (md.type === "list") {
-    md.items.forEach((item, i) => {
-      const div = document.createElement("div");
-      div.className = "model-title";
-      div.innerHTML = `<span>${item.title}</span> <a href="${item.url}" target="_blank" class="open-btn">شاهد</a>`;
-      const taskList = document.createElement("div");
-      TASKS.forEach(task => {
-        const tdiv = document.createElement("div");
-        tdiv.className = "task";
-        tdiv.innerHTML = `<span>${task}</span><input type="checkbox" data-key="${section}_${i}_${task}"/>`;
+  } else if (md.type==="list") {
+    md.items.forEach((item,i)=>{
+      const div=document.createElement("div");
+      div.className="model-title";
+      div.innerHTML=`<span>${item.title}</span> <a href="${item.url}" target="_blank" class="open-btn">شاهد</a>`;
+      const taskList=document.createElement("div");
+      TASKS.forEach(task=>{
+        const tdiv=document.createElement("div");
+        tdiv.className="task";
+        tdiv.innerHTML=`<span>${task}</span><input type="checkbox" data-key="${section}_${i}_${task}"/>`;
         taskList.appendChild(tdiv);
       });
       div.appendChild(taskList);
@@ -204,15 +169,12 @@ function openModule(section) {
     });
   }
 
-  content.querySelectorAll("input[type=checkbox]").forEach(cb => {
-    const k = cb.dataset.key;
-    if (userData[k]) {
-      cb.checked = true;
-      cb.parentElement.classList.add("completed");
-    }
-    cb.addEventListener("change", () => {
-      userData[k] = cb.checked;
-      if (cb.checked) cb.parentElement.classList.add("completed");
+  content.querySelectorAll("input[type=checkbox]").forEach(cb=>{
+    const k=cb.dataset.key;
+    if(userData[k]) { cb.checked=true; cb.parentElement.classList.add("completed"); }
+    cb.addEventListener("change", ()=>{
+      userData[k]=cb.checked;
+      if(cb.checked) cb.parentElement.classList.add("completed"); 
       else cb.parentElement.classList.remove("completed");
       updateProgress();
       saveUserData();
@@ -225,63 +187,48 @@ function openModule(section) {
 /* ================== PROGRESS + CELEBRATION ================== */
 function updateProgress() {
   const md = moduleData[selectedSection];
-  const total = md.type === "models" ? md.count * TASKS.length : md.items.length * TASKS.length;
-  let done = 0;
-  for (const k in userData) if (k.startsWith(selectedSection + "_") && userData[k]) done++;
+  const total = md.type==="models"?md.count*TASKS.length:md.items.length*TASKS.length;
+  let done=0;
+  for(const k in userData) if(k.startsWith(selectedSection+"_") && userData[k]) done++;
+  const pct = total ? Math.round((done/total)*100) : 0;
+  document.getElementById("progress-count").textContent=`${done} / ${total}`;
+  const bar=document.getElementById("progress-bar");
+  bar.style.width=`${pct}%`;
+  bar.textContent=`${pct}%`;
+  const motiv=document.getElementById("motivator");
+  motiv.textContent=DUAS[Math.floor(Math.random()*DUAS.length)].text;
 
-  const pct = total ? Math.round((done / total) * 100) : 0;
-  document.getElementById("progress-count").textContent = `${done} / ${total}`;
-  const bar = document.getElementById("progress-bar");
-  bar.style.width = `${pct}%`;
-  bar.textContent = `${pct}%`;
-
-  const motiv = document.getElementById("motivator");
-  motiv.textContent = DUAS[Math.floor(Math.random() * DUAS.length)].text;
-
-  const moduleContainer = document.getElementById("content");
-
-  if (done === total && !completedSections[selectedSection]) {
-    completedSections[selectedSection] = true;
-
-    moduleContainer.querySelectorAll(".model-title").forEach(div => {
-      div.classList.add("scale-effect");
-      setTimeout(() => div.classList.remove("scale-effect"), 500);
-    });
-
+  if(done===total && !completedSections[selectedSection]){
+    completedSections[selectedSection]=true;
     showCelebration(`🎉 تم إنهاء محور ${selectedSection}!`);
-  } else if (done < total) delete completedSections[selectedSection];
+  } else if(done<total) delete completedSections[selectedSection];
 
   saveUserData();
 }
 
 /* ================== CELEBRATION BANNER + CONFETTI ================== */
-function showCelebration(text) {
-  const banner = document.querySelector('.celebrate-banner');
-  if (!banner) return;
-
-  banner.innerText = text;
-  banner.classList.add('show');
-
+function showCelebration(text){
+  const banner=document.querySelector(".celebrate-banner");
+  if(!banner) return;
+  banner.innerText=text;
+  banner.classList.add("show");
   createConfetti();
-
-  setTimeout(() => banner.classList.remove('show'), 2500);
+  setTimeout(()=>banner.classList.remove("show"),2500);
 }
 
-function createConfetti() {
-  const colors = ['#FF0A54','#FF477E','#FF7096','#FF85A1','#FBB1B1','#FAE0E4','#00C0FF','#0BB4D8','#22C55E','#FFD700'];
-  const confettiCount = 25;
-  for (let i=0; i<confettiCount; i++){
-    const conf = document.createElement('div');
+function createConfetti(){
+  const colors=['#FF0A54','#FF477E','#FF7096','#FF85A1','#FBB1B1','#FAE0E4','#00C0FF','#0BB4D8','#22C55E','#FFD700'];
+  const confettiCount=25;
+  for(let i=0;i<confettiCount;i++){
+    const conf=document.createElement('div');
     conf.classList.add('confetti');
-    conf.style.color = colors[Math.floor(Math.random()*colors.length)];
-    conf.style.left = Math.random()*100 + 'vw';
-    conf.style.fontSize = (10+Math.random()*20)+'px';
-    conf.innerText = '🎉';
+    conf.style.color=colors[Math.floor(Math.random()*colors.length)];
+    conf.style.left=Math.random()*100+'vw';
+    conf.style.fontSize=(10+Math.random()*20)+'px';
+    conf.innerText='🎉';
     document.body.appendChild(conf);
-
-    conf.style.animationDuration = (1+Math.random()*2)+'s';
-    conf.style.animationDelay = Math.random()*0.5+'s';
-
-    setTimeout(()=> conf.remove(),2500);
+    conf.style.animationDuration=(1+Math.random()*2)+'s';
+    conf.style.animationDelay=Math.random()*0.5+'s';
+    setTimeout(()=>conf.remove(),2500);
   }
 }

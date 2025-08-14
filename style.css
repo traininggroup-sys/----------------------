@@ -1,4 +1,4 @@
-/* ================== RESET ================== */
+/* RESET */
 * {
   margin: 0;
   padding: 0;
@@ -12,21 +12,20 @@ body {
   min-height: 100vh;
 }
 
-/* ================== PAGES ================== */
+/* PAGES */
 .page {
   display: block;
   width: 100%;
-  height: 100vh; /* يملأ الشاشة بالكامل */
-  overflow-y: auto; /* لو محتوى أطول يظهر سكرول داخل الصفحة فقط */
+  height: 100vh;
+  overflow-y: auto;
   padding: 20px;
-  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .hidden {
   display: none;
 }
 
-/* ================== BUTTONS ================== */
+/* BUTTONS */
 button,
 .module-button,
 .open-btn {
@@ -49,7 +48,7 @@ button:hover,
   background: #4338ca;
 }
 
-/* ================== MODULES ================== */
+/* MODULES */
 .module-button {
   display: flex;
   align-items: center;
@@ -71,7 +70,7 @@ button:hover,
   font-size: 18px;
 }
 
-/* ================== MODEL / TASK ================== */
+/* MODEL / TASK */
 .model-title {
   background: #fff;
   padding: 15px;
@@ -97,8 +96,8 @@ button:hover,
   color: #999;
 }
 
-/* ================== PROGRESS ================== */
-#progress-bar-container {
+/* PROGRESS */
+.progress-container {
   width: 100%;
   background: #e5e7eb;
   border-radius: 8px;
@@ -106,7 +105,7 @@ button:hover,
   margin: 15px 0;
 }
 
-#progress-bar {
+.progress-bar {
   height: 25px;
   background: #4f46e5;
   color: #fff;
@@ -121,7 +120,7 @@ button:hover,
   font-weight: bold;
 }
 
-/* ================== MOTIVATOR ================== */
+/* MOTIVATOR */
 #motivator {
   margin: 15px 0;
   font-size: 18px;
@@ -129,7 +128,7 @@ button:hover,
   color: #1e3a8a;
 }
 
-/* ================== CELEBRATION ================== */
+/* CELEBRATION */
 .celebrate-banner {
   position: fixed;
   top: 20px;
@@ -152,7 +151,7 @@ button:hover,
   pointer-events: auto;
 }
 
-/* ================== CONFETTI ================== */
+/* CONFETTI */
 .confetti {
   position: fixed;
   top: 0;
@@ -172,7 +171,7 @@ button:hover,
   }
 }
 
-/* ================== LEADERBOARD ================== */
+/* LEADERBOARD */
 #lbBody td {
   padding: 8px 12px;
   text-align: center;
