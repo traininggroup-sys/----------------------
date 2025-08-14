@@ -17,20 +17,14 @@
   <body>
     <!-- ==================== شاشة البداية ==================== -->
     <section id="screen-start" class="page">
-      <div class="start-content">
-        <img
-          src="5776125144014639249.jpg"
-          alt="شعار الجروب"
-          class="start-img"
-        />
-        <h1>متابعة أعضاء جروب المشتركين للتدريب</h1>
-        <input id="nameInput" class="start-input" placeholder="ادخل اسمك" />
-        <div class="row-gap">
-          <button class="btn btn-primary" id="btnStart">
-            ابدأ المذاكرة الآن
-          </button>
-          <button class="btn btn-ghost" id="btnGoLB">لوحة المتصدرين 🏆</button>
-        </div>
+      <img src="5776125144014639249.jpg" alt="شعار الجروب" />
+      <h1>متابعة أعضاء جروب المشتركين للتدريب</h1>
+      <input id="nameInput" class="start-input" placeholder="ادخل اسمك" />
+      <div class="row-gap">
+        <button class="btn btn-primary" id="btnStart">
+          ابدأ المذاكرة الآن
+        </button>
+        <button class="btn btn-ghost" id="btnGoLB">لوحة المتصدرين 🏆</button>
       </div>
     </section>
 
@@ -64,6 +58,7 @@
       </div>
 
       <div id="content" class="invisible"></div>
+      <div class="motivator" id="motivator"></div>
     </main>
 
     <!-- ==================== شاشة لوحة المتصدرين ==================== -->
@@ -98,12 +93,6 @@
         </div>
       </div>
     </section>
-
-    <!-- ==================== POPUP MOTIVATOR ==================== -->
-    <div id="motivator-popup" class="motivator-popup hidden"></div>
-
-    <!-- ==================== CELEBRATION ==================== -->
-    <div class="celebrate-banner"></div>
 
     <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-database-compat.js"></script>
