@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- Screen 1: Start -->
-    <section id="screen-start" class="screen start-screen active">
+    <!-- ==================== شاشة البداية ==================== -->
+    <section id="screen-start" class="screen active">
       <img src="5776125144014639249.jpg" alt="شعار الجروب" />
       <h1>جروب أسئلة الجهاز المركزي</h1>
       <input id="nameInput" class="start-input" placeholder="ادخل اسمك" />
@@ -28,8 +28,8 @@
       </div>
     </section>
 
-    <!-- Screen 2: Modules -->
-    <section id="screen-modules" class="screen module-grid">
+    <!-- ==================== شاشة المحاور ==================== -->
+    <section id="screen-modules" class="screen">
       <h2>اختر المحور لبدء المذاكرة</h2>
       <div class="row-gap">
         <button class="btn link-btn" id="btnBackToStart">الرجوع</button>
@@ -40,7 +40,7 @@
       <div class="modules-wrap" id="modules-container"></div>
     </section>
 
-    <!-- Screen 3: Section details -->
+    <!-- ==================== شاشة التفاصيل ==================== -->
     <main id="screen-main" class="screen">
       <div class="bar-top">
         <button class="back-btn" id="btnBackToModules">🔙 رجوع</button>
@@ -61,7 +61,7 @@
       <div class="motivator" id="motivator"></div>
     </main>
 
-    <!-- Screen 4: Leaderboard -->
+    <!-- ==================== شاشة لوحة المتصدرين ==================== -->
     <section id="screen-lb" class="screen leaderboard">
       <div class="lb-card">
         <div class="lb-head">
@@ -94,24 +94,8 @@
       </div>
     </section>
 
-    <!-- Celebration banner -->
-    <div id="celebrateBanner" class="celebrate-banner">
-      🏆 برافوو! إنجاز رهيب!
-    </div>
-
-    <!-- Dua toast -->
-    <div id="duaToast" class="dua-toast">
-      <div class="head">
-        <span id="duaIcon">📚</span><span>دعاء تحفيزي</span>
-      </div>
-      <div id="duaText"></div>
-      <small>جروب المشتركين للتدريب مبسوط بإنجازك 🤗</small>
-    </div>
-
-    <!-- Firebase App -->
     <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-database-compat.js"></script>
-
     <script src="script.js"></script>
   </body>
 </html>
