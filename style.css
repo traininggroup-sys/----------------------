@@ -7,17 +7,35 @@
 }
 
 body {
-  background: #f7f7f7;
+  background: #f0f4f8;
   color: #333;
   min-height: 100vh;
+}
+
+/* ================== START SCREEN ================== */
+.start-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  gap: 20px;
+}
+
+.start-img {
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
+  border-radius: 15px;
 }
 
 /* ================== PAGES ================== */
 .page {
   display: block;
   width: 100%;
-  height: 100vh; /* يملأ الشاشة بالكامل */
-  overflow-y: auto; /* لو محتوى أطول يظهر سكرول داخل الصفحة فقط */
+  height: 100vh;
+  overflow-y: auto;
   padding: 20px;
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
@@ -33,20 +51,31 @@ button,
   cursor: pointer;
   padding: 10px 15px;
   border: none;
-  border-radius: 5px;
-  background: #4f46e5;
-  color: #fff;
+  border-radius: 8px;
   font-size: 16px;
   transition: 0.3s;
-  text-decoration: none;
   display: inline-block;
   margin: 5px 0;
 }
 
-button:hover,
-.module-button:hover,
-.open-btn:hover {
+.btn-primary {
+  background: #4f46e5;
+  color: #fff;
+}
+
+.btn-primary:hover {
   background: #4338ca;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 2px solid #4f46e5;
+  color: #4f46e5;
+}
+
+.btn-ghost:hover {
+  background: #4f46e5;
+  color: #fff;
 }
 
 /* ================== MODULES ================== */
@@ -58,7 +87,7 @@ button:hover,
   color: #1e40af;
   padding: 12px 20px;
   margin-bottom: 10px;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 18px;
 }
 
@@ -68,7 +97,7 @@ button:hover,
 }
 
 .module-check {
-  font-size: 18px;
+  font-size: 20px;
 }
 
 /* ================== MODEL / TASK ================== */
@@ -76,8 +105,8 @@ button:hover,
   background: #fff;
   padding: 15px;
   margin-bottom: 15px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s;
 }
 
@@ -116,17 +145,26 @@ button:hover,
   transition: width 0.3s ease;
 }
 
-#progress-count {
-  margin-top: 5px;
+/* ================== POPUP MOTIVATOR ================== */
+.motivator-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #facc15;
+  padding: 20px 30px;
+  border-radius: 12px;
+  font-size: 18px;
   font-weight: bold;
+  color: #000;
+  z-index: 2000;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
-/* ================== MOTIVATOR ================== */
-#motivator {
-  margin: 15px 0;
-  font-size: 18px;
-  font-weight: 500;
-  color: #1e3a8a;
+.motivator-popup.show {
+  opacity: 1;
 }
 
 /* ================== CELEBRATION ================== */
@@ -152,7 +190,6 @@ button:hover,
   pointer-events: auto;
 }
 
-/* ================== CONFETTI ================== */
 .confetti {
   position: fixed;
   top: 0;
