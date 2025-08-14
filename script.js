@@ -35,6 +35,15 @@ const moduleData = {
       { title: "فيديو رقم 14", url: "https://youtu.be/8ypgm2RJ804" },
       { title: "أهم الاختصارات", url: "https://youtu.be/lhjovAocMMw" },
       { title: "اسئلة مجمعة", url: "https://youtu.be/BgYzh47Icm0" },
+      { title: "النموذج 1", url: "https://youtu.be/evZEGltYYXs" },
+      { title: "النموذج 2", url: "https://youtu.be/U_jAqbzbjRA" },
+      { title: "النموذج 3", url: "https://youtu.be/IkT_6INmCyY" },
+      { title: "فيديو رقم 15", url: "https://youtu.be/9AY9POUJYLc" },
+      { title: "مراجعة للحاسب جزء ١", url: "https://youtu.be/2V0fQEpAeiM" },
+      { title: "مراجعة للحاسب جزء ٢", url: "https://youtu.be/W1Qcsu6hy4U" },
+      { title: "النموذج 9", url: "https://youtu.be/VtOe_dx5qn8" },
+      { title: "شرح حساب عدد الخلايا في Excel", url: "https://youtu.be/-uIb6ZpFEi4" },
+      { title: "شرح سؤال لعمل تخطيط هيكلي نختار إيه", url: "https://youtu.be/Odgj-G4pHUQ" },
       ...Array.from({ length: 22 }, (_, i) => ({ title: `النموذج ${i + 1}`, url: "#" })),
     ],
   },
@@ -195,23 +204,25 @@ function openModule(section) {
     });
   }
 
-  updateCheckBoxes();
+  content.querySelectorAll("input[type=checkbox]").forEach(cb => {
+    const k = cb.dataset.key;
+    if (userData[k]) {
+      cb.checked = true;
+      cb.parentElement.classList.add("completed");
+    }
+    cb.addEventListener("change", () => {
+      userData[k] = cb.checked;
+      if (cb.checked) cb.parentElement.classList.add("completed");
+      else cb.parentElement.classList.remove("completed");
+      updateProgress();
+      saveUserData();
+    });
+  });
+
   updateProgress();
 }
 
-/* ================== CHECKBOXES ================== */
-function updateCheckBoxes() {
-  document.querySelectorAll("#content input[type=checkbox]").forEach(cb => {
-    cb.checked = !!userData[cb.dataset.key];
-    cb.addEventListener("change", e => {
-      const key = e.target.dataset.key;
-      userData[key] = e.target.checked;
-      updateProgress();
-    });
-  });
-}
-
-/* ================== PROGRESS + CELEBRATION + MOTIVATOR ================== */
+/* ================== PROGRESS + CELEBRATION ================== */
 function updateProgress() {
   const md = moduleData[selectedSection];
   const total = md.type === "models" ? md.count * TASKS.length : md.items.length * TASKS.length;
@@ -224,17 +235,14 @@ function updateProgress() {
   bar.style.width = `${pct}%`;
   bar.textContent = `${pct}%`;
 
-  // عرض الدعاء كبوب أب
-  const motivPopup = document.getElementById("motivator-popup");
-  const dua = DUAS[Math.floor(Math.random() * DUAS.length)].text;
-  motivPopup.innerText = `${dua}\n\nجروب المشتركين للتدريب مبسوط بانجازكم`;
-  motivPopup.classList.add("show");
-  setTimeout(() => motivPopup.classList.remove("show"), 2500);
+  const motiv = document.getElementById("motivator");
+  motiv.textContent = DUAS[Math.floor(Math.random() * DUAS.length)].text;
 
   const moduleContainer = document.getElementById("content");
 
   if (done === total && !completedSections[selectedSection]) {
     completedSections[selectedSection] = true;
+
     moduleContainer.querySelectorAll(".model-title").forEach(div => {
       div.classList.add("scale-effect");
       setTimeout(() => div.classList.remove("scale-effect"), 500);
@@ -246,25 +254,34 @@ function updateProgress() {
   saveUserData();
 }
 
-/* ================== CELEBRATION ================== */
-function showCelebration(msg) {
-  const banner = document.querySelector(".celebrate-banner");
-  banner.textContent = msg;
-  banner.classList.add("show");
-  setTimeout(() => banner.classList.remove("show"), 3000);
-  launchConfetti();
+/* ================== CELEBRATION BANNER + CONFETTI ================== */
+function showCelebration(text) {
+  const banner = document.querySelector('.celebrate-banner');
+  if (!banner) return;
+
+  banner.innerText = text;
+  banner.classList.add('show');
+
+  createConfetti();
+
+  setTimeout(() => banner.classList.remove('show'), 2500);
 }
 
-function launchConfetti() {
-  for (let i = 0; i < 100; i++) {
-    const div = document.createElement("div");
-    div.className = "confetti";
-    div.style.background = `hsl(${Math.random() * 360}, 70%, 50%)`;
-    div.style.left = `${Math.random() * 100}vw`;
-    div.style.width = "8px";
-    div.style.height = "8px";
-    div.style.animationDuration = `${Math.random() * 2 + 3}s`;
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 4000);
+function createConfetti() {
+  const colors = ['#FF0A54','#FF477E','#FF7096','#FF85A1','#FBB1B1','#FAE0E4','#00C0FF','#0BB4D8','#22C55E','#FFD700'];
+  const confettiCount = 25;
+  for (let i=0; i<confettiCount; i++){
+    const conf = document.createElement('div');
+    conf.classList.add('confetti');
+    conf.style.color = colors[Math.floor(Math.random()*colors.length)];
+    conf.style.left = Math.random()*100 + 'vw';
+    conf.style.fontSize = (10+Math.random()*20)+'px';
+    conf.innerText = '🎉';
+    document.body.appendChild(conf);
+
+    conf.style.animationDuration = (1+Math.random()*2)+'s';
+    conf.style.animationDelay = Math.random()*0.5+'s';
+
+    setTimeout(()=> conf.remove(),2500);
   }
 }
