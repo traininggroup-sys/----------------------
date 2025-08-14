@@ -73,9 +73,9 @@ const STORAGE = {
 };
 
 /* ================== HELPERS ================== */
-function showScreen(id) {
-  document.querySelectorAll(".screen, main").forEach(s => s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
+function showPage(pageId) {
+  document.querySelectorAll(".page").forEach(page => page.classList.add("hidden"));
+  document.getElementById(pageId).classList.remove("hidden");
 }
 
 function saveUserData() {
@@ -139,17 +139,17 @@ document.getElementById("btnStart").addEventListener("click", () => {
   localStorage.setItem("savedName", username);
   userData = JSON.parse(localStorage.getItem(userKey) || "{}");
   completedSections = JSON.parse(localStorage.getItem(STORAGE.doneSectionsKey(username)) || "{}");
-  showScreen("screen-modules");
+  showPage("screen-modules");
   renderModules();
 });
 
-document.getElementById("btnBackToStart").addEventListener("click", () => showScreen("screen-start"));
-document.getElementById("btnGoLB").addEventListener("click", () => { showScreen("screen-lb"); renderLeaderboard(); });
-document.getElementById("btnLeaderboard1").addEventListener("click", () => { showScreen("screen-lb"); renderLeaderboard(); });
-document.getElementById("btnLeaderboard2").addEventListener("click", () => { showScreen("screen-lb"); renderLeaderboard(); });
-document.getElementById("btnLBBackStart").addEventListener("click", () => showScreen("screen-start"));
-document.getElementById("btnLBBackModules").addEventListener("click", () => showScreen("screen-modules"));
-document.getElementById("btnBackToModules").addEventListener("click", () => showScreen("screen-modules"));
+document.getElementById("btnBackToStart").addEventListener("click", () => showPage("screen-start"));
+document.getElementById("btnGoLB").addEventListener("click", () => { showPage("screen-lb"); renderLeaderboard(); });
+document.getElementById("btnLeaderboard1").addEventListener("click", () => { showPage("screen-lb"); renderLeaderboard(); });
+document.getElementById("btnLeaderboard2").addEventListener("click", () => { showPage("screen-lb"); renderLeaderboard(); });
+document.getElementById("btnLBBackStart").addEventListener("click", () => showPage("screen-start"));
+document.getElementById("btnLBBackModules").addEventListener("click", () => showPage("screen-modules"));
+document.getElementById("btnBackToModules").addEventListener("click", () => showPage("screen-modules"));
 
 /* ================== MODULES ================== */
 function renderModules() {
@@ -166,11 +166,12 @@ function renderModules() {
 
 function openModule(section) {
   selectedSection = section;
-  showScreen("screen-main");
+  showPage("screen-main");
   const content = document.getElementById("content");
   content.innerHTML = "";
   content.classList.remove("invisible");
   const md = moduleData[section];
+
   if (md.type === "models") {
     for (let i = 1; i <= md.count; i++) {
       const div = document.createElement("div");
@@ -203,7 +204,6 @@ function openModule(section) {
     });
   }
 
-  // Restore checked
   content.querySelectorAll("input[type=checkbox]").forEach(cb => {
     const k = cb.dataset.key;
     if (userData[k]) {
@@ -218,6 +218,7 @@ function openModule(section) {
       saveUserData();
     });
   });
+
   updateProgress();
 }
 
@@ -239,17 +240,14 @@ function updateProgress() {
 
   const moduleContainer = document.getElementById("content");
 
-  // لو اكتمل المحور بالكامل
   if (done === total && !completedSections[selectedSection]) {
     completedSections[selectedSection] = true;
 
-    // تفعيل تأثير Scale لكل نموذج
     moduleContainer.querySelectorAll(".model-title").forEach(div => {
       div.classList.add("scale-effect");
       setTimeout(() => div.classList.remove("scale-effect"), 500);
     });
 
-    // عرض الاحتفال
     showCelebration(`🎉 تم إنهاء محور ${selectedSection}!`);
   } else if (done < total) delete completedSections[selectedSection];
 

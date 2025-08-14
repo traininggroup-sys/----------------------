@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>جروب أسئلة الجهاز المركزي</title>
+    <title>متابعة أعضاء جروب المشتركين للتدريب</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap"
       rel="stylesheet"
@@ -16,7 +16,7 @@
   </head>
   <body>
     <!-- ==================== شاشة البداية ==================== -->
-    <section id="screen-start" class="screen active">
+    <section id="screen-start" class="page">
       <img src="5776125144014639249.jpg" alt="شعار الجروب" />
       <h1>جروب أسئلة الجهاز المركزي</h1>
       <input id="nameInput" class="start-input" placeholder="ادخل اسمك" />
@@ -29,7 +29,7 @@
     </section>
 
     <!-- ==================== شاشة المحاور ==================== -->
-    <section id="screen-modules" class="screen">
+    <section id="screen-modules" class="page hidden">
       <h2>اختر المحور لبدء المذاكرة</h2>
       <div class="row-gap">
         <button class="btn link-btn" id="btnBackToStart">الرجوع</button>
@@ -41,7 +41,7 @@
     </section>
 
     <!-- ==================== شاشة التفاصيل ==================== -->
-    <main id="screen-main" class="screen">
+    <main id="screen-main" class="page hidden">
       <div class="bar-top">
         <button class="back-btn" id="btnBackToModules">🔙 رجوع</button>
         <button class="link-btn" id="btnLeaderboard2">لوحة المتصدرين 🏆</button>
@@ -62,7 +62,7 @@
     </main>
 
     <!-- ==================== شاشة لوحة المتصدرين ==================== -->
-    <section id="screen-lb" class="screen leaderboard">
+    <section id="screen-lb" class="page leaderboard hidden">
       <div class="lb-card">
         <div class="lb-head">
           <div>
