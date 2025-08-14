@@ -194,63 +194,50 @@ function openModule(section){
   updateProgress();
 }
 
-/* ================== CHECKBOXES ================== */
-function updateCheckBoxes(){
-  document.querySelectorAll("#content input[type=checkbox]").forEach(cb=>{
-    cb.checked=!!userData[cb.dataset.key];
-    cb.addEventListener("change", e=>{
-      const key=e.target.dataset.key;
-      userData[key]=e.target.checked;
-      if(e.target.checked) e.target.parentElement.classList.add("completed");
-      else e.target.parentElement.classList.remove("completed");
-
-      // نحتفل لو أنهينا نموذج كامل
-      const parentDiv = e.target.closest(".model-title");
-      const allTasks = parentDiv.querySelectorAll("input[type=checkbox]");
-      if(Array.from(allTasks).every(t=>t.checked)){
-        playCelebrationSound();
-        createConfetti();
-      }
-
-      updateProgress();
-      saveUserData();
-    });
-  });
-}
-
 /* ================== PROGRESS + CELEBRATION ================== */
-function updateProgress(){
+function updateProgress() {
   const md = moduleData[selectedSection];
-  const total = md.type==="models"?md.count*TASKS.length:md.items.length*TASKS.length;
-  let done=0;
-  for(const k in userData) if(k.startsWith(selectedSection+"_") && userData[k]) done++;
+  const total = md.type === "models" ? md.count * TASKS.length : md.items.length * TASKS.length;
+  let done = 0;
 
-  const pct = total?Math.round((done/total)*100):0;
-  document.getElementById("progress-count").textContent=`${done} / ${total}`;
+  // حساب عدد المهام المكتملة
+  for (const k in userData) if (k.startsWith(selectedSection + "_") && userData[k]) done++;
+
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  document.getElementById("progress-count").textContent = `${done} / ${total}`;
   const bar = document.getElementById("progress-bar");
-  bar.style.width=`${pct}%`;
-  bar.textContent=`${pct}%`;
+  bar.style.width = `${pct}%`;
+  bar.textContent = `${pct}%`;
 
-  document.getElementById("motivator").textContent = DUAS[Math.floor(Math.random()*DUAS.length)].text;
+  // تحديث الرسالة التحفيزية
+  document.getElementById("motivator").textContent = DUAS[Math.floor(Math.random() * DUAS.length)].text;
 
   // علامة الصح للمحور بعد اكتماله
   const container = document.getElementById("modules-container");
-  container.querySelectorAll(".module-button").forEach(btn=>{
-    if(btn.textContent.includes(selectedSection)){
-      if(done === total){
-        completedSections[selectedSection]=true;
+  container.querySelectorAll(".module-button").forEach(btn => {
+    if (btn.textContent.includes(selectedSection)) {
+      if (done === total) {
+        completedSections[selectedSection] = true;
         btn.classList.add("done");
-        btn.querySelector(".module-check").textContent="✔️";
-        playCelebrationSound();
-        createConfetti();
+        btn.querySelector(".module-check").textContent = "✔️";
+
+        // الاحتفال عند اكتمال المحور
+        showCelebration(`🎉 تم إنهاء محور ${selectedSection}!`);
       } else {
         delete completedSections[selectedSection];
         btn.classList.remove("done");
-        btn.querySelector(".module-check").textContent="";
+        btn.querySelector(".module-check").textContent = "";
       }
     }
   });
+
+  // حفظ البيانات بعد أي تحديث
+  saveUserData();
+
+  // تحديث لوحة المتصدرين مباشرة
+  updateLeaderboardSnapshot();
 }
+
 
 /* ================== CELEBRATION BANNER + CONFETTI + SOUND ================== */
 function showCelebration(text){
