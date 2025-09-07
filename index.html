@@ -33,7 +33,8 @@
       #start-screen,
       #module-grid,
       #main,
-      #screen-lb {
+      #screen-lb,
+      #admin-panel {
         display: none;
         padding: 20px;
         min-height: 100vh;
@@ -446,6 +447,85 @@
         opacity: 0.5; /* باهت شوية */
         cursor: not-allowed; /* مؤشر الفأرة يشير إنه مقفول */
       }
+
+      /* ================== Admin Panel ================== */
+      #admin-panel {
+        background-color: #f8f9fa;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        width: 90%;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .admin-form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .admin-form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .admin-form label {
+        font-weight: bold;
+        font-size: 16px;
+        color: #333;
+      }
+
+      .admin-form input,
+      .admin-form select {
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        font-size: 16px;
+        width: 100%;
+      }
+
+      .admin-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+
+      .admin-btn {
+        padding: 12px 25px;
+        font-size: 16px;
+        font-weight: bold;
+      }
+
+      .admin-btn-primary {
+        background: linear-gradient(90deg, #4a148c, #7b1fa2);
+      }
+
+      .admin-btn-secondary {
+        background: linear-gradient(90deg, #37474f, #546e7a);
+      }
+
+      .admin-notification {
+        background-color: #e8f5e9;
+        border-left: 5px solid #4caf50;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 5px;
+        font-weight: bold;
+        display: none;
+      }
+
+      .admin-tools-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .admin-tools-row button {
+        flex: 1;
+      }
     </style>
   </head>
 
@@ -479,6 +559,9 @@
     <div id="module-grid">
       <h2 class="section-title">المحاور</h2>
       <div id="modules-container"></div>
+      <div id="admin-buttons" style="display: none">
+        <button id="openAdminPanelBtn">لوحة التحكم للمشرف</button>
+      </div>
       <button class="fixed-back" onclick="backToStart()">رجوع</button>
     </div>
 
@@ -486,8 +569,11 @@
     <div id="main">
       <div id="admin-tools" style="display: none">
         <h3>أدوات المشرف</h3>
-        <button id="addModuleBtn">إضافة نموذج جديد</button>
-        <button id="removeModuleBtn">حذف آخر نموذج</button>
+        <div class="admin-tools-row">
+          <button id="addModuleBtn">إضافة نموذج جديد</button>
+          <button id="removeModuleBtn">حذف آخر نموذج</button>
+          <button id="backToAdminBtn">لوحة التحكم الرئيسية</button>
+        </div>
       </div>
       <h2 id="section-title"></h2>
       <div id="progress-container"><div id="progress-bar">0%</div></div>
@@ -495,7 +581,6 @@
       <button class="fixed-back" onclick="backToModules()">رجوع</button>
     </div>
 
-    <!-- ===== Leaderboard ===== -->
     <!-- ===== Leaderboard ===== -->
     <div id="screen-lb" style="display: none">
       <table id="leaderboard">
@@ -513,6 +598,80 @@
       <button class="fixed-back" onclick="closeLeaderboard()">رجوع</button>
     </div>
 
+    <!-- ===== Admin Panel ===== -->
+    <div id="admin-panel">
+      <h2 class="section-title">لوحة تحكم المشرف</h2>
+      <div class="admin-notification" id="adminNotification">
+        تم الحفظ بنجاح
+      </div>
+
+      <div class="admin-form">
+        <div class="admin-form-group">
+          <label>اختر المحور</label>
+          <select id="adminSectionSelect">
+            <option value=" معلومات عامة">معلومات عامة</option>
+            <option value=" حاسب">حاسب</option>
+            <option value=" انجليزي">انجليزي</option>
+            <option value=" عربي">عربي</option>
+          </select>
+        </div>
+
+        <div class="admin-form-group">
+          <label>عنوان النموذج</label>
+          <input
+            type="text"
+            id="adminModuleTitle"
+            placeholder="مثال: النموذج 21"
+          />
+        </div>
+
+        <div class="admin-form-group">
+          <label>رابط الملف (اختياري)</label>
+          <input
+            type="text"
+            id="adminModuleFile"
+            placeholder="https://t.me/..."
+          />
+        </div>
+
+        <div class="admin-form-group">
+          <label>رابط الفيديو (اختياري)</label>
+          <input
+            type="text"
+            id="adminModuleVideo"
+            placeholder="https://youtu.be/..."
+          />
+        </div>
+
+        <div class="admin-form-group">
+          <label>الترتيب في المحور</label>
+          <select id="adminModulePosition">
+            <option value="end">إضافة في النهاية</option>
+            <option value="start">إضافة في البداية</option>
+            <option value="custom">تحديد موقع معين</option>
+          </select>
+        </div>
+
+        <div
+          class="admin-form-group"
+          id="customPositionGroup"
+          style="display: none"
+        >
+          <label>الموقع المحدد (رقم)</label>
+          <input type="number" id="adminCustomPosition" min="1" value="1" />
+        </div>
+      </div>
+
+      <div class="admin-buttons">
+        <button class="admin-btn admin-btn-primary" id="adminAddModule">
+          إضافة النموذج
+        </button>
+        <button class="admin-btn admin-btn-secondary" id="adminBackToModules">
+          العودة للمحاور
+        </button>
+      </div>
+    </div>
+
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
       import {
@@ -522,6 +681,8 @@
         setDoc,
         collection,
         getDocs,
+        updateDoc,
+        arrayUnion,
       } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
       const firebaseConfig = {
@@ -537,7 +698,9 @@
       const db = getFirestore(app);
 
       const adminName = "نجلا";
+      const adminPassword = "2";
 
+      let isAdmin = false;
       let username = "",
         password = "",
         selectedSection = "";
@@ -562,6 +725,33 @@
         if (!nameInput || !passInput)
           return alert("الرجاء إدخال الاسم وكلمة المرور");
 
+        // تحقق مما إذا كان المستخدم هو المشرف
+        if (nameInput === adminName && passInput === adminPassword) {
+          isAdmin = true;
+          username = nameInput;
+          password = passInput;
+
+          // احصل على بيانات المستخدم أو أنشئ حساباً جديداً
+          const userRef = doc(db, "users", nameInput);
+          const snap = await getDoc(userRef);
+          if (!snap.exists()) {
+            await setDoc(userRef, {
+              name: nameInput,
+              password: passInput,
+              completedTasks: {},
+              completedSections: {},
+              isAdmin: true,
+            });
+          }
+
+          document.getElementById("start-screen").style.display = "none";
+          document.getElementById("module-grid").style.display = "flex";
+          document.getElementById("admin-buttons").style.display = "block";
+          renderModuleButtons();
+          return;
+        }
+
+        // التحقق من المستخدمين العاديين
         const userRef = doc(db, "users", nameInput);
         const snap = await getDoc(userRef);
 
@@ -578,11 +768,13 @@
           });
         }
 
+        isAdmin = false;
         username = nameInput;
         password = passInput;
 
         document.getElementById("start-screen").style.display = "none";
         document.getElementById("module-grid").style.display = "flex";
+        document.getElementById("admin-buttons").style.display = "none";
         renderModuleButtons();
       };
 
@@ -609,8 +801,9 @@
         selectedSection = section;
         document.getElementById("module-grid").style.display = "none";
         document.getElementById("main").style.display = "flex";
-        document.getElementById("admin-tools").style.display =
-          username === adminName ? "block" : "none";
+        document.getElementById("admin-tools").style.display = isAdmin
+          ? "block"
+          : "none";
         generateModules(section);
         updateProgressBar();
       };
@@ -930,6 +1123,43 @@
           { title: "نموذج 16", file: "https://t.me/c/2299629125/31034" },
         ],
       };
+
+      // حفظ النماذج في Firestore
+      async function saveLinksDataToFirestore() {
+        try {
+          const linksDataRef = doc(db, "appData", "linksData");
+          await setDoc(linksDataRef, { sections: linksData });
+          return true;
+        } catch (error) {
+          console.error("Error saving links data:", error);
+          return false;
+        }
+      }
+
+      // جلب النماذج من Firestore
+      async function loadLinksDataFromFirestore() {
+        try {
+          const linksDataRef = doc(db, "appData", "linksData");
+          const snap = await getDoc(linksDataRef);
+
+          if (snap.exists()) {
+            const data = snap.data();
+            // استخدام البيانات من Firestore إذا كانت موجودة
+            if (data.sections) {
+              Object.assign(linksData, data.sections);
+            }
+          } else {
+            // إذا لم تكن البيانات موجودة، احفظ النسخة الحالية
+            await saveLinksDataToFirestore();
+          }
+        } catch (error) {
+          console.error("Error loading links data:", error);
+        }
+      }
+
+      // تحميل البيانات عند بدء التطبيق
+      loadLinksDataFromFirestore();
+
       // ======================= Generate Modules for all Sections =======================
       async function generateModules(section) {
         const container = document.getElementById("content");
@@ -1027,21 +1257,141 @@
         }
       }
 
-      // إضافة نموذج جديد
-      document.getElementById("addModuleBtn").onclick = () => {
+      // ======================= Admin Functions =======================
+
+      // فتح لوحة الإدارة
+      document
+        .getElementById("openAdminPanelBtn")
+        .addEventListener("click", function () {
+          document.getElementById("module-grid").style.display = "none";
+          document.getElementById("admin-panel").style.display = "flex";
+        });
+
+      // العودة من لوحة الإدارة
+      document
+        .getElementById("adminBackToModules")
+        .addEventListener("click", function () {
+          document.getElementById("admin-panel").style.display = "none";
+          document.getElementById("module-grid").style.display = "flex";
+        });
+
+      // العودة إلى لوحة الإدارة من المحور
+      document
+        .getElementById("backToAdminBtn")
+        .addEventListener("click", function () {
+          document.getElementById("main").style.display = "none";
+          document.getElementById("admin-panel").style.display = "flex";
+        });
+
+      // إظهار حقل الموقع المخصص عند اختيار "تحديد موقع معين"
+      document
+        .getElementById("adminModulePosition")
+        .addEventListener("change", function () {
+          const customGroup = document.getElementById("customPositionGroup");
+          customGroup.style.display =
+            this.value === "custom" ? "block" : "none";
+        });
+
+      // إضافة نموذج جديد من لوحة الإدارة
+      document
+        .getElementById("adminAddModule")
+        .addEventListener("click", async function () {
+          const section = document.getElementById("adminSectionSelect").value;
+          const title = document
+            .getElementById("adminModuleTitle")
+            .value.trim();
+          const file = document.getElementById("adminModuleFile").value.trim();
+          const video = document
+            .getElementById("adminModuleVideo")
+            .value.trim();
+          const position = document.getElementById("adminModulePosition").value;
+
+          if (!title) {
+            alert("الرجاء إدخال عنوان للنموذج");
+            return;
+          }
+
+          const newModule = {
+            title: title,
+            file: file || null,
+            video: video || null,
+          };
+
+          // إذا لم يكن المحور موجوداً، أنشئه
+          if (!linksData[section]) {
+            linksData[section] = [];
+          }
+
+          // تحديد موقع إضافة النموذج
+          if (position === "start") {
+            linksData[section].unshift(newModule);
+          } else if (position === "custom") {
+            const pos =
+              parseInt(document.getElementById("adminCustomPosition").value) -
+              1;
+            const validPos = Math.max(
+              0,
+              Math.min(pos, linksData[section].length)
+            );
+            linksData[section].splice(validPos, 0, newModule);
+          } else {
+            // الإضافة في النهاية (الافتراضي)
+            linksData[section].push(newModule);
+          }
+
+          // تحديث عدد النماذج في المحور
+          moduleData[section].count = linksData[section].length;
+
+          // حفظ التغييرات في Firestore
+          const success = await saveLinksDataToFirestore();
+
+          // إظهار رسالة نجاح
+          const notification = document.getElementById("adminNotification");
+          notification.style.display = "block";
+          notification.textContent = success
+            ? `تم إضافة النموذج "${title}" إلى محور "${section}" بنجاح!`
+            : "حدث خطأ أثناء حفظ النموذج. الرجاء المحاولة مرة أخرى.";
+
+          // إخفاء الرسالة بعد 3 ثوان
+          setTimeout(() => {
+            notification.style.display = "none";
+          }, 3000);
+
+          // إعادة تعيين حقول النموذج
+          document.getElementById("adminModuleTitle").value = "";
+          document.getElementById("adminModuleFile").value = "";
+          document.getElementById("adminModuleVideo").value = "";
+        });
+
+      // إضافة نموذج جديد من صفحة المحور
+      document.getElementById("addModuleBtn").onclick = async () => {
         if (!selectedSection) return alert("اختر محور أولاً!");
+
+        // إنشاء عنوان تلقائي للنموذج الجديد
         const count = moduleData[selectedSection].count + 1;
-        const newModule = { title: `النموذج ${count}`, file: "" };
+        const title = `النموذج ${count}`;
 
-        if (!linksData[selectedSection]) linksData[selectedSection] = [];
+        const newModule = { title: title, file: "", video: "" };
+
+        if (!linksData[selectedSection]) {
+          linksData[selectedSection] = [];
+        }
+
         linksData[selectedSection].push(newModule);
-
         moduleData[selectedSection].count = count;
+
+        // حفظ التغييرات في Firestore
+        await saveLinksDataToFirestore();
+
+        // تحديث العرض
         generateModules(selectedSection);
+
+        // إظهار رسالة نجاح
+        showBanner(`تم إضافة ${title} بنجاح!`);
       };
 
       // حذف آخر نموذج
-      document.getElementById("removeModuleBtn").onclick = () => {
+      document.getElementById("removeModuleBtn").onclick = async () => {
         if (!selectedSection) return alert("اختر محور أولاً!");
         if (
           !linksData[selectedSection] ||
@@ -1049,12 +1399,26 @@
         )
           return alert("لا يوجد نماذج لحذفها!");
 
+        // حفظ اسم النموذج المحذوف للإشعار
+        const removedTitle =
+          linksData[selectedSection][linksData[selectedSection].length - 1]
+            .title;
+
+        // حذف النموذج
         linksData[selectedSection].pop();
         moduleData[selectedSection].count = Math.max(
           0,
           moduleData[selectedSection].count - 1
         );
+
+        // حفظ التغييرات في Firestore
+        await saveLinksDataToFirestore();
+
+        // تحديث العرض
         generateModules(selectedSection);
+
+        // إظهار رسالة نجاح
+        showBanner(`تم حذف ${removedTitle} بنجاح!`);
       };
 
       // ======================= User Data =======================
@@ -1163,7 +1527,6 @@
           const data = docSnap.data();
           const name = data.name || docSnap.id;
 
-          // حساب عدد المهام المكتملة
           // حساب عدد المهام المكتملة
           let completedTasks = Object.values(data.completedTasks || {}).filter(
             Boolean
