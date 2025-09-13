@@ -13,7 +13,6 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link rel="icon" type="image/png" href="/path/to/favicon.png" />
 
     <style>
       /* ================== General ================== */
@@ -488,6 +487,12 @@
         width: 100%;
       }
 
+      .admin-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+
       .admin-btn {
         padding: 12px 25px;
         font-size: 16px;
@@ -510,6 +515,16 @@
         border-radius: 5px;
         font-weight: bold;
         display: none;
+      }
+
+      .admin-tools-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .admin-tools-row button {
+        flex: 1;
       }
     </style>
   </head>
@@ -544,12 +559,22 @@
     <div id="module-grid">
       <h2 class="section-title">المحاور</h2>
       <div id="modules-container"></div>
-
+      <div id="admin-buttons" style="display: none">
+        <button id="openAdminPanelBtn">لوحة التحكم للمشرف</button>
+      </div>
       <button class="fixed-back" onclick="backToStart()">رجوع</button>
     </div>
 
     <!-- ===== Main Module ===== -->
     <div id="main">
+      <div id="admin-tools" style="display: none">
+        <h3>أدوات المشرف</h3>
+        <div class="admin-tools-row">
+          <button id="addModuleBtn">إضافة نموذج جديد</button>
+          <button id="removeModuleBtn">حذف آخر نموذج</button>
+          <button id="backToAdminBtn">لوحة التحكم الرئيسية</button>
+        </div>
+      </div>
       <h2 id="section-title"></h2>
       <div id="progress-container"><div id="progress-bar">0%</div></div>
       <div id="content"></div>
@@ -571,6 +596,80 @@
       </table>
 
       <button class="fixed-back" onclick="closeLeaderboard()">رجوع</button>
+    </div>
+
+    <!-- ===== Admin Panel ===== -->
+    <div id="admin-panel">
+      <h2 class="section-title">لوحة تحكم المشرف</h2>
+      <div class="admin-notification" id="adminNotification">
+        تم الحفظ بنجاح
+      </div>
+
+      <div class="admin-form">
+        <div class="admin-form-group">
+          <label>اختر المحور</label>
+          <select id="adminSectionSelect">
+            <option value=" معلومات عامة">معلومات عامة</option>
+            <option value=" حاسب">حاسب</option>
+            <option value=" انجليزي">انجليزي</option>
+            <option value=" عربي">عربي</option>
+          </select>
+        </div>
+
+        <div class="admin-form-group">
+          <label>عنوان النموذج</label>
+          <input
+            type="text"
+            id="adminModuleTitle"
+            placeholder="مثال: النموذج 21"
+          />
+        </div>
+
+        <div class="admin-form-group">
+          <label>رابط الملف (اختياري)</label>
+          <input
+            type="text"
+            id="adminModuleFile"
+            placeholder="https://t.me/..."
+          />
+        </div>
+
+        <div class="admin-form-group">
+          <label>رابط الفيديو (اختياري)</label>
+          <input
+            type="text"
+            id="adminModuleVideo"
+            placeholder="https://youtu.be/..."
+          />
+        </div>
+
+        <div class="admin-form-group">
+          <label>الترتيب في المحور</label>
+          <select id="adminModulePosition">
+            <option value="end">إضافة في النهاية</option>
+            <option value="start">إضافة في البداية</option>
+            <option value="custom">تحديد موقع معين</option>
+          </select>
+        </div>
+
+        <div
+          class="admin-form-group"
+          id="customPositionGroup"
+          style="display: none"
+        >
+          <label>الموقع المحدد (رقم)</label>
+          <input type="number" id="adminCustomPosition" min="1" value="1" />
+        </div>
+      </div>
+
+      <div class="admin-buttons">
+        <button class="admin-btn admin-btn-primary" id="adminAddModule">
+          إضافة النموذج
+        </button>
+        <button class="admin-btn admin-btn-secondary" id="adminBackToModules">
+          العودة للمحاور
+        </button>
+      </div>
     </div>
 
     <script type="module">
@@ -598,6 +697,10 @@
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
 
+      const adminName = "نجلا";
+      const adminPassword = "2";
+
+      let isAdmin = false;
       let username = "",
         password = "",
         selectedSection = "";
@@ -622,6 +725,32 @@
         if (!nameInput || !passInput)
           return alert("الرجاء إدخال الاسم وكلمة المرور");
 
+        // تحقق مما إذا كان المستخدم هو المشرف
+        if (nameInput === adminName && passInput === adminPassword) {
+          isAdmin = true;
+          username = nameInput;
+          password = passInput;
+
+          // احصل على بيانات المستخدم أو أنشئ حساباً جديداً
+          const userRef = doc(db, "users", nameInput);
+          const snap = await getDoc(userRef);
+          if (!snap.exists()) {
+            await setDoc(userRef, {
+              name: nameInput,
+              password: passInput,
+              completedTasks: {},
+              completedSections: {},
+              isAdmin: true,
+            });
+          }
+
+          document.getElementById("start-screen").style.display = "none";
+          document.getElementById("module-grid").style.display = "flex";
+          document.getElementById("admin-buttons").style.display = "block";
+          renderModuleButtons();
+          return;
+        }
+
         // التحقق من المستخدمين العاديين
         const userRef = doc(db, "users", nameInput);
         const snap = await getDoc(userRef);
@@ -639,11 +768,13 @@
           });
         }
 
+        isAdmin = false;
         username = nameInput;
         password = passInput;
 
         document.getElementById("start-screen").style.display = "none";
         document.getElementById("module-grid").style.display = "flex";
+        document.getElementById("admin-buttons").style.display = "none";
         renderModuleButtons();
       };
 
@@ -670,27 +801,15 @@
         selectedSection = section;
         document.getElementById("module-grid").style.display = "none";
         document.getElementById("main").style.display = "flex";
-
+        document.getElementById("admin-tools").style.display = isAdmin
+          ? "block"
+          : "none";
         generateModules(section);
         updateProgressBar();
       };
       /*المحاوووور*/
       const linksData = {
         " معلومات عامة": [
-          {
-            title: "محاور وكباري",
-            file: "https://t.me/c/2299629125/2/34633?single",
-          },
-          {
-            title: "اهم المنظمات العالمية",
-            file: "https://t.me/c/2299629125/2/35213",
-          },
-          {
-            title: "اقاليم مصر الاقتصادية",
-            file: "https://t.me/c/2299629125/2/35024",
-          },
-          { title: "حكام مصر", file: "https://t.me/c/2299629125/2/35003" },
-          { title: "صوامع مصر", file: "https://t.me/c/2299629125/2/34792" },
           { title: "النموذج 1", file: "https://t.me/c/2299629125/2/30375" },
           { title: "النموذج 2", file: "https://t.me/c/2299629125/2/30396" },
           { title: "النموذج 3", file: "https://t.me/c/2299629125/2/30428" },
@@ -711,6 +830,20 @@
           { title: "النموذج 18", file: "https://t.me/c/2299629125/2/31415" },
           { title: "النموذج 19", file: "https://t.me/c/2299629125/2/31437" },
           { title: "النموذج 20", file: "https://t.me/c/2299629125/2/31460" },
+          {
+            title: "محاور وكباري",
+            file: "https://t.me/c/2299629125/2/34633?single",
+          },
+          {
+            title: "اهم المنظمات العالمية",
+            file: "https://t.me/c/2299629125/2/35213",
+          },
+          {
+            title: "اقاليم مصر الاقتصادية",
+            file: "https://t.me/c/2299629125/2/35024",
+          },
+          { title: "حكام مصر", file: "https://t.me/c/2299629125/2/35003" },
+          { title: "صوامع مصر", file: "https://t.me/c/2299629125/2/34792" },
         ],
         " حاسب": [
           {
@@ -1124,125 +1257,331 @@
         }
       }
 
+      // ======================= Admin Functions =======================
+
+      // فتح لوحة الإدارة
+      document
+        .getElementById("openAdminPanelBtn")
+        .addEventListener("click", function () {
+          document.getElementById("module-grid").style.display = "none";
+          document.getElementById("admin-panel").style.display = "flex";
+        });
+
+      // العودة من لوحة الإدارة
+      document
+        .getElementById("adminBackToModules")
+        .addEventListener("click", function () {
+          document.getElementById("admin-panel").style.display = "none";
+          document.getElementById("module-grid").style.display = "flex";
+        });
+
+      // العودة إلى لوحة الإدارة من المحور
+      document
+        .getElementById("backToAdminBtn")
+        .addEventListener("click", function () {
+          document.getElementById("main").style.display = "none";
+          document.getElementById("admin-panel").style.display = "flex";
+        });
+
+      // إظهار حقل الموقع المخصص عند اختيار "تحديد موقع معين"
+      document
+        .getElementById("adminModulePosition")
+        .addEventListener("change", function () {
+          const customGroup = document.getElementById("customPositionGroup");
+          customGroup.style.display =
+            this.value === "custom" ? "block" : "none";
+        });
+
+      // إضافة نموذج جديد من لوحة الإدارة
+      document
+        .getElementById("adminAddModule")
+        .addEventListener("click", async function () {
+          const section = document.getElementById("adminSectionSelect").value;
+          const title = document
+            .getElementById("adminModuleTitle")
+            .value.trim();
+          const file = document.getElementById("adminModuleFile").value.trim();
+          const video = document
+            .getElementById("adminModuleVideo")
+            .value.trim();
+          const position = document.getElementById("adminModulePosition").value;
+
+          if (!title) {
+            alert("الرجاء إدخال عنوان للنموذج");
+            return;
+          }
+
+          const newModule = {
+            title: title,
+            file: file || null,
+            video: video || null,
+          };
+
+          // إذا لم يكن المحور موجوداً، أنشئه
+          if (!linksData[section]) {
+            linksData[section] = [];
+          }
+
+          // تحديد موقع إضافة النموذج
+          if (position === "start") {
+            linksData[section].unshift(newModule);
+          } else if (position === "custom") {
+            const pos =
+              parseInt(document.getElementById("adminCustomPosition").value) -
+              1;
+            const validPos = Math.max(
+              0,
+              Math.min(pos, linksData[section].length)
+            );
+            linksData[section].splice(validPos, 0, newModule);
+          } else {
+            // الإضافة في النهاية (الافتراضي)
+            linksData[section].push(newModule);
+          }
+
+          // تحديث عدد النماذج في المحور
+          moduleData[section].count = linksData[section].length;
+
+          // حفظ التغييرات في Firestore
+          const success = await saveLinksDataToFirestore();
+
+          // إظهار رسالة نجاح
+          const notification = document.getElementById("adminNotification");
+          notification.style.display = "block";
+          notification.textContent = success
+            ? `تم إضافة النموذج "${title}" إلى محور "${section}" بنجاح!`
+            : "حدث خطأ أثناء حفظ النموذج. الرجاء المحاولة مرة أخرى.";
+
+          // إخفاء الرسالة بعد 3 ثوان
+          setTimeout(() => {
+            notification.style.display = "none";
+          }, 3000);
+
+          // إعادة تعيين حقول النموذج
+          document.getElementById("adminModuleTitle").value = "";
+          document.getElementById("adminModuleFile").value = "";
+          document.getElementById("adminModuleVideo").value = "";
+        });
+
+      // إضافة نموذج جديد من صفحة المحور
+      document.getElementById("addModuleBtn").onclick = async () => {
+        if (!selectedSection) return alert("اختر محور أولاً!");
+
+        // إنشاء عنوان تلقائي للنموذج الجديد
+        const count = moduleData[selectedSection].count + 1;
+        const title = `النموذج ${count}`;
+
+        const newModule = { title: title, file: "", video: "" };
+
+        if (!linksData[selectedSection]) {
+          linksData[selectedSection] = [];
+        }
+
+        linksData[selectedSection].push(newModule);
+        moduleData[selectedSection].count = count;
+
+        // حفظ التغييرات في Firestore
+        await saveLinksDataToFirestore();
+
+        // تحديث العرض
+        generateModules(selectedSection);
+
+        // إظهار رسالة نجاح
+        showBanner(`تم إضافة ${title} بنجاح!`);
+      };
+
+      // حذف آخر نموذج
+      document.getElementById("removeModuleBtn").onclick = async () => {
+        if (!selectedSection) return alert("اختر محور أولاً!");
+        if (
+          !linksData[selectedSection] ||
+          linksData[selectedSection].length === 0
+        )
+          return alert("لا يوجد نماذج لحذفها!");
+
+        // حفظ اسم النموذج المحذوف للإشعار
+        const removedTitle =
+          linksData[selectedSection][linksData[selectedSection].length - 1]
+            .title;
+
+        // حذف النموذج
+        linksData[selectedSection].pop();
+        moduleData[selectedSection].count = Math.max(
+          0,
+          moduleData[selectedSection].count - 1
+        );
+
+        // حفظ التغييرات في Firestore
+        await saveLinksDataToFirestore();
+
+        // تحديث العرض
+        generateModules(selectedSection);
+
+        // إظهار رسالة نجاح
+        showBanner(`تم حذف ${removedTitle} بنجاح!`);
+      };
+
       // ======================= User Data =======================
-      async function getUserData(name) {
-        const userRef = doc(db, "users", name);
-        const docSnap = await getDoc(userRef);
-        return docSnap.exists() ? docSnap.data() : null;
+      async function getUserData() {
+        const userRef = doc(db, "users", username);
+        const snap = await getDoc(userRef);
+        return snap.exists()
+          ? snap.data()
+          : { completedTasks: {}, completedSections: {} };
       }
 
-      async function updateTask(
-        user,
-        section,
-        moduleIndex,
-        taskIndex,
-        isChecked
-      ) {
-        const userRef = doc(db, "users", user);
-        const userData = (await getDoc(userRef)).data() || { progress: {} };
-
-        if (!userData.progress[section]) userData.progress[section] = [];
-        if (!userData.progress[section][moduleIndex])
-          userData.progress[section][moduleIndex] = [];
-
-        userData.progress[section][moduleIndex][taskIndex] = isChecked;
-
-        await setDoc(userRef, userData);
-        updateProgressBar(userData, section);
-        checkSectionCompletion(userData, section);
+      async function updateTask(section, taskId, done) {
+        const userRef = doc(db, "users", username);
+        await setDoc(
+          userRef,
+          { completedTasks: { [`${section}_${taskId}`]: done } },
+          { merge: true }
+        );
       }
 
       // ======================= Progress Bar =======================
-      function updateProgressBar(userData, section) {
-        const modules = (userData.progress[section] || []).flat();
-        const completed = modules.filter(Boolean).length;
-        const total = modules.length || 1;
-        const percentage = Math.round((completed / total) * 100);
-        const bar = document.getElementById("progress-bar");
+      function updateProgressBar() {
+        const progressContainer = document.getElementById("progress-container");
+        const progressBar = document.getElementById("progress-bar");
 
-        bar.style.width = percentage + "%";
-        bar.textContent = percentage + "%";
+        // كل الـ checkboxes الموجودة
+        const allCheckboxes = document.querySelectorAll(
+          '#content input[type="checkbox"]'
+        );
+
+        // استبعد الـ disabled
+        const enabledCheckboxes = Array.from(allCheckboxes).filter(
+          (cb) => !cb.disabled
+        );
+
+        // كام واحدة متعلم عليها
+        const checkedCheckboxes = enabledCheckboxes.filter((cb) => cb.checked);
+
+        // احسب النسبة
+        const percent =
+          enabledCheckboxes.length > 0
+            ? Math.round(
+                (checkedCheckboxes.length / enabledCheckboxes.length) * 100
+              )
+            : 0;
+
+        // عدل في شكل البار
+        progressBar.style.width = percent + "%";
+        progressBar.textContent = percent + "%";
       }
 
-      function checkSectionCompletion(userData, section) {
-        const modules = (userData.progress[section] || []).flat();
-        if (modules.length > 0 && modules.every(Boolean)) {
-          triggerCelebration();
+      async function checkSectionCompletion(section) {
+        const userData = await getUserData();
+        const totalTasks = moduleData[section].count * tasks.length;
+        let completed = 0;
+        Object.keys(userData.completedTasks || {}).forEach((k) => {
+          if (k.startsWith(section)) completed++;
+        });
+        if (completed >= totalTasks && !userData.completedSections?.[section]) {
+          const userRef = doc(db, "users", username);
+          await setDoc(
+            userRef,
+            { completedSections: { [section]: true } },
+            { merge: true }
+          );
+          showBanner(`🏆 برافوو يا ${username}! خلصت محور ${section}!`);
+          launchConfetti(80, 4000);
         }
       }
 
       // ======================= Navigation =======================
-      function backToModules() {
+      window.backToModules = function () {
         document.getElementById("main").style.display = "none";
-        document.getElementById("module-grid").style.display = "block";
-      }
-
-      function backToStart() {
+        document.getElementById("module-grid").style.display = "flex";
+      };
+      window.backToStart = function () {
         document.getElementById("module-grid").style.display = "none";
-        document.getElementById("start-screen").style.display = "block";
-      }
+        document.getElementById("start-screen").style.display = "flex";
+      };
 
       // ======================= Banner & Confetti =======================
-      function triggerCelebration() {
+      function showBanner(msg) {
         const banner = document.getElementById("celebrateBanner");
-        banner.style.display = "block";
-        setTimeout(() => (banner.style.display = "none"), 3000);
-        confetti();
+        banner.textContent = msg;
+        banner.classList.add("show");
+        setTimeout(() => {
+          banner.classList.remove("show");
+        }, 5000);
+      }
+
+      function launchConfetti(amount = 30, duration = 2000) {
+        confetti({ particleCount: amount, spread: 100, origin: { y: 0.5 } });
       }
 
       // ======================= Leaderboard =======================
-      async function loadLeaderboard() {
+      window.openLeaderboard = async function () {
+        document.getElementById("start-screen").style.display = "none";
+        document.getElementById("screen-lb").style.display = "block";
         const lbBody = document.getElementById("lbBody");
         lbBody.innerHTML = "";
 
-        const querySnapshot = await getDocs(collection(db, "users"));
+        const querySnap = await getDocs(collection(db, "users"));
         let users = [];
 
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          let completed = 0,
-            total = 0;
+        querySnap.forEach((docSnap) => {
+          const data = docSnap.data();
+          const name = data.name || docSnap.id;
 
-          for (const section in data.progress) {
-            data.progress[section].forEach((module) => {
-              module.forEach((task) => {
-                total++;
-                if (task) completed++;
-              });
-            });
+          // حساب عدد المهام المكتملة
+          let completedTasks = Object.values(data.completedTasks || {}).filter(
+            Boolean
+          ).length;
+          let totalTasks = 0;
+          for (const section in moduleData) {
+            totalTasks += moduleData[section].count * 4; // كل نموذج فيه 4 مربعات
           }
+          const progressPercent = totalTasks
+            ? Math.round((completedTasks / totalTasks) * 100)
+            : 0;
 
-          const percentage = total ? Math.round((completed / total) * 100) : 0;
-          users.push({ name: doc.id, progress: percentage });
+          users.push({
+            name,
+            progressPercent,
+          });
         });
 
-        users.sort((a, b) => b.progress - a.progress);
+        // ترتيب المستخدمين حسب التقدم
+        users.sort((a, b) => b.progressPercent - a.progressPercent);
 
-        users.forEach((user, index) => {
-          const row = `<tr>
-      <td>${index + 1}</td>
-      <td>${user.name}</td>
-      <td>${user.progress}%</td>
-      <td>${user.progress == 100 ? "🏅" : ""}</td>
-    </tr>`;
-          lbBody.innerHTML += row;
+        // أسماء المراكز
+        const ranks = ["المركز الأول", "المركز الثاني", "المركز الثالث"];
+
+        // الأوسمة حسب المراكز
+        const badges = ["🥇", "🥈", "🥉"];
+
+        users.forEach((u, i) => {
+          const rankText = ranks[i] || `المركز ${i + 1}`;
+          const badge = badges[i] || "🏅";
+
+          const tr = document.createElement("tr");
+          tr.className = "lb-row" + (i === 0 ? " top-1" : "");
+          tr.innerHTML = `
+    <td>${rankText}</td>
+    <td>${u.name}</td>
+    <td>
+      <div class="progress-bar-container" style="width:100%; background:#eee; border-radius:5px; height:12px; position:relative;">
+        <div class="progress-bar" style="width:${u.progressPercent}%; background:#4caf50; height:100%; border-radius:5px; transition: width 0.5s;"></div>
+        <span style="position:absolute; right:5px; top:-2px; font-size:10px; font-weight:bold; color:#222;">${u.progressPercent}%</span>
+      </div>
+    </td>
+    <td>${badge}</td>
+  `;
+          lbBody.appendChild(tr);
         });
-      }
+      };
 
+      window.closeLeaderboard = function () {
+        document.getElementById("screen-lb").style.display = "none";
+        document.getElementById("start-screen").style.display = "flex";
+      };
       document
         .getElementById("btnLeaderboard")
-        .addEventListener("click", () => {
-          document.getElementById("start-screen").style.display = "none";
-          document.getElementById("module-grid").style.display = "none";
-          document.getElementById("main").style.display = "none";
-          document.getElementById("screen-lb").style.display = "block";
-          loadLeaderboard();
-        });
-
-      function closeLeaderboard() {
-        document.getElementById("screen-lb").style.display = "none";
-        document.getElementById("start-screen").style.display = "block";
-      }
+        ?.addEventListener("click", openLeaderboard);
     </script>
   </body>
 </html>
