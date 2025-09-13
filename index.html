@@ -1126,331 +1126,125 @@
         }
       }
 
-      // ======================= Admin Functions =======================
-
-      // فتح لوحة الإدارة
-      document
-        .getElementById("openAdminPanelBtn")
-        .addEventListener("click", function () {
-          document.getElementById("module-grid").style.display = "none";
-          document.getElementById("admin-panel").style.display = "flex";
-        });
-
-      // العودة من لوحة الإدارة
-      document
-        .getElementById("adminBackToModules")
-        .addEventListener("click", function () {
-          document.getElementById("admin-panel").style.display = "none";
-          document.getElementById("module-grid").style.display = "flex";
-        });
-
-      // العودة إلى لوحة الإدارة من المحور
-      document
-        .getElementById("backToAdminBtn")
-        .addEventListener("click", function () {
-          document.getElementById("main").style.display = "none";
-          document.getElementById("admin-panel").style.display = "flex";
-        });
-
-      // إظهار حقل الموقع المخصص عند اختيار "تحديد موقع معين"
-      document
-        .getElementById("adminModulePosition")
-        .addEventListener("change", function () {
-          const customGroup = document.getElementById("customPositionGroup");
-          customGroup.style.display =
-            this.value === "custom" ? "block" : "none";
-        });
-
-      // إضافة نموذج جديد من لوحة الإدارة
-      document
-        .getElementById("adminAddModule")
-        .addEventListener("click", async function () {
-          const section = document.getElementById("adminSectionSelect").value;
-          const title = document
-            .getElementById("adminModuleTitle")
-            .value.trim();
-          const file = document.getElementById("adminModuleFile").value.trim();
-          const video = document
-            .getElementById("adminModuleVideo")
-            .value.trim();
-          const position = document.getElementById("adminModulePosition").value;
-
-          if (!title) {
-            alert("الرجاء إدخال عنوان للنموذج");
-            return;
-          }
-
-          const newModule = {
-            title: title,
-            file: file || null,
-            video: video || null,
-          };
-
-          // إذا لم يكن المحور موجوداً، أنشئه
-          if (!linksData[section]) {
-            linksData[section] = [];
-          }
-
-          // تحديد موقع إضافة النموذج
-          if (position === "start") {
-            linksData[section].unshift(newModule);
-          } else if (position === "custom") {
-            const pos =
-              parseInt(document.getElementById("adminCustomPosition").value) -
-              1;
-            const validPos = Math.max(
-              0,
-              Math.min(pos, linksData[section].length)
-            );
-            linksData[section].splice(validPos, 0, newModule);
-          } else {
-            // الإضافة في النهاية (الافتراضي)
-            linksData[section].push(newModule);
-          }
-
-          // تحديث عدد النماذج في المحور
-          moduleData[section].count = linksData[section].length;
-
-          // حفظ التغييرات في Firestore
-          const success = await saveLinksDataToFirestore();
-
-          // إظهار رسالة نجاح
-          const notification = document.getElementById("adminNotification");
-          notification.style.display = "block";
-          notification.textContent = success
-            ? `تم إضافة النموذج "${title}" إلى محور "${section}" بنجاح!`
-            : "حدث خطأ أثناء حفظ النموذج. الرجاء المحاولة مرة أخرى.";
-
-          // إخفاء الرسالة بعد 3 ثوان
-          setTimeout(() => {
-            notification.style.display = "none";
-          }, 3000);
-
-          // إعادة تعيين حقول النموذج
-          document.getElementById("adminModuleTitle").value = "";
-          document.getElementById("adminModuleFile").value = "";
-          document.getElementById("adminModuleVideo").value = "";
-        });
-
-      // إضافة نموذج جديد من صفحة المحور
-      document.getElementById("addModuleBtn").onclick = async () => {
-        if (!selectedSection) return alert("اختر محور أولاً!");
-
-        // إنشاء عنوان تلقائي للنموذج الجديد
-        const count = moduleData[selectedSection].count + 1;
-        const title = `النموذج ${count}`;
-
-        const newModule = { title: title, file: "", video: "" };
-
-        if (!linksData[selectedSection]) {
-          linksData[selectedSection] = [];
-        }
-
-        linksData[selectedSection].push(newModule);
-        moduleData[selectedSection].count = count;
-
-        // حفظ التغييرات في Firestore
-        await saveLinksDataToFirestore();
-
-        // تحديث العرض
-        generateModules(selectedSection);
-
-        // إظهار رسالة نجاح
-        showBanner(`تم إضافة ${title} بنجاح!`);
-      };
-
-      // حذف آخر نموذج
-      document.getElementById("removeModuleBtn").onclick = async () => {
-        if (!selectedSection) return alert("اختر محور أولاً!");
-        if (
-          !linksData[selectedSection] ||
-          linksData[selectedSection].length === 0
-        )
-          return alert("لا يوجد نماذج لحذفها!");
-
-        // حفظ اسم النموذج المحذوف للإشعار
-        const removedTitle =
-          linksData[selectedSection][linksData[selectedSection].length - 1]
-            .title;
-
-        // حذف النموذج
-        linksData[selectedSection].pop();
-        moduleData[selectedSection].count = Math.max(
-          0,
-          moduleData[selectedSection].count - 1
-        );
-
-        // حفظ التغييرات في Firestore
-        await saveLinksDataToFirestore();
-
-        // تحديث العرض
-        generateModules(selectedSection);
-
-        // إظهار رسالة نجاح
-        showBanner(`تم حذف ${removedTitle} بنجاح!`);
-      };
-
       // ======================= User Data =======================
-      async function getUserData() {
-        const userRef = doc(db, "users", username);
-        const snap = await getDoc(userRef);
-        return snap.exists()
-          ? snap.data()
-          : { completedTasks: {}, completedSections: {} };
+      async function getUserData(name) {
+        const userRef = doc(db, "users", name);
+        const docSnap = await getDoc(userRef);
+        return docSnap.exists() ? docSnap.data() : null;
       }
 
-      async function updateTask(section, taskId, done) {
-        const userRef = doc(db, "users", username);
-        await setDoc(
-          userRef,
-          { completedTasks: { [`${section}_${taskId}`]: done } },
-          { merge: true }
-        );
+      async function updateTask(
+        user,
+        section,
+        moduleIndex,
+        taskIndex,
+        isChecked
+      ) {
+        const userRef = doc(db, "users", user);
+        const userData = (await getDoc(userRef)).data() || { progress: {} };
+
+        if (!userData.progress[section]) userData.progress[section] = [];
+        if (!userData.progress[section][moduleIndex])
+          userData.progress[section][moduleIndex] = [];
+
+        userData.progress[section][moduleIndex][taskIndex] = isChecked;
+
+        await setDoc(userRef, userData);
+        updateProgressBar(userData, section);
+        checkSectionCompletion(userData, section);
       }
 
       // ======================= Progress Bar =======================
-      function updateProgressBar() {
-        const progressContainer = document.getElementById("progress-container");
-        const progressBar = document.getElementById("progress-bar");
+      function updateProgressBar(userData, section) {
+        const modules = (userData.progress[section] || []).flat();
+        const completed = modules.filter(Boolean).length;
+        const total = modules.length || 1;
+        const percentage = Math.round((completed / total) * 100);
+        const bar = document.getElementById("progress-bar");
 
-        // كل الـ checkboxes الموجودة
-        const allCheckboxes = document.querySelectorAll(
-          '#content input[type="checkbox"]'
-        );
-
-        // استبعد الـ disabled
-        const enabledCheckboxes = Array.from(allCheckboxes).filter(
-          (cb) => !cb.disabled
-        );
-
-        // كام واحدة متعلم عليها
-        const checkedCheckboxes = enabledCheckboxes.filter((cb) => cb.checked);
-
-        // احسب النسبة
-        const percent =
-          enabledCheckboxes.length > 0
-            ? Math.round(
-                (checkedCheckboxes.length / enabledCheckboxes.length) * 100
-              )
-            : 0;
-
-        // عدل في شكل البار
-        progressBar.style.width = percent + "%";
-        progressBar.textContent = percent + "%";
+        bar.style.width = percentage + "%";
+        bar.textContent = percentage + "%";
       }
 
-      async function checkSectionCompletion(section) {
-        const userData = await getUserData();
-        const totalTasks = moduleData[section].count * tasks.length;
-        let completed = 0;
-        Object.keys(userData.completedTasks || {}).forEach((k) => {
-          if (k.startsWith(section)) completed++;
-        });
-        if (completed >= totalTasks && !userData.completedSections?.[section]) {
-          const userRef = doc(db, "users", username);
-          await setDoc(
-            userRef,
-            { completedSections: { [section]: true } },
-            { merge: true }
-          );
-          showBanner(`🏆 برافوو يا ${username}! خلصت محور ${section}!`);
-          launchConfetti(80, 4000);
+      function checkSectionCompletion(userData, section) {
+        const modules = (userData.progress[section] || []).flat();
+        if (modules.length > 0 && modules.every(Boolean)) {
+          triggerCelebration();
         }
       }
 
       // ======================= Navigation =======================
-      window.backToModules = function () {
+      function backToModules() {
         document.getElementById("main").style.display = "none";
-        document.getElementById("module-grid").style.display = "flex";
-      };
-      window.backToStart = function () {
-        document.getElementById("module-grid").style.display = "none";
-        document.getElementById("start-screen").style.display = "flex";
-      };
-
-      // ======================= Banner & Confetti =======================
-      function showBanner(msg) {
-        const banner = document.getElementById("celebrateBanner");
-        banner.textContent = msg;
-        banner.classList.add("show");
-        setTimeout(() => {
-          banner.classList.remove("show");
-        }, 5000);
+        document.getElementById("module-grid").style.display = "block";
       }
 
-      function launchConfetti(amount = 30, duration = 2000) {
-        confetti({ particleCount: amount, spread: 100, origin: { y: 0.5 } });
+      function backToStart() {
+        document.getElementById("module-grid").style.display = "none";
+        document.getElementById("start-screen").style.display = "block";
+      }
+
+      // ======================= Banner & Confetti =======================
+      function triggerCelebration() {
+        const banner = document.getElementById("celebrateBanner");
+        banner.style.display = "block";
+        setTimeout(() => (banner.style.display = "none"), 3000);
+        confetti();
       }
 
       // ======================= Leaderboard =======================
-      window.openLeaderboard = async function () {
-        document.getElementById("start-screen").style.display = "none";
-        document.getElementById("screen-lb").style.display = "block";
+      async function loadLeaderboard() {
         const lbBody = document.getElementById("lbBody");
         lbBody.innerHTML = "";
 
-        const querySnap = await getDocs(collection(db, "users"));
+        const querySnapshot = await getDocs(collection(db, "users"));
         let users = [];
 
-        querySnap.forEach((docSnap) => {
-          const data = docSnap.data();
-          const name = data.name || docSnap.id;
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          let completed = 0,
+            total = 0;
 
-          // حساب عدد المهام المكتملة
-          let completedTasks = Object.values(data.completedTasks || {}).filter(
-            Boolean
-          ).length;
-          let totalTasks = 0;
-          for (const section in moduleData) {
-            totalTasks += moduleData[section].count * 4; // كل نموذج فيه 4 مربعات
+          for (const section in data.progress) {
+            data.progress[section].forEach((module) => {
+              module.forEach((task) => {
+                total++;
+                if (task) completed++;
+              });
+            });
           }
-          const progressPercent = totalTasks
-            ? Math.round((completedTasks / totalTasks) * 100)
-            : 0;
 
-          users.push({
-            name,
-            progressPercent,
-          });
+          const percentage = total ? Math.round((completed / total) * 100) : 0;
+          users.push({ name: doc.id, progress: percentage });
         });
 
-        // ترتيب المستخدمين حسب التقدم
-        users.sort((a, b) => b.progressPercent - a.progressPercent);
+        users.sort((a, b) => b.progress - a.progress);
 
-        // أسماء المراكز
-        const ranks = ["المركز الأول", "المركز الثاني", "المركز الثالث"];
-
-        // الأوسمة حسب المراكز
-        const badges = ["🥇", "🥈", "🥉"];
-
-        users.forEach((u, i) => {
-          const rankText = ranks[i] || `المركز ${i + 1}`;
-          const badge = badges[i] || "🏅";
-
-          const tr = document.createElement("tr");
-          tr.className = "lb-row" + (i === 0 ? " top-1" : "");
-          tr.innerHTML = `
-    <td>${rankText}</td>
-    <td>${u.name}</td>
-    <td>
-      <div class="progress-bar-container" style="width:100%; background:#eee; border-radius:5px; height:12px; position:relative;">
-        <div class="progress-bar" style="width:${u.progressPercent}%; background:#4caf50; height:100%; border-radius:5px; transition: width 0.5s;"></div>
-        <span style="position:absolute; right:5px; top:-2px; font-size:10px; font-weight:bold; color:#222;">${u.progressPercent}%</span>
-      </div>
-    </td>
-    <td>${badge}</td>
-  `;
-          lbBody.appendChild(tr);
+        users.forEach((user, index) => {
+          const row = `<tr>
+      <td>${index + 1}</td>
+      <td>${user.name}</td>
+      <td>${user.progress}%</td>
+      <td>${user.progress == 100 ? "🏅" : ""}</td>
+    </tr>`;
+          lbBody.innerHTML += row;
         });
-      };
+      }
 
-      window.closeLeaderboard = function () {
-        document.getElementById("screen-lb").style.display = "none";
-        document.getElementById("start-screen").style.display = "flex";
-      };
       document
         .getElementById("btnLeaderboard")
-        ?.addEventListener("click", openLeaderboard);
+        .addEventListener("click", () => {
+          document.getElementById("start-screen").style.display = "none";
+          document.getElementById("module-grid").style.display = "none";
+          document.getElementById("main").style.display = "none";
+          document.getElementById("screen-lb").style.display = "block";
+          loadLeaderboard();
+        });
+
+      function closeLeaderboard() {
+        document.getElementById("screen-lb").style.display = "none";
+        document.getElementById("start-screen").style.display = "block";
+      }
     </script>
   </body>
 </html>
