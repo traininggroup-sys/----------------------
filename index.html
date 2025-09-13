@@ -559,12 +559,22 @@
     <div id="module-grid">
       <h2 class="section-title">المحاور</h2>
       <div id="modules-container"></div>
-
+      <div id="admin-buttons" style="display: none">
+        <button id="openAdminPanelBtn">لوحة التحكم للمشرف</button>
+      </div>
       <button class="fixed-back" onclick="backToStart()">رجوع</button>
     </div>
 
     <!-- ===== Main Module ===== -->
     <div id="main">
+      <div id="admin-tools" style="display: none">
+        <h3>أدوات المشرف</h3>
+        <div class="admin-tools-row">
+          <button id="addModuleBtn">إضافة نموذج جديد</button>
+          <button id="removeModuleBtn">حذف آخر نموذج</button>
+          <button id="backToAdminBtn">لوحة التحكم الرئيسية</button>
+        </div>
+      </div>
       <h2 id="section-title"></h2>
       <div id="progress-container"><div id="progress-bar">0%</div></div>
       <div id="content"></div>
@@ -586,6 +596,80 @@
       </table>
 
       <button class="fixed-back" onclick="closeLeaderboard()">رجوع</button>
+    </div>
+
+    <!-- ===== Admin Panel ===== -->
+    <div id="admin-panel">
+      <h2 class="section-title">لوحة تحكم المشرف</h2>
+      <div class="admin-notification" id="adminNotification">
+        تم الحفظ بنجاح
+      </div>
+
+      <div class="admin-form">
+        <div class="admin-form-group">
+          <label>اختر المحور</label>
+          <select id="adminSectionSelect">
+            <option value=" معلومات عامة">معلومات عامة</option>
+            <option value=" حاسب">حاسب</option>
+            <option value=" انجليزي">انجليزي</option>
+            <option value=" عربي">عربي</option>
+          </select>
+        </div>
+
+        <div class="admin-form-group">
+          <label>عنوان النموذج</label>
+          <input
+            type="text"
+            id="adminModuleTitle"
+            placeholder="مثال: النموذج 21"
+          />
+        </div>
+
+        <div class="admin-form-group">
+          <label>رابط الملف (اختياري)</label>
+          <input
+            type="text"
+            id="adminModuleFile"
+            placeholder="https://t.me/..."
+          />
+        </div>
+
+        <div class="admin-form-group">
+          <label>رابط الفيديو (اختياري)</label>
+          <input
+            type="text"
+            id="adminModuleVideo"
+            placeholder="https://youtu.be/..."
+          />
+        </div>
+
+        <div class="admin-form-group">
+          <label>الترتيب في المحور</label>
+          <select id="adminModulePosition">
+            <option value="end">إضافة في النهاية</option>
+            <option value="start">إضافة في البداية</option>
+            <option value="custom">تحديد موقع معين</option>
+          </select>
+        </div>
+
+        <div
+          class="admin-form-group"
+          id="customPositionGroup"
+          style="display: none"
+        >
+          <label>الموقع المحدد (رقم)</label>
+          <input type="number" id="adminCustomPosition" min="1" value="1" />
+        </div>
+      </div>
+
+      <div class="admin-buttons">
+        <button class="admin-btn admin-btn-primary" id="adminAddModule">
+          إضافة النموذج
+        </button>
+        <button class="admin-btn admin-btn-secondary" id="adminBackToModules">
+          العودة للمحاور
+        </button>
+      </div>
     </div>
 
     <script type="module">
@@ -643,7 +727,7 @@
 
         // تحقق مما إذا كان المستخدم هو المشرف
         if (nameInput === adminName && passInput === adminPassword) {
-          isAdmin = false;
+          isAdmin = true;
           username = nameInput;
           password = passInput;
 
@@ -656,7 +740,7 @@
               password: passInput,
               completedTasks: {},
               completedSections: {},
-              isAdmin: false,
+              isAdmin: true,
             });
           }
 
@@ -717,11 +801,12 @@
         selectedSection = section;
         document.getElementById("module-grid").style.display = "none";
         document.getElementById("main").style.display = "flex";
-        document.getElementById("admin-tools").style.display = "none"; // لا تظهر أدوات المشرف
+        document.getElementById("admin-tools").style.display = isAdmin
+          ? "block"
+          : "none";
         generateModules(section);
         updateProgressBar();
       };
-
       /*المحاوووور*/
       const linksData = {
         " معلومات عامة": [
@@ -1277,13 +1362,6 @@
           document.getElementById("adminModuleFile").value = "";
           document.getElementById("adminModuleVideo").value = "";
         });
-
-      document.getElementById("addModuleBtn")?.remove();
-      document.getElementById("removeModuleBtn")?.remove();
-      document.getElementById("backToAdminBtn")?.remove();
-      document.getElementById("openAdminPanelBtn")?.remove();
-      document.getElementById("adminAddModule")?.remove();
-      document.getElementById("adminBackToModules")?.remove();
 
       // إضافة نموذج جديد من صفحة المحور
       document.getElementById("addModuleBtn").onclick = async () => {
