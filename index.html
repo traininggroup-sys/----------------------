@@ -33,8 +33,7 @@
       #start-screen,
       #module-grid,
       #main,
-      #screen-lb,
-      #admin-panel {
+      #screen-lb {
         display: none;
         padding: 20px;
         min-height: 100vh;
@@ -447,85 +446,6 @@
         opacity: 0.5; /* باهت شوية */
         cursor: not-allowed; /* مؤشر الفأرة يشير إنه مقفول */
       }
-
-      /* ================== Admin Panel ================== */
-      #admin-panel {
-        background-color: #f8f9fa;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-        width: 90%;
-        max-width: 800px;
-        margin: 0 auto;
-      }
-
-      .admin-form {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .admin-form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-      }
-
-      .admin-form label {
-        font-weight: bold;
-        font-size: 16px;
-        color: #333;
-      }
-
-      .admin-form input,
-      .admin-form select {
-        padding: 12px;
-        border-radius: 8px;
-        border: 1px solid #ddd;
-        font-size: 16px;
-        width: 100%;
-      }
-
-      .admin-buttons {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 20px;
-      }
-
-      .admin-btn {
-        padding: 12px 25px;
-        font-size: 16px;
-        font-weight: bold;
-      }
-
-      .admin-btn-primary {
-        background: linear-gradient(90deg, #4a148c, #7b1fa2);
-      }
-
-      .admin-btn-secondary {
-        background: linear-gradient(90deg, #37474f, #546e7a);
-      }
-
-      .admin-notification {
-        background-color: #e8f5e9;
-        border-left: 5px solid #4caf50;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 5px;
-        font-weight: bold;
-        display: none;
-      }
-
-      .admin-tools-row {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 15px;
-      }
-
-      .admin-tools-row button {
-        flex: 1;
-      }
     </style>
   </head>
 
@@ -559,9 +479,6 @@
     <div id="module-grid">
       <h2 class="section-title">المحاور</h2>
       <div id="modules-container"></div>
-      <div id="admin-buttons" style="display: none">
-        <button id="openAdminPanelBtn">لوحة التحكم للمشرف</button>
-      </div>
       <button class="fixed-back" onclick="backToStart()">رجوع</button>
     </div>
 
@@ -569,11 +486,8 @@
     <div id="main">
       <div id="admin-tools" style="display: none">
         <h3>أدوات المشرف</h3>
-        <div class="admin-tools-row">
-          <button id="addModuleBtn">إضافة نموذج جديد</button>
-          <button id="removeModuleBtn">حذف آخر نموذج</button>
-          <button id="backToAdminBtn">لوحة التحكم الرئيسية</button>
-        </div>
+        <button id="addModuleBtn">إضافة نموذج جديد</button>
+        <button id="removeModuleBtn">حذف آخر نموذج</button>
       </div>
       <h2 id="section-title"></h2>
       <div id="progress-container"><div id="progress-bar">0%</div></div>
@@ -581,6 +495,7 @@
       <button class="fixed-back" onclick="backToModules()">رجوع</button>
     </div>
 
+    <!-- ===== Leaderboard ===== -->
     <!-- ===== Leaderboard ===== -->
     <div id="screen-lb" style="display: none">
       <table id="leaderboard">
@@ -598,80 +513,6 @@
       <button class="fixed-back" onclick="closeLeaderboard()">رجوع</button>
     </div>
 
-    <!-- ===== Admin Panel ===== -->
-    <div id="admin-panel">
-      <h2 class="section-title">لوحة تحكم المشرف</h2>
-      <div class="admin-notification" id="adminNotification">
-        تم الحفظ بنجاح
-      </div>
-
-      <div class="admin-form">
-        <div class="admin-form-group">
-          <label>اختر المحور</label>
-          <select id="adminSectionSelect">
-            <option value=" معلومات عامة">معلومات عامة</option>
-            <option value=" حاسب">حاسب</option>
-            <option value=" انجليزي">انجليزي</option>
-            <option value=" عربي">عربي</option>
-          </select>
-        </div>
-
-        <div class="admin-form-group">
-          <label>عنوان النموذج</label>
-          <input
-            type="text"
-            id="adminModuleTitle"
-            placeholder="مثال: النموذج 21"
-          />
-        </div>
-
-        <div class="admin-form-group">
-          <label>رابط الملف (اختياري)</label>
-          <input
-            type="text"
-            id="adminModuleFile"
-            placeholder="https://t.me/..."
-          />
-        </div>
-
-        <div class="admin-form-group">
-          <label>رابط الفيديو (اختياري)</label>
-          <input
-            type="text"
-            id="adminModuleVideo"
-            placeholder="https://youtu.be/..."
-          />
-        </div>
-
-        <div class="admin-form-group">
-          <label>الترتيب في المحور</label>
-          <select id="adminModulePosition">
-            <option value="end">إضافة في النهاية</option>
-            <option value="start">إضافة في البداية</option>
-            <option value="custom">تحديد موقع معين</option>
-          </select>
-        </div>
-
-        <div
-          class="admin-form-group"
-          id="customPositionGroup"
-          style="display: none"
-        >
-          <label>الموقع المحدد (رقم)</label>
-          <input type="number" id="adminCustomPosition" min="1" value="1" />
-        </div>
-      </div>
-
-      <div class="admin-buttons">
-        <button class="admin-btn admin-btn-primary" id="adminAddModule">
-          إضافة النموذج
-        </button>
-        <button class="admin-btn admin-btn-secondary" id="adminBackToModules">
-          العودة للمحاور
-        </button>
-      </div>
-    </div>
-
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
       import {
@@ -681,8 +522,6 @@
         setDoc,
         collection,
         getDocs,
-        updateDoc,
-        arrayUnion,
       } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
       const firebaseConfig = {
@@ -698,9 +537,7 @@
       const db = getFirestore(app);
 
       const adminName = "نجلا";
-      const adminPassword = "2";
 
-      let isAdmin = false;
       let username = "",
         password = "",
         selectedSection = "";
@@ -708,7 +545,7 @@
         "مذاكرة النموذج",
         "مشاهدة الفيديو",
         "حل الاستفتاءات",
-        "حل الاختبار بوقت",
+        /*"حل الاختبار بوقت",*/
       ];
 
       const moduleData = {
@@ -716,6 +553,7 @@
         " حاسب": { type: "models", icon: "💻", count: 22 }, // مجموع الفيديوهات + النماذج
         " انجليزي": { type: "models", icon: "🗣️", count: 22 },
         " عربي": { type: "models", icon: "📘", count: 19 },
+        التربوي: { type: "models", icon: "📘", count: 19 },
       };
 
       // ======================= Login =======================
@@ -725,33 +563,6 @@
         if (!nameInput || !passInput)
           return alert("الرجاء إدخال الاسم وكلمة المرور");
 
-        // تحقق مما إذا كان المستخدم هو المشرف
-        if (nameInput === adminName && passInput === adminPassword) {
-          isAdmin = true;
-          username = nameInput;
-          password = passInput;
-
-          // احصل على بيانات المستخدم أو أنشئ حساباً جديداً
-          const userRef = doc(db, "users", nameInput);
-          const snap = await getDoc(userRef);
-          if (!snap.exists()) {
-            await setDoc(userRef, {
-              name: nameInput,
-              password: passInput,
-              completedTasks: {},
-              completedSections: {},
-              isAdmin: true,
-            });
-          }
-
-          document.getElementById("start-screen").style.display = "none";
-          document.getElementById("module-grid").style.display = "flex";
-          document.getElementById("admin-buttons").style.display = "block";
-          renderModuleButtons();
-          return;
-        }
-
-        // التحقق من المستخدمين العاديين
         const userRef = doc(db, "users", nameInput);
         const snap = await getDoc(userRef);
 
@@ -768,13 +579,11 @@
           });
         }
 
-        isAdmin = false;
         username = nameInput;
         password = passInput;
 
         document.getElementById("start-screen").style.display = "none";
         document.getElementById("module-grid").style.display = "flex";
-        document.getElementById("admin-buttons").style.display = "none";
         renderModuleButtons();
       };
 
@@ -801,15 +610,28 @@
         selectedSection = section;
         document.getElementById("module-grid").style.display = "none";
         document.getElementById("main").style.display = "flex";
-        document.getElementById("admin-tools").style.display = isAdmin
-          ? "block"
-          : "none";
+        document.getElementById("admin-tools").style.display =
+          username === adminName ? "block" : "none";
         generateModules(section);
         updateProgressBar();
       };
       /*المحاوووور*/
       const linksData = {
         " معلومات عامة": [
+          {
+            title: "محاور وكباري",
+            file: "https://t.me/c/2299629125/2/34633?single",
+          },
+          {
+            title: "اهم المنظمات العالمية",
+            file: "https://t.me/c/2299629125/2/35213",
+          },
+          {
+            title: "اقاليم مصر الاقتصادية",
+            file: "https://t.me/c/2299629125/2/35024",
+          },
+          { title: "حكام مصر", file: "https://t.me/c/2299629125/2/35003" },
+          { title: "صوامع مصر", file: "https://t.me/c/2299629125/2/34792" },
           { title: "النموذج 1", file: "https://t.me/c/2299629125/2/30375" },
           { title: "النموذج 2", file: "https://t.me/c/2299629125/2/30396" },
           { title: "النموذج 3", file: "https://t.me/c/2299629125/2/30428" },
@@ -830,20 +652,8 @@
           { title: "النموذج 18", file: "https://t.me/c/2299629125/2/31415" },
           { title: "النموذج 19", file: "https://t.me/c/2299629125/2/31437" },
           { title: "النموذج 20", file: "https://t.me/c/2299629125/2/31460" },
-          {
-            title: "محاور وكباري",
-            file: "https://t.me/c/2299629125/2/34633?single",
-          },
-          {
-            title: "اهم المنظمات العالمية",
-            file: "https://t.me/c/2299629125/2/35213",
-          },
-          {
-            title: "اقاليم مصر الاقتصادية",
-            file: "https://t.me/c/2299629125/2/35024",
-          },
-          { title: "حكام مصر", file: "https://t.me/c/2299629125/2/35003" },
-          { title: "صوامع مصر", file: "https://t.me/c/2299629125/2/34792" },
+          { title: "النموذج 21", file: "https://t.me/c/2299629125/37610" },
+          { title: "النموذج 22", file: "https://t.me/c/2299629125/37611" },
         ],
         " حاسب": [
           {
@@ -871,6 +681,7 @@
             video: "https://youtu.be/1DbFtQZpsW0",
             file: "https://t.me/c/2299629125/4/27787?single",
           },
+
           {
             title: "برنامج Excel",
             video: "https://youtu.be/JzsTom7tTx8",
@@ -954,14 +765,14 @@
             title: "مراجعة للحاسب جزء ٢",
             video: "https://youtu.be/W1Qcsu6hy4U",
           },
-          /* {
+          {
             title: "شرح حساب عدد الخلايا في Excel",
             video: "https://youtu.be/-uIb6ZpFEi4",
           },
           {
             title: "شرح سؤال لعمل تخطيط هيكلي نختار إيه",
             video: "https://youtu.be/Odgj-G4pHU",
-          },*/
+          },
           // النماذج
           {
             title: "النموذج 1",
@@ -987,17 +798,9 @@
           },
           { title: "النموذج 8", file: "https://t.me/c/2299629125/4/29927" },
           {
-            title: "النموذج 9",
+            title: "نموذج رقم 9",
             video: "https://youtu.be/VtOe_dx5qn8",
             file: "https://t.me/c/2299629125/4/29958",
-          },
-          {
-            title: "النموذج 10",
-            file: "https://t.me/c/2299629125/4/27223?single",
-          },
-          {
-            title: "النموذج 11",
-            file: "https://t.me/c/2299629125/4/27224?single",
           },
           {
             title: "النموذج 12",
@@ -1105,61 +908,126 @@
           },
         ],
         " انجليزي": [
-          { title: "نموذج 1", file: "https://t.me/c/2299629125/31685" },
-          { title: "نموذج 2", file: "https://t.me/c/2299629125/31686" },
-          { title: "نموذج 3", file: "https://t.me/c/2299629125/31687" },
-          { title: "نموذج 4", file: "https://t.me/c/2299629125/27885" },
-          { title: "نموذج 5", file: "https://t.me/c/2299629125/27935" },
-          { title: "نموذج 6", file: "https://t.me/c/2299629125/28069" },
-          { title: "نموذج 7", file: "https://t.me/c/2299629125/28113" },
-          { title: "نموذج 8", file: "https://t.me/c/2299629125/28287" },
-          { title: "نموذج 9", file: "https://t.me/c/2299629125/28325" },
-          { title: "نموذج 10", file: "https://t.me/c/2299629125/28430" },
-          { title: "نموذج 11", file: "https://t.me/c/2299629125/28534" },
-          { title: "نموذج 12", file: "https://t.me/c/2299629125/28762" },
-          { title: "نموذج 13", file: "https://t.me/c/2299629125/29676" },
-          { title: "نموذج 14", file: "https://t.me/c/2299629125/29875" },
-          { title: "نموذج 15", file: "https://t.me/c/2299629125/30292" },
-          { title: "نموذج 16", file: "https://t.me/c/2299629125/31034" },
+          {
+            title: "نموذج 1",
+            file: "https://t.me/c/2299629125/6/34626",
+            video: "https://youtu.be/L-zQiFntTnI?si=msXGWwy3KX5QG7Ln",
+          },
+          {
+            title: "نموذج 2",
+            file: "https://t.me/c/2299629125/6/34794",
+            video: "https://youtu.be/vA59J4GrLkc?si=mHvKaXEPmBTlPRna",
+          },
+          {
+            title: "نموذج 3",
+            file: "https://t.me/c/2299629125/6/35028",
+            video: "https://t.me/c/2299629125/6/35029",
+          },
+          {
+            title: "نموذج 4",
+            file: "https://t.me/c/2299629125/6/35228",
+            video: "https://t.me/c/2299629125/6/35229",
+          },
+          {
+            title: "نموذج 5",
+            file: "https://t.me/c/2299629125/6/35570",
+            video: "https://t.me/c/2299629125/6/35571",
+          },
+          {
+            title: "نموذج 6",
+            file: "https://t.me/c/2299629125/6/35960",
+            video: "https://t.me/c/2299629125/6/35962",
+          },
+          {
+            title: "نموذج 7",
+            file: "https://t.me/c/2299629125/6/36456",
+            video: "https://t.me/c/2299629125/6/36457",
+          },
+          {
+            title: "نموذج 8",
+            file: "https://t.me/c/2299629125/6/36824",
+            video: "https://t.me/c/2299629125/6/36825",
+          },
+          {
+            title: "نموذج 9",
+            file: "https://t.me/c/2299629125/6/37221",
+            video: "https://t.me/c/2299629125/6/37222",
+          },
+          {
+            title: "نموذج 10",
+            file: "https://t.me/c/2299629125/6/37351?single",
+            video: "https://t.me/c/2299629125/6/37352?single",
+          },
+          {
+            title: "نموذج 11",
+            file: "https://t.me/c/2299629125/6/37508?single",
+            video: "https://t.me/c/2299629125/6/37509?single",
+          },
+          {
+            title: "نموذج 12",
+            file: "https://t.me/c/2299629125/6/37613?single",
+            video: "https://t.me/c/2299629125/6/37614?single",
+          },
+          {
+            title: "نموذج 13",
+            file: "https://t.me/c/2299629125/6/37981?single",
+            video: "https://t.me/c/2299629125/6/37982?single",
+          },
+          {
+            title: "نموذج 14",
+            file: "https://t.me/c/2299629125/6/38114?single",
+            video: "https://t.me/c/2299629125/6/38115?single",
+          },
+          {
+            title: "نموذج 15",
+            file: "https://t.me/c/2299629125/6/38188?single",
+            video: "https://t.me/c/2299629125/6/38189?single",
+          },
+          {
+            title: "نموذج 16",
+            file: "https://t.me/c/2299629125/6/38924?single",
+            video: "https://t.me/c/2299629125/6/38925?single",
+          },
+        ],
+        التربوي: [
+          {
+            title: "الموضوع الأول",
+            file: "https://t.me/c/2299629125/19608/34801",
+          },
+          {
+            title: "الموضوع الثاني",
+            file: "https://t.me/c/2299629125/19608/34820",
+          },
+          {
+            title: "الموضوع الثالث",
+            file: "https://t.me/c/2299629125/19608/34854",
+          },
+          {
+            title: "الموضوع الرابع",
+            file: "https://t.me/c/2299629125/19608/34868",
+          },
+          {
+            title: "الموضوع الخامس",
+            file: "https://t.me/c/2299629125/19608/34887",
+          },
+          {
+            title: "نموذج ١",
+            file: "https://t.me/c/2299629125/19608/36954",
+          },
+          {
+            title: "نموذج ٢",
+            file: "https://t.me/c/2299629125/19608/37002",
+          },
+          {
+            title: "نموذج ٣",
+            file: "https://t.me/c/2299629125/19608/37048",
+          },
+          {
+            title: "نموذج ٤",
+            file: "https://t.me/c/2299629125/19608/37091",
+          },
         ],
       };
-
-      // حفظ النماذج في Firestore
-      async function saveLinksDataToFirestore() {
-        try {
-          const linksDataRef = doc(db, "appData", "linksData");
-          await setDoc(linksDataRef, { sections: linksData });
-          return true;
-        } catch (error) {
-          console.error("Error saving links data:", error);
-          return false;
-        }
-      }
-
-      // جلب النماذج من Firestore
-      async function loadLinksDataFromFirestore() {
-        try {
-          const linksDataRef = doc(db, "appData", "linksData");
-          const snap = await getDoc(linksDataRef);
-
-          if (snap.exists()) {
-            const data = snap.data();
-            // استخدام البيانات من Firestore إذا كانت موجودة
-            if (data.sections) {
-              Object.assign(linksData, data.sections);
-            }
-          } else {
-            // إذا لم تكن البيانات موجودة، احفظ النسخة الحالية
-            await saveLinksDataToFirestore();
-          }
-        } catch (error) {
-          console.error("Error loading links data:", error);
-        }
-      }
-
-      // تحميل البيانات عند بدء التطبيق
-      loadLinksDataFromFirestore();
-
       // ======================= Generate Modules for all Sections =======================
       async function generateModules(section) {
         const container = document.getElementById("content");
@@ -1257,141 +1125,21 @@
         }
       }
 
-      // ======================= Admin Functions =======================
-
-      // فتح لوحة الإدارة
-      document
-        .getElementById("openAdminPanelBtn")
-        .addEventListener("click", function () {
-          document.getElementById("module-grid").style.display = "none";
-          document.getElementById("admin-panel").style.display = "flex";
-        });
-
-      // العودة من لوحة الإدارة
-      document
-        .getElementById("adminBackToModules")
-        .addEventListener("click", function () {
-          document.getElementById("admin-panel").style.display = "none";
-          document.getElementById("module-grid").style.display = "flex";
-        });
-
-      // العودة إلى لوحة الإدارة من المحور
-      document
-        .getElementById("backToAdminBtn")
-        .addEventListener("click", function () {
-          document.getElementById("main").style.display = "none";
-          document.getElementById("admin-panel").style.display = "flex";
-        });
-
-      // إظهار حقل الموقع المخصص عند اختيار "تحديد موقع معين"
-      document
-        .getElementById("adminModulePosition")
-        .addEventListener("change", function () {
-          const customGroup = document.getElementById("customPositionGroup");
-          customGroup.style.display =
-            this.value === "custom" ? "block" : "none";
-        });
-
-      // إضافة نموذج جديد من لوحة الإدارة
-      document
-        .getElementById("adminAddModule")
-        .addEventListener("click", async function () {
-          const section = document.getElementById("adminSectionSelect").value;
-          const title = document
-            .getElementById("adminModuleTitle")
-            .value.trim();
-          const file = document.getElementById("adminModuleFile").value.trim();
-          const video = document
-            .getElementById("adminModuleVideo")
-            .value.trim();
-          const position = document.getElementById("adminModulePosition").value;
-
-          if (!title) {
-            alert("الرجاء إدخال عنوان للنموذج");
-            return;
-          }
-
-          const newModule = {
-            title: title,
-            file: file || null,
-            video: video || null,
-          };
-
-          // إذا لم يكن المحور موجوداً، أنشئه
-          if (!linksData[section]) {
-            linksData[section] = [];
-          }
-
-          // تحديد موقع إضافة النموذج
-          if (position === "start") {
-            linksData[section].unshift(newModule);
-          } else if (position === "custom") {
-            const pos =
-              parseInt(document.getElementById("adminCustomPosition").value) -
-              1;
-            const validPos = Math.max(
-              0,
-              Math.min(pos, linksData[section].length)
-            );
-            linksData[section].splice(validPos, 0, newModule);
-          } else {
-            // الإضافة في النهاية (الافتراضي)
-            linksData[section].push(newModule);
-          }
-
-          // تحديث عدد النماذج في المحور
-          moduleData[section].count = linksData[section].length;
-
-          // حفظ التغييرات في Firestore
-          const success = await saveLinksDataToFirestore();
-
-          // إظهار رسالة نجاح
-          const notification = document.getElementById("adminNotification");
-          notification.style.display = "block";
-          notification.textContent = success
-            ? `تم إضافة النموذج "${title}" إلى محور "${section}" بنجاح!`
-            : "حدث خطأ أثناء حفظ النموذج. الرجاء المحاولة مرة أخرى.";
-
-          // إخفاء الرسالة بعد 3 ثوان
-          setTimeout(() => {
-            notification.style.display = "none";
-          }, 3000);
-
-          // إعادة تعيين حقول النموذج
-          document.getElementById("adminModuleTitle").value = "";
-          document.getElementById("adminModuleFile").value = "";
-          document.getElementById("adminModuleVideo").value = "";
-        });
-
-      // إضافة نموذج جديد من صفحة المحور
-      document.getElementById("addModuleBtn").onclick = async () => {
+      // إضافة نموذج جديد
+      document.getElementById("addModuleBtn").onclick = () => {
         if (!selectedSection) return alert("اختر محور أولاً!");
-
-        // إنشاء عنوان تلقائي للنموذج الجديد
         const count = moduleData[selectedSection].count + 1;
-        const title = `النموذج ${count}`;
+        const newModule = { title: `النموذج ${count}`, file: "" };
 
-        const newModule = { title: title, file: "", video: "" };
-
-        if (!linksData[selectedSection]) {
-          linksData[selectedSection] = [];
-        }
-
+        if (!linksData[selectedSection]) linksData[selectedSection] = [];
         linksData[selectedSection].push(newModule);
+
         moduleData[selectedSection].count = count;
-
-        // حفظ التغييرات في Firestore
-        await saveLinksDataToFirestore();
-
-        // تحديث العرض
         generateModules(selectedSection);
-
-        // إظهار رسالة نجاح
-        showBanner(`تم إضافة ${title} بنجاح!`);
       };
 
       // حذف آخر نموذج
-      document.getElementById("removeModuleBtn").onclick = async () => {
+      document.getElementById("removeModuleBtn").onclick = () => {
         if (!selectedSection) return alert("اختر محور أولاً!");
         if (
           !linksData[selectedSection] ||
@@ -1399,26 +1147,12 @@
         )
           return alert("لا يوجد نماذج لحذفها!");
 
-        // حفظ اسم النموذج المحذوف للإشعار
-        const removedTitle =
-          linksData[selectedSection][linksData[selectedSection].length - 1]
-            .title;
-
-        // حذف النموذج
         linksData[selectedSection].pop();
         moduleData[selectedSection].count = Math.max(
           0,
           moduleData[selectedSection].count - 1
         );
-
-        // حفظ التغييرات في Firestore
-        await saveLinksDataToFirestore();
-
-        // تحديث العرض
         generateModules(selectedSection);
-
-        // إظهار رسالة نجاح
-        showBanner(`تم حذف ${removedTitle} بنجاح!`);
       };
 
       // ======================= User Data =======================
@@ -1528,12 +1262,13 @@
           const name = data.name || docSnap.id;
 
           // حساب عدد المهام المكتملة
+          // حساب عدد المهام المكتملة
           let completedTasks = Object.values(data.completedTasks || {}).filter(
             Boolean
           ).length;
           let totalTasks = 0;
           for (const section in moduleData) {
-            totalTasks += moduleData[section].count * 4; // كل نموذج فيه 4 مربعات
+            totalTasks += moduleData[section].count * tasks.length;
           }
           const progressPercent = totalTasks
             ? Math.round((completedTasks / totalTasks) * 100)
