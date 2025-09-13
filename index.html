@@ -659,10 +659,10 @@
           const btn = document.createElement("button");
           btn.className = "module-button" + (done ? " done" : "");
           btn.innerHTML = `
-            <span style="font-size:24px;margin-left:10px;">${moduleData[section].icon}</span>
-            <span style="font-size:18px;font-weight:700;color:#222;">${section}</span>
-            <span class="module-check">✅</span>
-          `;
+        <span style="font-size:24px;margin-left:10px;">${moduleData[section].icon}</span>
+        <span style="font-size:18px;font-weight:700;color:#222;">${section}</span>
+        <span class="module-check">✅</span>
+      `;
           btn.onclick = () => openModule(section);
           wrap.appendChild(btn);
         }
@@ -824,13 +824,13 @@
             video: "https://youtu.be/W1Qcsu6hy4U",
           },
           /* {
-                title: "شرح حساب عدد الخلايا في Excel",
-                video: "https://youtu.be/-uIb6ZpFEi4",
-              },
-              {
-                title: "شرح سؤال لعمل تخطيط هيكلي نختار إيه",
-                video: "https://youtu.be/Odgj-G4pHU",
-              },*/
+            title: "شرح حساب عدد الخلايا في Excel",
+            video: "https://youtu.be/-uIb6ZpFEi4",
+          },
+          {
+            title: "شرح سؤال لعمل تخطيط هيكلي نختار إيه",
+            video: "https://youtu.be/Odgj-G4pHU",
+          },*/
           // النماذج
           {
             title: "النموذج 1",
@@ -1126,6 +1126,112 @@
         }
       }
 
+      // ======================= Admin Functions =======================
+
+      // فتح لوحة الإدارة
+      document
+        .getElementById("openAdminPanelBtn")
+        .addEventListener("click", function () {
+          document.getElementById("module-grid").style.display = "none";
+          document.getElementById("admin-panel").style.display = "flex";
+        });
+
+      // العودة من لوحة الإدارة
+      document
+        .getElementById("adminBackToModules")
+        .addEventListener("click", function () {
+          document.getElementById("admin-panel").style.display = "none";
+          document.getElementById("module-grid").style.display = "flex";
+        });
+
+      // العودة إلى لوحة الإدارة من المحور
+      document
+        .getElementById("backToAdminBtn")
+        .addEventListener("click", function () {
+          document.getElementById("main").style.display = "none";
+          document.getElementById("admin-panel").style.display = "flex";
+        });
+
+      // إظهار حقل الموقع المخصص عند اختيار "تحديد موقع معين"
+      document
+        .getElementById("adminModulePosition")
+        .addEventListener("change", function () {
+          const customGroup = document.getElementById("customPositionGroup");
+          customGroup.style.display =
+            this.value === "custom" ? "block" : "none";
+        });
+
+      // إضافة نموذج جديد من لوحة الإدارة
+      document
+        .getElementById("adminAddModule")
+        .addEventListener("click", async function () {
+          const section = document.getElementById("adminSectionSelect").value;
+          const title = document
+            .getElementById("adminModuleTitle")
+            .value.trim();
+          const file = document.getElementById("adminModuleFile").value.trim();
+          const video = document
+            .getElementById("adminModuleVideo")
+            .value.trim();
+          const position = document.getElementById("adminModulePosition").value;
+
+          if (!title) {
+            alert("الرجاء إدخال عنوان للنموذج");
+            return;
+          }
+
+          const newModule = {
+            title: title,
+            file: file || null,
+            video: video || null,
+          };
+
+          // إذا لم يكن المحور موجوداً، أنشئه
+          if (!linksData[section]) {
+            linksData[section] = [];
+          }
+
+          // تحديد موقع إضافة النموذج
+          if (position === "start") {
+            linksData[section].unshift(newModule);
+          } else if (position === "custom") {
+            const pos =
+              parseInt(document.getElementById("adminCustomPosition").value) -
+              1;
+            const validPos = Math.max(
+              0,
+              Math.min(pos, linksData[section].length)
+            );
+            linksData[section].splice(validPos, 0, newModule);
+          } else {
+            // الإضافة في النهاية (الافتراضي)
+            linksData[section].push(newModule);
+          }
+
+          // تحديث عدد النماذج في المحور
+          moduleData[section].count = linksData[section].length;
+
+          // حفظ التغييرات في Firestore
+          const success = await saveLinksDataToFirestore();
+
+          // إظهار رسالة نجاح
+          const notification = document.getElementById("adminNotification");
+          notification.style.display = "block";
+          notification.textContent = success
+            ? `تم إضافة النموذج "${title}" إلى محور "${section}" بنجاح!`
+            : "حدث خطأ أثناء حفظ النموذج. الرجاء المحاولة مرة أخرى.";
+
+          // إخفاء الرسالة بعد 3 ثوان
+          setTimeout(() => {
+            notification.style.display = "none";
+          }, 3000);
+
+          // إعادة تعيين حقول النموذج
+          document.getElementById("adminModuleTitle").value = "";
+          document.getElementById("adminModuleFile").value = "";
+          document.getElementById("adminModuleVideo").value = "";
+        });
+
       // إضافة نموذج جديد من صفحة المحور
       document.getElementById("addModuleBtn").onclick = async () => {
         if (!selectedSection) return alert("اختر محور أولاً!");
@@ -1324,16 +1430,16 @@
           const tr = document.createElement("tr");
           tr.className = "lb-row" + (i === 0 ? " top-1" : "");
           tr.innerHTML = `
-        <td>${rankText}</td>
-        <td>${u.name}</td>
-        <td>
-          <div class="progress-bar-container" style="width:100%; background:#eee; border-radius:5px; height:12px; position:relative;">
-            <div class="progress-bar" style="width:${u.progressPercent}%; background:#4caf50; height:100%; border-radius:5px; transition: width 0.5s;"></div>
-            <span style="position:absolute; right:5px; top:-2px; font-size:10px; font-weight:bold; color:#222;">${u.progressPercent}%</span>
-          </div>
-        </td>
-        <td>${badge}</td>
-      `;
+    <td>${rankText}</td>
+    <td>${u.name}</td>
+    <td>
+      <div class="progress-bar-container" style="width:100%; background:#eee; border-radius:5px; height:12px; position:relative;">
+        <div class="progress-bar" style="width:${u.progressPercent}%; background:#4caf50; height:100%; border-radius:5px; transition: width 0.5s;"></div>
+        <span style="position:absolute; right:5px; top:-2px; font-size:10px; font-weight:bold; color:#222;">${u.progressPercent}%</span>
+      </div>
+    </td>
+    <td>${badge}</td>
+  `;
           lbBody.appendChild(tr);
         });
       };
