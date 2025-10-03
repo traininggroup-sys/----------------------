@@ -16,11 +16,50 @@
 
     <style>
       /* ================== General ================== */
+      :root {
+        --bg-color: linear-gradient(to right, #f0f0f0, #e0f7fa);
+        --text-color: #000;
+        --card-bg: #fff;
+        --card-shadow: rgba(0, 0, 0, 0.1);
+        --button-bg: linear-gradient(90deg, #6f3f75, #0629d4);
+        --button-hover: opacity(0.9);
+        --section-title-color: #000000;
+        --module-button-bg: #fff;
+        --module-button-done: #a0ffa0;
+        --task-bg: transparent;
+        --task-completed: #e0ffe0;
+        --progress-bg: #eee;
+        --progress-fill: #4caf50;
+        --banner-bg: #f57c00;
+        --table-border: #ddd;
+        --table-bg: transparent;
+      }
+
+      .dark-mode {
+        --bg-color: linear-gradient(to right, #1a1a1a, #2d2d2d);
+        --text-color: #fff;
+        --card-bg: #333;
+        --card-shadow: rgba(255, 255, 255, 0.1);
+        --button-bg: linear-gradient(90deg, #444, #222);
+        --button-hover: opacity(0.8);
+        --section-title-color: #fff;
+        --module-button-bg: #444;
+        --module-button-done: #4a5d4a;
+        --task-bg: transparent;
+        --task-completed: #4a5d4a;
+        --progress-bg: #555;
+        --progress-fill: #66bb6a;
+        --banner-bg: #ff5722;
+        --table-border: #666;
+        --table-bg: #333;
+      }
+
       body {
         font-family: "Cairo", sans-serif;
         margin: 0;
         padding: 0;
-        background: linear-gradient(to right, #f0f0f0, #e0f7fa);
+        background: var(--bg-color);
+        color: var(--text-color);
         overflow-x: hidden;
       }
       h1,
@@ -446,6 +485,84 @@
         opacity: 0.5; /* باهت شوية */
         cursor: not-allowed; /* مؤشر الفأرة يشير إنه مقفول */
       }
+      .progress-container {
+        width: 100%;
+        background-color: #eee;
+        border-radius: 10px;
+        height: 20px;
+        margin: 10px 0;
+      }
+
+      .progress-bar {
+        height: 100%;
+        width: 0%;
+        background-color: #4caf50;
+        border-radius: 10px;
+        transition: width 0.3s ease-in-out;
+      }
+      #congratsMessage {
+        margin-top: 15px;
+        padding: 10px;
+        background: #dff0d8;
+        border: 1px solid #3c763d;
+        border-radius: 5px;
+        color: #3c763d;
+        font-weight: bold;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* Apply CSS variables */
+      .section-title {
+        color: var(--section-title-color);
+      }
+      .module-button {
+        background: var(--module-button-bg);
+        box-shadow: var(--card-shadow);
+      }
+      .module-button.done {
+        background: var(--module-button-done);
+      }
+      .module {
+        background: var(--card-bg);
+        box-shadow: var(--card-shadow);
+      }
+      .task.completed {
+        background: var(--task-completed);
+      }
+      #celebrateBanner {
+        background: var(--banner-bg);
+      }
+      table {
+        background: var(--table-bg);
+      }
+      th,
+      td {
+        border-bottom: 1px solid var(--table-border);
+      }
+      .progress-bar-container {
+        background-color: var(--progress-bg);
+      }
+      .progress-bar {
+        background: var(--progress-fill);
+      }
+      #progress-container {
+        background-color: var(--progress-bg);
+      }
+      #progress-bar {
+        background-color: var(--progress-fill);
+      }
+      button {
+        background: var(--button-bg);
+      }
+      button:hover {
+        opacity: var(--button-hover);
+      }
+      .module-header h2 {
+        color: var(--text-color);
+      }
     </style>
   </head>
 
@@ -473,6 +590,9 @@
       />
       <button onclick="startApp()">ابدأ</button>
       <button id="btnLeaderboard">لوحة المتصدرين</button>
+      <button id="btnDarkMode" title="تبديل الوضع المظلم">
+        <i class="fas fa-moon"></i> الوضع المظلم
+      </button>
     </div>
 
     <!-- ===== Module Grid ===== -->
@@ -490,8 +610,14 @@
         <button id="removeModuleBtn">حذف آخر نموذج</button>
       </div>
       <h2 id="section-title"></h2>
-      <div id="progress-container"><div id="progress-bar">0%</div></div>
+      <div id="modulesContainer"></div>
+      <div id="tasksContainer"></div>
+      <progress id="progress" max="100" value="0"></progress>
+
       <div id="content"></div>
+      <div id="progress-container">
+        <div id="progress-bar">0%</div>
+      </div>
       <button class="fixed-back" onclick="backToModules()">رجوع</button>
     </div>
 
@@ -509,6 +635,7 @@
         </thead>
         <tbody id="lbBody"></tbody>
       </table>
+      <div id="congratsMessage" class="hidden"></div>
 
       <button class="fixed-back" onclick="closeLeaderboard()">رجوع</button>
     </div>
@@ -522,7 +649,18 @@
         setDoc,
         collection,
         getDocs,
+        updateDoc, // إضافة جديدة للتحديث
       } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+      // دالة لتحديث linksData في Firebase
+      async function updateLinksData(newLinksData) {
+        try {
+          const appDataRef = doc(db, "appData", "links");
+          await updateDoc(appDataRef, { data: newLinksData });
+          console.log("تم تحديث البيانات بنجاح ✅");
+        } catch (error) {
+          console.error("خطأ أثناء تحديث البيانات:", error);
+        }
+      }
 
       const firebaseConfig = {
         apiKey: "AIzaSyD8OVH4XP4AOCCRcEjp-BWLXuIBDzEbdcU",
@@ -556,6 +694,672 @@
         التربوي: { type: "models", icon: "📘", count: 19 },
       };
 
+      // ======================= Links Data - مع تحميل من Firebase =======================
+      let linksData = {}; // هتكون فارغة أولاً، هنحمّلها من Firebase
+
+      // دالة جديدة: تحميل linksData من Firebase
+      async function loadLinksData() {
+        try {
+          const appDataRef = doc(db, "appData", "links"); // document واحد لكل الروابط
+          const snap = await getDoc(appDataRef);
+          if (snap.exists()) {
+            linksData = snap.data().data || {}; // استرجاع البيانات
+            // حدّث count في moduleData بناءً على الروابط المحفوظة
+            for (const section in linksData) {
+              if (moduleData[section]) {
+                moduleData[section].count = linksData[section].length;
+              }
+            }
+          } else {
+            // لو مش موجود، استخدمي القيمة الأصلية كـ default
+            linksData = {
+              " معلومات عامة": [
+                {
+                  title: "محاور وكباري",
+                  file: "https://t.me/c/2299629125/2/34633?single",
+                },
+                {
+                  title: "اهم المنظمات العالمية",
+                  file: "https://t.me/c/2299629125/2/35213",
+                },
+                {
+                  title: "اقاليم مصر الاقتصادية",
+                  file: "https://t.me/c/2299629125/2/35024",
+                },
+                {
+                  title: "حكام مصر",
+                  file: "https://t.me/c/2299629125/2/35003",
+                },
+                {
+                  title: "صوامع مصر",
+                  file: "https://t.me/c/2299629125/2/34792",
+                },
+                {
+                  title: "النموذج 1",
+                  file: "https://t.me/c/2299629125/2/30375",
+                },
+                {
+                  title: "النموذج 2",
+                  file: "https://t.me/c/2299629125/2/30396",
+                },
+                {
+                  title: "النموذج 3",
+                  file: "https://t.me/c/2299629125/2/30428",
+                },
+                {
+                  title: "النموذج 4",
+                  file: "https://t.me/c/2299629125/2/30449",
+                },
+                {
+                  title: "النموذج 5",
+                  file: "https://t.me/c/2299629125/2/30470",
+                },
+                {
+                  title: "النموذج 6",
+                  file: "https://t.me/c/2299629125/2/30492",
+                },
+                {
+                  title: "النموذج 7",
+                  file: "https://t.me/c/2299629125/2/30513",
+                },
+                {
+                  title: "النموذج 8",
+                  file: "https://t.me/c/2299629125/2/30540",
+                },
+                {
+                  title: "النموذج 9",
+                  file: "https://t.me/c/2299629125/2/30560",
+                },
+                {
+                  title: "النموذج 10",
+                  file: "https://t.me/c/2299629125/2/30581",
+                },
+                {
+                  title: "النموذج 11",
+                  file: "https://t.me/c/2299629125/2/31259",
+                },
+                {
+                  title: "النموذج 12",
+                  file: "https://t.me/c/2299629125/2/31280",
+                },
+                {
+                  title: "النموذج 13",
+                  file: "https://t.me/c/2299629125/2/31302",
+                },
+                {
+                  title: "النموذج 14",
+                  file: "https://t.me/c/2299629125/2/31327",
+                },
+                {
+                  title: "النموذج 15",
+                  file: "https://t.me/c/2299629125/2/31348",
+                },
+                {
+                  title: "النموذج 16",
+                  file: "https://t.me/c/2299629125/2/31370",
+                },
+                {
+                  title: "النموذج 17",
+                  file: "https://t.me/c/2299629125/2/31393",
+                },
+                {
+                  title: "النموذج 18",
+                  file: "https://t.me/c/2299629125/2/31415",
+                },
+                {
+                  title: "النموذج 19",
+                  file: "https://t.me/c/2299629125/2/31437",
+                },
+                {
+                  title: "النموذج 20",
+                  file: "https://t.me/c/2299629125/2/31460",
+                },
+                {
+                  title: "النموذج 21",
+                  file: "https://t.me/c/2299629125/37610",
+                },
+                {
+                  title: "النموذج 22",
+                  file: "https://t.me/c/2299629125/37611",
+                },
+                {
+                  title: "النموذج 23",
+                  file: "https://t.me/c/2299629125/31488",
+                },
+                {
+                  title: "النموذج 24",
+                  file: "https://t.me/c/2299629125/2/41888",
+                },
+                {
+                  title: "النموذج 25",
+                  file: "https://t.me/c/2299629125/2/41911",
+                },
+                {
+                  title: "النموذج 26",
+                  file: "https://t.me/c/2299629125/2/41934",
+                },
+                {
+                  title: "النموذج 27",
+                  file: "https://t.me/c/2299629125/2/41957",
+                },
+                {
+                  title: "النموذج 28",
+                  file: "https://t.me/c/2299629125/2/41979",
+                },
+              ],
+              " حاسب": [
+                {
+                  title: "فيديو رقم 1",
+                  video: "https://youtu.be/aTGmvmeDJf8",
+                  file: "https://t.me/c/2299629125/4/27632",
+                },
+                {
+                  title: "فيديو رقم 2",
+                  video: "https://youtu.be/9tye0LUQfYI",
+                  file: "https://t.me/c/2299629125/4/27633",
+                },
+                {
+                  title: "فيديو رقم 3",
+                  video: "https://youtu.be/N3Z5p65om0o",
+                  file: "https://t.me/c/2299629125/4/27634",
+                },
+                {
+                  title: "فيديو رقم 4",
+                  video: "https://youtu.be/_HwWcpqTdHI",
+                  file: "https://t.me/c/2299629125/4/27786?single",
+                },
+                {
+                  title: "فيديو رقم 6",
+                  video: "https://youtu.be/1DbFtQZpsW0",
+                  file: "https://t.me/c/2299629125/4/27787?single",
+                },
+
+                {
+                  title: "برنامج Excel",
+                  video: "https://youtu.be/JzsTom7tTx8",
+                  file: "https://t.me/c/2299629125/4/33248?single",
+                },
+                {
+                  title: "فيديو رقم 7",
+                  video: "https://youtu.be/jUBGca5qRnM",
+                  file: "https://t.me/c/2299629125/4/27788?single",
+                },
+                {
+                  title: "فيديو رقم 8",
+                  video: "https://youtu.be/q3Zz99bThyQ",
+                  file: "https://t.me/c/2299629125/4/27964?single",
+                },
+                {
+                  title: "فيديو رقم 9",
+                  video: "https://youtu.be/_Ea_z_Ft4bs",
+                  file: "https://t.me/c/2299629125/4/27964?single",
+                },
+                {
+                  title: "شرح اختبار علي Excel",
+                  video: "https://youtu.be/qn5rs-4mFJo",
+                },
+                {
+                  title: "فيديو رقم 10",
+                  video: "https://youtu.be/hRAdE691Mg4",
+                  file: "https://t.me/c/2299629125/4/28036",
+                },
+                {
+                  title: "فيديو رقم 11",
+                  video: "https://youtu.be/LNlw1VhnDWM",
+                  file: "https://t.me/c/2299629125/4/28235",
+                },
+                {
+                  title: "فيديو رقم 12",
+                  video: "https://youtu.be/mdgj-gbvOIg",
+                  file: "https://t.me/c/2299629125/4/28236",
+                },
+                {
+                  title: "برنامج Excel",
+                  video: "https://youtu.be/GI8RU0FXXO4",
+                  file: "https://t.me/c/2299629125/4/33248?single",
+                },
+                {
+                  title: "فيديو رقم 13",
+                  video: "https://youtu.be/sTGkL7xYwCE",
+                  file: "https://t.me/c/2299629125/4/31134",
+                },
+                {
+                  title: "برنامج Access",
+                  video: "https://youtu.be/SOFszLmW_X8",
+                  file: "https://t.me/c/2299629125/4/28417",
+                },
+                {
+                  title: "برنامج PowerPoint جزء ١",
+                  video: "https://youtu.be/53ydwEIFrog",
+                },
+                {
+                  title: "برنامج PowerPoint جزء ٢",
+                  video: "https://youtu.be/yCvhQdWY0ac",
+                  file: "https://t.me/c/2299629125/4/28565",
+                },
+                {
+                  title: "فيديو رقم 14",
+                  video: "https://youtu.be/8ypgm2RJ804",
+                  file: "https://t.me/c/2299629125/4/33241",
+                },
+                {
+                  title: "أهم الاختصارات",
+                  video: "https://youtu.be/lhjovAocMMw",
+                },
+                { title: "اسئلة مجمعة", video: "https://youtu.be/BgYzh47Icm0" },
+                {
+                  title: "فيديو رقم 15",
+                  video: "https://youtu.be/9AY9POUJYLc",
+                  file: "https://t.me/c/2299629125/4/29232?single",
+                },
+                {
+                  title: "مراجعة للحاسب جزء ١",
+                  video: "https://youtu.be/2V0fQEpAeiM",
+                },
+                {
+                  title: "مراجعة للحاسب جزء ٢",
+                  video: "https://youtu.be/W1Qcsu6hy4U",
+                },
+                {
+                  title: "شرح حساب عدد الخلايا في Excel",
+                  video: "https://youtu.be/-uIb6ZpFEi4",
+                },
+                {
+                  title: "شرح سؤال لعمل تخطيط هيكلي نختار إيه",
+                  video: "https://youtu.be/Odgj-G4pHU",
+                },
+                // النماذج
+                {
+                  title: "النموذج 1",
+                  video: "https://youtu.be/evZEGltYYXs",
+                  file: "https://t.me/c/2299629125/4/28648",
+                },
+                {
+                  title: "النموذج 2",
+                  video: "https://youtu.be/U_jAqbzbjRA",
+                  file: "https://t.me/c/2299629125/4/28765",
+                },
+                {
+                  title: "النموذج 3",
+                  video: "https://youtu.be/IkT_6INmCyY",
+                  file: "https://t.me/c/2299629125/4/28767",
+                },
+                {
+                  title: "النموذج 4",
+                  file: "https://t.me/c/2299629125/4/28873",
+                },
+                {
+                  title: "النموذج 5",
+                  file: "https://t.me/c/2299629125/4/28960",
+                },
+                {
+                  title: "النموذج 6",
+                  file: "https://t.me/c/2299629125/4/28961",
+                },
+                {
+                  title: "النموذج 7",
+                  file: "https://t.me/c/2299629125/4/33673?single",
+                },
+                {
+                  title: "النموذج 8",
+                  file: "https://t.me/c/2299629125/4/29927",
+                },
+                {
+                  title: "نموذج رقم 9",
+                  video: "https://youtu.be/VtOe_dx5qn8",
+                  file: "https://t.me/c/2299629125/4/29958",
+                },
+                {
+                  title: "النموذج 12",
+                  file: "https://t.me/c/2299629125/4/27873?single",
+                },
+                {
+                  title: "النموذج 13",
+                  file: "https://t.me/c/2299629125/4/28108?single",
+                },
+                {
+                  title: "النموذج 14",
+                  file: "https://t.me/c/2299629125/4/28328",
+                },
+                {
+                  title: "النموذج 15",
+                  file: "https://t.me/c/2299629125/4/28876",
+                },
+                {
+                  title: "النموذج 16",
+                  file: "https://t.me/c/2299629125/4/30152",
+                },
+                {
+                  title: "النموذج 17",
+                  file: "https://t.me/c/2299629125/4/30620",
+                },
+                {
+                  title: "النموذج 18",
+                  file: "https://t.me/c/2299629125/4/31220",
+                },
+                {
+                  title: "النموذج 19",
+                  file: "https://t.me/c/2299629125/4/31502",
+                },
+                {
+                  title: "النموذج 20",
+                  file: "https://t.me/c/2299629125/4/31574",
+                },
+                {
+                  title: "النموذج 21",
+                  file: "https://t.me/c/2299629125/4/31678",
+                },
+                {
+                  title: "النموذج 22",
+                  file: "https://t.me/c/2299629125/4/33727",
+                },
+                {
+                  title: "النموذج 23",
+                  file: "https://t.me/c/2299629125/4/39164",
+                },
+                {
+                  title: "النموذج 24",
+                  file: "https://t.me/c/2299629125/4/39165",
+                },
+                {
+                  title: "أساسيات مهمة",
+                  file: "https://t.me/c/2299629125/4/40290",
+                },
+                {
+                  title: "النموذج 25 ",
+                  file: "https://t.me/c/2299629125/4/41675",
+                },
+                {
+                  title: "النموذج 26 ",
+                  file: "https://t.me/c/2299629125/4/41738",
+                },
+                {
+                  title: "النموذج 27 ",
+                  file: "https://t.me/c/2299629125/4/42004",
+                },
+                {
+                  title: "النموذج 28 ",
+                  file: "https://t.me/c/2299629125/4/42047",
+                },
+                {
+                  title: "النموذج 29",
+                  file: "https://t.me/c/2299629125/4/42385",
+                },
+              ],
+              " عربي": [
+                {
+                  title: "النموذج 1",
+                  file: "https://t.me/c/2299629125/6/31685?single",
+                  video: "https://youtu.be/wlBIvz_dTXE?si=DiRX6LvEI_udXyLB",
+                },
+                {
+                  title: "النموذج 2",
+                  file: "https://t.me/c/2299629125/5/27302",
+                  video: "https://youtu.be/q1-auicu-bE?si=hpPgLbheY7432t_w",
+                },
+                {
+                  title: "النموذج 3",
+                  file: "https://t.me/c/2299629125/5/27324",
+                  video: "https://youtu.be/AhYq6ZZiKVQ?si=W-L2CB4o1ZrKzVVa",
+                },
+                {
+                  title: "النموذج 4",
+                  file: "https://t.me/c/2299629125/5/27353",
+                  video: "https://youtu.be/EnRTnXnSEYk?si=066sWTmFgJ9sCVyo",
+                },
+                {
+                  title: "النموذج 5",
+                  file: "https://t.me/c/2299629125/5/27377",
+                  video: "https://youtu.be/PGZ0TV8jTCs?si=Z7mfqHU3yEtn9UNg",
+                },
+                {
+                  title: "النموذج 6",
+                  file: "https://t.me/c/2299629125/5/27399",
+                  video: "https://youtu.be/kYQr7_15wQE?si=S6FhBZbAhA7doVHi",
+                },
+                {
+                  title: "النموذج 7",
+                  file: "https://t.me/c/2299629125/5/27421",
+                  video: "https://youtu.be/YQDznKlEkrI?si=5Ydv3nEPMfhYLPm7",
+                },
+                {
+                  title: "النموذج 8",
+                  file: "https://t.me/c/2299629125/5/27442",
+                  video: "https://youtu.be/5mSEfprkYUc?si=WdkxXlHDE8sM8o_A",
+                },
+                {
+                  title: "النموذج 9",
+                  file: "https://t.me/c/2299629125/5/27464",
+                  video: "https://youtu.be/D36OQYWPAs0?si=qmYQtxEZEAUOzSFj",
+                },
+                {
+                  title: "النموذج 10",
+                  file: "https://t.me/c/2299629125/5/32883",
+                  video: "https://youtu.be/TLlsGuLN2HI?si=fl4oHKgpqbme8ZR_",
+                },
+                {
+                  title: "النموذج 11",
+                  file: "https://t.me/c/2299629125/5/32907",
+                  video: "https://youtu.be/Jp-Wdxm8lx8?si=xFbwbSoDNahg8gVU",
+                },
+                {
+                  title: "النموذج 12",
+                  file: "https://t.me/c/2299629125/5/32954",
+                  video: "https://youtu.be/Fu7WGlj6Qb0?si=XtxZx6ITA-dbBjus",
+                },
+                {
+                  title: "النموذج 13",
+                  file: "https://t.me/c/2299629125/5/32977",
+                  video: "https://youtu.be/wgNUImdSLr8?si=anukyXsgn3lm7Afp",
+                },
+                {
+                  title: "النموذج 14",
+                  file: "https://t.me/c/2299629125/5/32998",
+                  video: "https://youtu.be/bIMfCEPEDhI?si=3-rXSaQswJyTFl9t",
+                },
+                {
+                  title: "النموذج 15",
+                  file: "https://t.me/c/2299629125/5/33020",
+                  video: "https://youtu.be/Cpv1SpgNJzY?si=GKa7jcCP-HSJ_GpU",
+                },
+                {
+                  title: "النموذج 16",
+                  file: "https://t.me/c/2299629125/5/32429",
+                  video: "https://youtu.be/ZDSbRvYQhXM?si=RLwhm_Zpx0F0JETh",
+                },
+                {
+                  title: "النموذج 17",
+                  file: "https://t.me/c/2299629125/5/33187",
+                  video: "https://youtu.be/bNJ08KVhME8?si=oEYnWMRor3Nm2BlH",
+                },
+              ],
+              " انجليزي": [
+                {
+                  title: "نموذج 1",
+                  file: "https://t.me/c/2299629125/6/34626",
+                  video: "https://youtu.be/L-zQiFntTnI?si=msXGWwy3KX5QG7Ln",
+                },
+                {
+                  title: "نموذج 2",
+                  file: "https://t.me/c/2299629125/6/34794",
+                  video: "https://youtu.be/vA59J4GrLkc?si=mHvKaXEPmBTlPRna",
+                },
+                {
+                  title: "نموذج 3",
+                  file: "https://t.me/c/2299629125/6/35028",
+                  video: "https://t.me/c/2299629125/6/35029",
+                },
+                {
+                  title: "نموذج 4",
+                  file: "https://t.me/c/2299629125/6/35228",
+                  video: "https://t.me/c/2299629125/6/35229",
+                },
+                {
+                  title: "نموذج 5",
+                  file: "https://t.me/c/2299629125/6/35570",
+                  video: "https://t.me/c/2299629125/6/35571",
+                },
+                {
+                  title: "نموذج 6",
+                  file: "https://t.me/c/2299629125/6/35960",
+                  video: "https://t.me/c/2299629125/6/35962",
+                },
+                {
+                  title: "نموذج 7",
+                  file: "https://t.me/c/2299629125/6/36456",
+                  video: "https://t.me/c/2299629125/6/36457",
+                },
+                {
+                  title: "نموذج 8",
+                  file: "https://t.me/c/2299629125/6/36824",
+                  video: "https://t.me/c/2299629125/6/36825",
+                },
+                {
+                  title: "نموذج 9",
+                  file: "https://t.me/c/2299629125/6/37221",
+                  video: "https://t.me/c/2299629125/6/37222",
+                },
+                {
+                  title: "نموذج 10",
+                  file: "https://t.me/c/2299629125/6/37351?single",
+                  video: "https://t.me/c/2299629125/6/37352?single",
+                },
+                {
+                  title: "نموذج 11",
+                  file: "https://t.me/c/2299629125/6/37508?single",
+                  video: "https://t.me/c/2299629125/6/37509?single",
+                },
+                {
+                  title: "نموذج 12",
+                  file: "https://t.me/c/2299629125/6/37613?single",
+                  video: "https://t.me/c/2299629125/6/37614?single",
+                },
+                {
+                  title: "نموذج 13",
+                  file: "https://t.me/c/2299629125/6/37981?single",
+                  video: "https://t.me/c/2299629125/6/37982?single",
+                },
+                {
+                  title: "نموذج 14",
+                  file: "https://t.me/c/2299629125/6/38114?single",
+                  video: "https://t.me/c/2299629125/6/38115?single",
+                },
+                {
+                  title: "نموذج 15",
+                  file: "https://t.me/c/2299629125/6/38188?single",
+                  video: "https://t.me/c/2299629125/6/38189?single",
+                },
+                {
+                  title: "نموذج 16",
+                  file: "https://t.me/c/2299629125/6/38924?single",
+                  video: "https://t.me/c/2299629125/6/38925?single",
+                },
+                {
+                  title: "نموذج 17",
+                  file: "https://t.me/c/2299629125/6/42131",
+                },
+              ],
+              التربوي: [
+                {
+                  title: "الموضوع الأول",
+                  file: "https://t.me/c/2299629125/19608/34801",
+                },
+                {
+                  title: "الموضوع الثاني",
+                  file: "https://t.me/c/2299629125/19608/34820",
+                },
+                {
+                  title: "الموضوع الثالث",
+                  file: "https://t.me/c/2299629125/19608/34854",
+                },
+                {
+                  title: "الموضوع الرابع",
+                  file: "https://t.me/c/2299629125/19608/34868",
+                },
+                {
+                  title: "الموضوع الخامس",
+                  file: "https://t.me/c/2299629125/19608/34887",
+                },
+                {
+                  title: "نموذج 1",
+                  file: "https://t.me/c/2299629125/19608/36954",
+                },
+                {
+                  title: "نموذج 2",
+                  file: "https://t.me/c/2299629125/19608/37002",
+                },
+                {
+                  title: "نموذج 3",
+                  file: "https://t.me/c/2299629125/19608/37048",
+                },
+                {
+                  title: "نموذج 4",
+                  file: "https://t.me/c/2299629125/19608/37091",
+                },
+                {
+                  title: "نموذج 5",
+                  file: "https://t.me/c/2299629125/19608/37180",
+                },
+                {
+                  title: "نموذج 6",
+                  file: "https://t.me/c/2299629125/19608/40958",
+                },
+                {
+                  title: "نموذج 7",
+                  file: "https://t.me/c/2299629125/19608/41001",
+                },
+                {
+                  title: "نموذج 8",
+                  file: "https://t.me/c/2299629125/19608/41045",
+                },
+                {
+                  title: "نموذج 9",
+                  file: "https://t.me/c/2299629125/19608/41089",
+                },
+                {
+                  title: "نموذج 10",
+                  file: "https://t.me/c/2299629125/19608/41130",
+                },
+                {
+                  title: "نموذج 11",
+                  file: "https://t.me/c/2299629125/19608/41192",
+                },
+                {
+                  title: "نموذج 12",
+                  file: "https://t.me/c/2299629125/19608/41248",
+                },
+                {
+                  title: "نموذج 13",
+                  file: "https://t.me/c/2299629125/19608/41797",
+                },
+              ],
+            };
+            // احفظي الـ default في Firebase
+            await setDoc(appDataRef, { data: linksData });
+          }
+        } catch (error) {
+          console.error("خطأ في تحميل linksData:", error);
+          // fallback للقيمة الأصلية إذا فشل
+          // (انسخي هنا الـ linksData الأصلية كاملة من الكود القديم)
+        }
+      }
+
+      // دالة جديدة: حفظ linksData في Firebase
+      async function saveLinksData() {
+        try {
+          const appDataRef = doc(db, "appData", "links");
+          await setDoc(appDataRef, { data: linksData }, { merge: true });
+          // حدّث count في moduleData
+          for (const section in linksData) {
+            if (moduleData[section]) {
+              moduleData[section].count = linksData[section].length;
+            }
+          }
+        } catch (error) {
+          console.error("خطأ في حفظ linksData:", error);
+        }
+      }
+
       // ======================= Login =======================
       window.startApp = async function () {
         const nameInput = document.getElementById("nameInput").value.trim();
@@ -582,6 +1386,9 @@
         username = nameInput;
         password = passInput;
 
+        // حمّل linksData قبل عرض الشاشة
+        await loadLinksData();
+
         document.getElementById("start-screen").style.display = "none";
         document.getElementById("module-grid").style.display = "flex";
         renderModuleButtons();
@@ -597,13 +1404,15 @@
           const btn = document.createElement("button");
           btn.className = "module-button" + (done ? " done" : "");
           btn.innerHTML = `
-        <span style="font-size:24px;margin-left:10px;">${moduleData[section].icon}</span>
-        <span style="font-size:18px;font-weight:700;color:#222;">${section}</span>
-        <span class="module-check">✅</span>
-      `;
+                              <span style="font-size:24px;margin-left:10px;">${moduleData[section].icon}</span>
+                              <span style="font-size:18px;font-weight:700;color:#222;">${section}</span>
+                              <span class="module-check">✅</span>
+                            `;
           btn.onclick = () => openModule(section);
           wrap.appendChild(btn);
         }
+        // استدعاء updateProgressBar هنا عشان يتحدث التقدم العام (اختياري، بس مفيد)
+        updateProgressBar();
       }
 
       window.openModule = async function (section) {
@@ -613,475 +1422,10 @@
         document.getElementById("admin-tools").style.display =
           username === adminName ? "block" : "none";
         generateModules(section);
-        updateProgressBar();
+        updateProgressBar(); // استدعاء هنا عشان يتحدث بعد توليد المحتوى
       };
-      /*المحاوووور*/
-      const linksData = {
-        " معلومات عامة": [
-          {
-            title: "محاور وكباري",
-            file: "https://t.me/c/2299629125/2/34633?single",
-          },
-          {
-            title: "اهم المنظمات العالمية",
-            file: "https://t.me/c/2299629125/2/35213",
-          },
-          {
-            title: "اقاليم مصر الاقتصادية",
-            file: "https://t.me/c/2299629125/2/35024",
-          },
-          { title: "حكام مصر", file: "https://t.me/c/2299629125/2/35003" },
-          { title: "صوامع مصر", file: "https://t.me/c/2299629125/2/34792" },
-          { title: "النموذج 1", file: "https://t.me/c/2299629125/2/30375" },
-          { title: "النموذج 2", file: "https://t.me/c/2299629125/2/30396" },
-          { title: "النموذج 3", file: "https://t.me/c/2299629125/2/30428" },
-          { title: "النموذج 4", file: "https://t.me/c/2299629125/2/30449" },
-          { title: "النموذج 5", file: "https://t.me/c/2299629125/2/30470" },
-          { title: "النموذج 6", file: "https://t.me/c/2299629125/2/30492" },
-          { title: "النموذج 7", file: "https://t.me/c/2299629125/2/30513" },
-          { title: "النموذج 8", file: "https://t.me/c/2299629125/2/30540" },
-          { title: "النموذج 9", file: "https://t.me/c/2299629125/2/30560" },
-          { title: "النموذج 10", file: "https://t.me/c/2299629125/2/30581" },
-          { title: "النموذج 11", file: "https://t.me/c/2299629125/2/31259" },
-          { title: "النموذج 12", file: "https://t.me/c/2299629125/2/31280" },
-          { title: "النموذج 13", file: "https://t.me/c/2299629125/2/31302" },
-          { title: "النموذج 14", file: "https://t.me/c/2299629125/2/31327" },
-          { title: "النموذج 15", file: "https://t.me/c/2299629125/2/31348" },
-          { title: "النموذج 16", file: "https://t.me/c/2299629125/2/31370" },
-          { title: "النموذج 17", file: "https://t.me/c/2299629125/2/31393" },
-          { title: "النموذج 18", file: "https://t.me/c/2299629125/2/31415" },
-          { title: "النموذج 19", file: "https://t.me/c/2299629125/2/31437" },
-          { title: "النموذج 20", file: "https://t.me/c/2299629125/2/31460" },
-          { title: "النموذج 21", file: "https://t.me/c/2299629125/37610" },
-          { title: "النموذج 22", file: "https://t.me/c/2299629125/37611" },
-          { title: "النموذج 23", file: "https://t.me/c/2299629125/31488" },
-          { title: "النموذج 24", file: "https://t.me/c/2299629125/2/41888" },
-          { title: "النموذج 25", file: "https://t.me/c/2299629125/2/41911" },
-          { title: "النموذج 26", file: "https://t.me/c/2299629125/2/41934" },
-          { title: "النموذج 27", file: "https://t.me/c/2299629125/2/41957" },
-          { title: "النموذج 28", file: "https://t.me/c/2299629125/2/41979" },
-        ],
-        " حاسب": [
-          {
-            title: "فيديو رقم 1",
-            video: "https://youtu.be/aTGmvmeDJf8",
-            file: "https://t.me/c/2299629125/4/27632",
-          },
-          {
-            title: "فيديو رقم 2",
-            video: "https://youtu.be/9tye0LUQfYI",
-            file: "https://t.me/c/2299629125/4/27633",
-          },
-          {
-            title: "فيديو رقم 3",
-            video: "https://youtu.be/N3Z5p65om0o",
-            file: "https://t.me/c/2299629125/4/27634",
-          },
-          {
-            title: "فيديو رقم 4",
-            video: "https://youtu.be/_HwWcpqTdHI",
-            file: "https://t.me/c/2299629125/4/27786?single",
-          },
-          {
-            title: "فيديو رقم 6",
-            video: "https://youtu.be/1DbFtQZpsW0",
-            file: "https://t.me/c/2299629125/4/27787?single",
-          },
 
-          {
-            title: "برنامج Excel",
-            video: "https://youtu.be/JzsTom7tTx8",
-            file: "https://t.me/c/2299629125/4/33248?single",
-          },
-          {
-            title: "فيديو رقم 7",
-            video: "https://youtu.be/jUBGca5qRnM",
-            file: "https://t.me/c/2299629125/4/27788?single",
-          },
-          {
-            title: "فيديو رقم 8",
-            video: "https://youtu.be/q3Zz99bThyQ",
-            file: "https://t.me/c/2299629125/4/27964?single",
-          },
-          {
-            title: "فيديو رقم 9",
-            video: "https://youtu.be/_Ea_z_Ft4bs",
-            file: "https://t.me/c/2299629125/4/27964?single",
-          },
-          {
-            title: "شرح اختبار علي Excel",
-            video: "https://youtu.be/qn5rs-4mFJo",
-          },
-          {
-            title: "فيديو رقم 10",
-            video: "https://youtu.be/hRAdE691Mg4",
-            file: "https://t.me/c/2299629125/4/28036",
-          },
-          {
-            title: "فيديو رقم 11",
-            video: "https://youtu.be/LNlw1VhnDWM",
-            file: "https://t.me/c/2299629125/4/28235",
-          },
-          {
-            title: "فيديو رقم 12",
-            video: "https://youtu.be/mdgj-gbvOIg",
-            file: "https://t.me/c/2299629125/4/28236",
-          },
-          {
-            title: "برنامج Excel",
-            video: "https://youtu.be/GI8RU0FXXO4",
-            file: "https://t.me/c/2299629125/4/33248?single",
-          },
-          {
-            title: "فيديو رقم 13",
-            video: "https://youtu.be/sTGkL7xYwCE",
-            file: "https://t.me/c/2299629125/4/31134",
-          },
-          {
-            title: "برنامج Access",
-            video: "https://youtu.be/SOFszLmW_X8",
-            file: "https://t.me/c/2299629125/4/28417",
-          },
-          {
-            title: "برنامج PowerPoint جزء ١",
-            video: "https://youtu.be/53ydwEIFrog",
-          },
-          {
-            title: "برنامج PowerPoint جزء ٢",
-            video: "https://youtu.be/yCvhQdWY0ac",
-            file: "https://t.me/c/2299629125/4/28565",
-          },
-          {
-            title: "فيديو رقم 14",
-            video: "https://youtu.be/8ypgm2RJ804",
-            file: "https://t.me/c/2299629125/4/33241",
-          },
-          { title: "أهم الاختصارات", video: "https://youtu.be/lhjovAocMMw" },
-          { title: "اسئلة مجمعة", video: "https://youtu.be/BgYzh47Icm0" },
-          {
-            title: "فيديو رقم 15",
-            video: "https://youtu.be/9AY9POUJYLc",
-            file: "https://t.me/c/2299629125/4/29232?single",
-          },
-          {
-            title: "مراجعة للحاسب جزء ١",
-            video: "https://youtu.be/2V0fQEpAeiM",
-          },
-          {
-            title: "مراجعة للحاسب جزء ٢",
-            video: "https://youtu.be/W1Qcsu6hy4U",
-          },
-          {
-            title: "شرح حساب عدد الخلايا في Excel",
-            video: "https://youtu.be/-uIb6ZpFEi4",
-          },
-          {
-            title: "شرح سؤال لعمل تخطيط هيكلي نختار إيه",
-            video: "https://youtu.be/Odgj-G4pHU",
-          },
-          // النماذج
-          {
-            title: "النموذج 1",
-            video: "https://youtu.be/evZEGltYYXs",
-            file: "https://t.me/c/2299629125/4/28648",
-          },
-          {
-            title: "النموذج 2",
-            video: "https://youtu.be/U_jAqbzbjRA",
-            file: "https://t.me/c/2299629125/4/28765",
-          },
-          {
-            title: "النموذج 3",
-            video: "https://youtu.be/IkT_6INmCyY",
-            file: "https://t.me/c/2299629125/4/28767",
-          },
-          { title: "النموذج 4", file: "https://t.me/c/2299629125/4/28873" },
-          { title: "النموذج 5", file: "https://t.me/c/2299629125/4/28960" },
-          { title: "النموذج 6", file: "https://t.me/c/2299629125/4/28961" },
-          {
-            title: "النموذج 7",
-            file: "https://t.me/c/2299629125/4/33673?single",
-          },
-          { title: "النموذج 8", file: "https://t.me/c/2299629125/4/29927" },
-          {
-            title: "نموذج رقم 9",
-            video: "https://youtu.be/VtOe_dx5qn8",
-            file: "https://t.me/c/2299629125/4/29958",
-          },
-          {
-            title: "النموذج 12",
-            file: "https://t.me/c/2299629125/4/27873?single",
-          },
-          {
-            title: "النموذج 13",
-            file: "https://t.me/c/2299629125/4/28108?single",
-          },
-          { title: "النموذج 14", file: "https://t.me/c/2299629125/4/28328" },
-          { title: "النموذج 15", file: "https://t.me/c/2299629125/4/28876" },
-          { title: "النموذج 16", file: "https://t.me/c/2299629125/4/30152" },
-          { title: "النموذج 17", file: "https://t.me/c/2299629125/4/30620" },
-          { title: "النموذج 18", file: "https://t.me/c/2299629125/4/31220" },
-          { title: "النموذج 19", file: "https://t.me/c/2299629125/4/31502" },
-          { title: "النموذج 20", file: "https://t.me/c/2299629125/4/31574" },
-          { title: "النموذج 21", file: "https://t.me/c/2299629125/4/31678" },
-          { title: "النموذج 22", file: "https://t.me/c/2299629125/4/33727" },
-          { title: "النموذج 23", file: "https://t.me/c/2299629125/4/39164" },
-          { title: "النموذج 24", file: "https://t.me/c/2299629125/4/39165" },
-          { title: "أساسيات مهمة", file: "https://t.me/c/2299629125/4/40290" },
-          { title: "النموذج 25 ", file: "https://t.me/c/2299629125/4/41675" },
-          { title: "النموذج 26 ", file: "https://t.me/c/2299629125/4/41738" },
-          { title: "النموذج 27 ", file: "https://t.me/c/2299629125/4/42004" },
-          { title: "النموذج 28 ", file: "https://t.me/c/2299629125/4/42047" },
-        ],
-        " عربي": [
-          {
-            title: "النموذج 1",
-            file: "https://t.me/c/2299629125/6/31685?single",
-            video: "https://youtu.be/wlBIvz_dTXE?si=DiRX6LvEI_udXyLB",
-          },
-          {
-            title: "النموذج 2",
-            file: "https://t.me/c/2299629125/5/27302",
-            video: "https://youtu.be/q1-auicu-bE?si=hpPgLbheY7432t_w",
-          },
-          {
-            title: "النموذج 3",
-            file: "https://t.me/c/2299629125/5/27324",
-            video: "https://youtu.be/AhYq6ZZiKVQ?si=W-L2CB4o1ZrKzVVa",
-          },
-          {
-            title: "النموذج 4",
-            file: "https://t.me/c/2299629125/5/27353",
-            video: "https://youtu.be/EnRTnXnSEYk?si=066sWTmFgJ9sCVyo",
-          },
-          {
-            title: "النموذج 5",
-            file: "https://t.me/c/2299629125/5/27377",
-            video: "https://youtu.be/PGZ0TV8jTCs?si=Z7mfqHU3yEtn9UNg",
-          },
-          {
-            title: "النموذج 6",
-            file: "https://t.me/c/2299629125/5/27399",
-            video: "https://youtu.be/kYQr7_15wQE?si=S6FhBZbAhA7doVHi",
-          },
-          {
-            title: "النموذج 7",
-            file: "https://t.me/c/2299629125/5/27421",
-            video: "https://youtu.be/YQDznKlEkrI?si=5Ydv3nEPMfhYLPm7",
-          },
-          {
-            title: "النموذج 8",
-            file: "https://t.me/c/2299629125/5/27442",
-            video: "https://youtu.be/5mSEfprkYUc?si=WdkxXlHDE8sM8o_A",
-          },
-          {
-            title: "النموذج 9",
-            file: "https://t.me/c/2299629125/5/27464",
-            video: "https://youtu.be/D36OQYWPAs0?si=qmYQtxEZEAUOzSFj",
-          },
-          {
-            title: "النموذج 10",
-            file: "https://t.me/c/2299629125/5/32883",
-            video: "https://youtu.be/TLlsGuLN2HI?si=fl4oHKgpqbme8ZR_",
-          },
-          {
-            title: "النموذج 11",
-            file: "https://t.me/c/2299629125/5/32907",
-            video: "https://youtu.be/Jp-Wdxm8lx8?si=xFbwbSoDNahg8gVU",
-          },
-          {
-            title: "النموذج 12",
-            file: "https://t.me/c/2299629125/5/32954",
-            video: "https://youtu.be/Fu7WGlj6Qb0?si=XtxZx6ITA-dbBjus",
-          },
-          {
-            title: "النموذج 13",
-            file: "https://t.me/c/2299629125/5/32977",
-            video: "https://youtu.be/wgNUImdSLr8?si=anukyXsgn3lm7Afp",
-          },
-          {
-            title: "النموذج 14",
-            file: "https://t.me/c/2299629125/5/32998",
-            video: "https://youtu.be/bIMfCEPEDhI?si=3-rXSaQswJyTFl9t",
-          },
-          {
-            title: "النموذج 15",
-            file: "https://t.me/c/2299629125/5/33020",
-            video: "https://youtu.be/Cpv1SpgNJzY?si=GKa7jcCP-HSJ_GpU",
-          },
-          {
-            title: "النموذج 16",
-            file: "https://t.me/c/2299629125/5/32429",
-            video: "https://youtu.be/ZDSbRvYQhXM?si=RLwhm_Zpx0F0JETh",
-          },
-          {
-            title: "النموذج 17",
-            file: "https://t.me/c/2299629125/5/33187",
-            video: "https://youtu.be/bNJ08KVhME8?si=oEYnWMRor3Nm2BlH",
-          },
-        ],
-        " انجليزي": [
-          {
-            title: "نموذج 1",
-            file: "https://t.me/c/2299629125/6/34626",
-            video: "https://youtu.be/L-zQiFntTnI?si=msXGWwy3KX5QG7Ln",
-          },
-          {
-            title: "نموذج 2",
-            file: "https://t.me/c/2299629125/6/34794",
-            video: "https://youtu.be/vA59J4GrLkc?si=mHvKaXEPmBTlPRna",
-          },
-          {
-            title: "نموذج 3",
-            file: "https://t.me/c/2299629125/6/35028",
-            video: "https://t.me/c/2299629125/6/35029",
-          },
-          {
-            title: "نموذج 4",
-            file: "https://t.me/c/2299629125/6/35228",
-            video: "https://t.me/c/2299629125/6/35229",
-          },
-          {
-            title: "نموذج 5",
-            file: "https://t.me/c/2299629125/6/35570",
-            video: "https://t.me/c/2299629125/6/35571",
-          },
-          {
-            title: "نموذج 6",
-            file: "https://t.me/c/2299629125/6/35960",
-            video: "https://t.me/c/2299629125/6/35962",
-          },
-          {
-            title: "نموذج 7",
-            file: "https://t.me/c/2299629125/6/36456",
-            video: "https://t.me/c/2299629125/6/36457",
-          },
-          {
-            title: "نموذج 8",
-            file: "https://t.me/c/2299629125/6/36824",
-            video: "https://t.me/c/2299629125/6/36825",
-          },
-          {
-            title: "نموذج 9",
-            file: "https://t.me/c/2299629125/6/37221",
-            video: "https://t.me/c/2299629125/6/37222",
-          },
-          {
-            title: "نموذج 10",
-            file: "https://t.me/c/2299629125/6/37351?single",
-            video: "https://t.me/c/2299629125/6/37352?single",
-          },
-          {
-            title: "نموذج 11",
-            file: "https://t.me/c/2299629125/6/37508?single",
-            video: "https://t.me/c/2299629125/6/37509?single",
-          },
-          {
-            title: "نموذج 12",
-            file: "https://t.me/c/2299629125/6/37613?single",
-            video: "https://t.me/c/2299629125/6/37614?single",
-          },
-          {
-            title: "نموذج 13",
-            file: "https://t.me/c/2299629125/6/37981?single",
-            video: "https://t.me/c/2299629125/6/37982?single",
-          },
-          {
-            title: "نموذج 14",
-            file: "https://t.me/c/2299629125/6/38114?single",
-            video: "https://t.me/c/2299629125/6/38115?single",
-          },
-          {
-            title: "نموذج 15",
-            file: "https://t.me/c/2299629125/6/38188?single",
-            video: "https://t.me/c/2299629125/6/38189?single",
-          },
-          {
-            title: "نموذج 16",
-            file: "https://t.me/c/2299629125/6/38924?single",
-            video: "https://t.me/c/2299629125/6/38925?single",
-          },
-          {
-            title: "نموذج 17",
-            file: "https://t.me/c/2299629125/6/42131",
-          },
-        ],
-        التربوي: [
-          {
-            title: "الموضوع الأول",
-            file: "https://t.me/c/2299629125/19608/34801",
-          },
-          {
-            title: "الموضوع الثاني",
-            file: "https://t.me/c/2299629125/19608/34820",
-          },
-          {
-            title: "الموضوع الثالث",
-            file: "https://t.me/c/2299629125/19608/34854",
-          },
-          {
-            title: "الموضوع الرابع",
-            file: "https://t.me/c/2299629125/19608/34868",
-          },
-          {
-            title: "الموضوع الخامس",
-            file: "https://t.me/c/2299629125/19608/34887",
-          },
-          {
-            title: "نموذج 1",
-            file: "https://t.me/c/2299629125/19608/36954",
-          },
-          {
-            title: "نموذج 2",
-            file: "https://t.me/c/2299629125/19608/37002",
-          },
-          {
-            title: "نموذج 3",
-            file: "https://t.me/c/2299629125/19608/37048",
-          },
-          {
-            title: "نموذج 4",
-            file: "https://t.me/c/2299629125/19608/37091",
-          },
-          {
-            title: "نموذج 5",
-            file: "https://t.me/c/2299629125/19608/37180",
-          },
-          {
-            title: "نموذج 6",
-            file: "https://t.me/c/2299629125/19608/40958",
-          },
-          {
-            title: "نموذج 7",
-            file: "https://t.me/c/2299629125/19608/41001",
-          },
-          {
-            title: "نموذج 8",
-            file: "https://t.me/c/2299629125/19608/41045",
-          },
-          {
-            title: "نموذج 9",
-            file: "https://t.me/c/2299629125/19608/41089",
-          },
-          {
-            title: "نموذج 10",
-            file: "https://t.me/c/2299629125/19608/41130",
-          },
-          {
-            title: "نموذج 11",
-            file: "https://t.me/c/2299629125/19608/41192",
-          },
-          {
-            title: "نموذج 12",
-            file: "https://t.me/c/2299629125/19608/41248",
-          },
-          {
-            title: "نموذج 13",
-            file: "https://t.me/c/2299629125/19608/41797",
-          },
-        ],
-      };
-      // ======================= Generate Modules for all Sections =======================
+      // ======================= Generate Modules =======================
       async function generateModules(section) {
         const container = document.getElementById("content");
         container.innerHTML = "";
@@ -1092,6 +1436,9 @@
         heading.innerText = section; // اسم المحور نفسه
         heading.classList.add("section-heading"); // لو عايزة تتحكمي بالـCSS
         container.appendChild(heading);
+
+        // تحققي إن linksData[section] موجودة
+        if (!linksData[section]) linksData[section] = [];
 
         for (let i = 0; i < linksData[section].length; i++) {
           const item = linksData[section][i];
@@ -1130,6 +1477,7 @@
             const checkbox = document.createElement("input");
             checkbox.type = "checkbox";
             const taskKey = `${section}_item_${i}_${idx}`;
+
             checkbox.checked = userData.completedTasks?.[taskKey] || false;
 
             // ✨ نحدد إذا لازم يكون الـ checkbox مفعل أو مقفول
@@ -1144,11 +1492,19 @@
 
             if (checkbox.checked) taskDiv.classList.add("completed");
             checkbox.setAttribute("data-task", taskKey);
-
             checkbox.addEventListener("change", async () => {
               await updateTask(section, `item_${i}_${idx}`, checkbox.checked);
               taskDiv.classList.toggle("completed", checkbox.checked);
-              updateProgressBar();
+              updateProgressBar(); // استدعاء هنا عشان يتحدث فورًا
+
+              // ✅ خزني التغيير في linksData
+              if (!linksData[section]) {
+                linksData[section] = {};
+              }
+              linksData[section][`item_${i}_${idx}`] = checkbox.checked;
+
+              // ✅ حدثي Firebase
+              await updateLinksData(linksData);
 
               const itemCompleted = tasks.every((_, tIdx) => {
                 const cb = document.querySelector(
@@ -1176,23 +1532,27 @@
 
           container.appendChild(block);
         }
+        // استدعاء updateProgressBar بعد انتهاء التوليد
+        updateProgressBar();
       }
 
-      // إضافة نموذج جديد
-      document.getElementById("addModuleBtn").onclick = () => {
+      // إضافة نموذج جديد (مع حفظ في Firebase)
+      document.getElementById("addModuleBtn").onclick = async () => {
         if (!selectedSection) return alert("اختر محور أولاً!");
-        const count = moduleData[selectedSection].count + 1;
-        const newModule = { title: `النموذج ${count}`, file: "" };
+        const count = (linksData[selectedSection] || []).length + 1;
+        const newModule = { title: `النموذج ${count}`, file: "", video: "" }; // فارغ عشان يملئيه المشرف لاحقًا
 
         if (!linksData[selectedSection]) linksData[selectedSection] = [];
         linksData[selectedSection].push(newModule);
 
-        moduleData[selectedSection].count = count;
-        generateModules(selectedSection);
+        await saveLinksData(); // حفظ في Firebase
+        moduleData[selectedSection].count = linksData[selectedSection].length;
+        generateModules(selectedSection); // إعادة توليد المحتوى
+        alert(`تم إضافة النموذج ${count} بنجاح! يمكنك تعديل الروابط لاحقًا.`);
       };
 
-      // حذف آخر نموذج
-      document.getElementById("removeModuleBtn").onclick = () => {
+      // حذف آخر نموذج (مع حفظ في Firebase)
+      document.getElementById("removeModuleBtn").onclick = async () => {
         if (!selectedSection) return alert("اختر محور أولاً!");
         if (
           !linksData[selectedSection] ||
@@ -1200,12 +1560,14 @@
         )
           return alert("لا يوجد نماذج لحذفها!");
 
-        linksData[selectedSection].pop();
+        linksData[selectedSection].pop(); // حذف آخر واحد
+        await saveLinksData(); // حفظ في Firebase
         moduleData[selectedSection].count = Math.max(
           0,
-          moduleData[selectedSection].count - 1
+          linksData[selectedSection].length
         );
-        generateModules(selectedSection);
+        generateModules(selectedSection); // إعادة توليد المحتوى
+        alert("تم حذف آخر نموذج بنجاح!");
       };
 
       // ======================= User Data =======================
@@ -1217,34 +1579,42 @@
           : { completedTasks: {}, completedSections: {} };
       }
 
-      async function updateTask(section, taskId, done) {
+      async function updateTask(section, taskKey, checked) {
         const userRef = doc(db, "users", username);
+
+        // خزّن في Firestore
         await setDoc(
           userRef,
-          { completedTasks: { [`${section}_${taskId}`]: done } },
+          {
+            completedTasks: {
+              [`${section}_${taskKey}`]: checked,
+            },
+          },
           { merge: true }
         );
       }
 
-      // ======================= Progress Bar =======================
+      // ======================= Progress Bar (محدثة للعمل مع checkboxes الفعالة) =======================
       function updateProgressBar() {
         const progressContainer = document.getElementById("progress-container");
         const progressBar = document.getElementById("progress-bar");
 
-        // كل الـ checkboxes الموجودة
+        if (!progressContainer || !progressBar) return; // تأكيد وجود العناصر
+
+        // كل الـ checkboxes الموجودة في المحتوى الحالي
         const allCheckboxes = document.querySelectorAll(
           '#content input[type="checkbox"]'
         );
 
-        // استبعد الـ disabled
+        // استبعد الـ disabled (اللي مش متاحة)
         const enabledCheckboxes = Array.from(allCheckboxes).filter(
           (cb) => !cb.disabled
         );
 
-        // كام واحدة متعلم عليها
+        // كام واحدة متعلم عليها (checked)
         const checkedCheckboxes = enabledCheckboxes.filter((cb) => cb.checked);
 
-        // احسب النسبة
+        // احسب النسبة المئوية
         const percent =
           enabledCheckboxes.length > 0
             ? Math.round(
@@ -1252,9 +1622,18 @@
               )
             : 0;
 
-        // عدل في شكل البار
+        // حدّث البار
         progressBar.style.width = percent + "%";
         progressBar.textContent = percent + "%";
+
+        // حدّث الـ progress element أيضًا
+        const progressEl = document.getElementById("progress");
+        if (progressEl) progressEl.value = percent;
+
+        // لو وصل 100%، أظهري رسالة احتفالية (اختياري)
+        if (percent === 100) {
+          showCongratsMessage();
+        }
       }
 
       async function checkSectionCompletion(section) {
@@ -1280,7 +1659,9 @@
       window.backToModules = function () {
         document.getElementById("main").style.display = "none";
         document.getElementById("module-grid").style.display = "flex";
+        renderModuleButtons(); // إعادة رسم الأزرار لتحديث الـ done status
       };
+
       window.backToStart = function () {
         document.getElementById("module-grid").style.display = "none";
         document.getElementById("start-screen").style.display = "flex";
@@ -1297,7 +1678,9 @@
       }
 
       function launchConfetti(amount = 30, duration = 2000) {
-        confetti({ particleCount: amount, spread: 100, origin: { y: 0.5 } });
+        if (typeof confetti !== "undefined") {
+          confetti({ particleCount: amount, spread: 100, origin: { y: 0.5 } });
+        }
       }
 
       // ======================= Leaderboard =======================
@@ -1315,17 +1698,20 @@
           const name = data.name || docSnap.id;
 
           // حساب عدد المهام المكتملة
-          // حساب عدد المهام المكتملة
           let completedTasks = Object.values(data.completedTasks || {}).filter(
             Boolean
           ).length;
+
+          // حساب إجمالي المهام بناءً على moduleData (المحدثة)
           let totalTasks = 0;
           for (const section in moduleData) {
             totalTasks += moduleData[section].count * tasks.length;
           }
-          const progressPercent = totalTasks
-            ? Math.round((completedTasks / totalTasks) * 100)
-            : 0;
+
+          const progressPercent =
+            totalTasks > 0
+              ? Math.round((completedTasks / totalTasks) * 100)
+              : 0;
 
           users.push({
             name,
@@ -1333,33 +1719,39 @@
           });
         });
 
-        // ترتيب المستخدمين حسب التقدم
+        // ترتيب المستخدمين حسب التقدم (تنازلي)
         users.sort((a, b) => b.progressPercent - a.progressPercent);
 
-        // أسماء المراكز
+        // أسماء المراكز والأوسمة
         const ranks = ["المركز الأول", "المركز الثاني", "المركز الثالث"];
-
-        // الأوسمة حسب المراكز
         const badges = ["🥇", "🥈", "🥉"];
 
         users.forEach((u, i) => {
-          const rankText = ranks[i] || `المركز ${i + 1}`;
-          const badge = badges[i] || "🏅";
+          const rankText = i < 3 ? ranks[i] : `المركز ${i + 1}`;
+          const badge = i < 3 ? badges[i] : "🏅";
 
           const tr = document.createElement("tr");
-          tr.className = "lb-row" + (i === 0 ? " top-1" : "");
+          tr.className = `lb-row ${
+            i === 0 ? "top-1" : i === 1 ? "top-2" : i === 2 ? "top-3" : ""
+          }`;
           tr.innerHTML = `
-    <td>${rankText}</td>
-    <td>${u.name}</td>
-    <td>
-      <div class="progress-bar-container" style="width:100%; background:#eee; border-radius:5px; height:12px; position:relative;">
-        <div class="progress-bar" style="width:${u.progressPercent}%; background:#4caf50; height:100%; border-radius:5px; transition: width 0.5s;"></div>
-        <span style="position:absolute; right:5px; top:-2px; font-size:10px; font-weight:bold; color:#222;">${u.progressPercent}%</span>
-      </div>
-    </td>
-    <td>${badge}</td>
-  `;
+                              <td>${rankText}</td>
+                              <td>${u.name}</td>
+                              <td>
+                                <div class="progress-bar-container">
+                                  <div class="progress-bar" style="width: ${u.progressPercent}%"></div>
+                                  <span style="position: absolute; right: 5px; top: -2px; font-size: 10px; font-weight: bold; color: #222;">${u.progressPercent}%</span>
+                                </div>
+                              </td>
+                              <td><span class="badge medal">${badge}</span></td>
+                            `;
           lbBody.appendChild(tr);
+        });
+
+        // إضافة تأثيرات الـ animation للجدول
+        const rows = lbBody.querySelectorAll(".lb-row");
+        rows.forEach((row, index) => {
+          row.style.animationDelay = `${(index + 1) * 0.1}s`;
         });
       };
 
@@ -1367,9 +1759,63 @@
         document.getElementById("screen-lb").style.display = "none";
         document.getElementById("start-screen").style.display = "flex";
       };
+
+      // ربط زر الـ Leaderboard
       document
         .getElementById("btnLeaderboard")
         ?.addEventListener("click", openLeaderboard);
+
+      // ======================= دوال إضافية من الكود الأصلي (اختيارية، بس نتركها للتوافق) =======================
+      function updateProgress() {
+        // دالة قديمة، ممكن نحذفها لو مش مستخدمة، بس نتركها
+        const checkboxes = document.querySelectorAll(".task-checkbox");
+        const completed = Array.from(checkboxes).filter(
+          (cb) => cb.checked
+        ).length;
+        const total = checkboxes.length;
+        const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+        const progressBar = document.getElementById("progress-bar");
+        if (progressBar) progressBar.style.width = percent + "%";
+
+        if (percent === 100) {
+          showCongratsMessage();
+        }
+      }
+
+      function showCongratsMessage() {
+        // افترضي إن currentUser  و currentModule معرفتين، أو استخدمي selectedSection
+        const userName = username;
+        const moduleName = selectedSection || "المحور الحالي";
+        const messageDiv = document.getElementById("congratsMessage");
+
+        if (messageDiv) {
+          messageDiv.textContent = `برافو يا ${userName}! 🎉 خلصت المحور: ${moduleName}`;
+          messageDiv.classList.remove("hidden");
+        }
+      }
+
+      // Dark mode toggle
+      document
+        .getElementById("btnDarkMode")
+        .addEventListener("click", toggleDarkMode);
+
+      function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+        const icon = document.querySelector("#btnDarkMode i");
+        if (document.body.classList.contains("dark-mode")) {
+          icon.className = "fas fa-sun";
+          localStorage.setItem("darkMode", "enabled");
+        } else {
+          icon.className = "fas fa-moon";
+          localStorage.setItem("darkMode", "disabled");
+        }
+      }
+
+      // Check for saved dark mode preference
+      if (localStorage.getItem("darkMode") === "enabled") {
+        document.body.classList.add("dark-mode");
+        document.querySelector("#btnDarkMode i").className = "fas fa-sun";
+      }
     </script>
   </body>
 </html>
