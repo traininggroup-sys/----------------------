@@ -590,9 +590,6 @@
       />
       <button onclick="startApp()">ابدأ</button>
       <button id="btnLeaderboard">لوحة المتصدرين</button>
-      <button id="btnDarkMode" title="تبديل الوضع المظلم">
-        <i class="fas fa-moon"></i> الوضع المظلم
-      </button>
     </div>
 
     <!-- ===== Module Grid ===== -->
@@ -1356,30 +1353,26 @@
       }
 
       // ======================= Progress Bar =======================
-      function updateProgressBar() {
+      async function updateProgressBar() {
         const progressContainer = document.getElementById("progress-container");
         const progressBar = document.getElementById("progress-bar");
 
-        // كل الـ checkboxes الموجودة
-        const allCheckboxes = document.querySelectorAll(
-          '#content input[type="checkbox"]'
-        );
-
-        // استبعد الـ disabled
-        const enabledCheckboxes = Array.from(allCheckboxes).filter(
-          (cb) => !cb.disabled
-        );
-
-        // كام واحدة متعلم عليها
-        const checkedCheckboxes = enabledCheckboxes.filter((cb) => cb.checked);
-
-        // احسب النسبة
-        const percent =
-          enabledCheckboxes.length > 0
-            ? Math.round(
-                (checkedCheckboxes.length / enabledCheckboxes.length) * 100
-              )
-            : 0;
+        const userData = await getUserData();
+        let completedTasks = Object.values(
+          userData.completedTasks || {}
+        ).filter(Boolean).length;
+        let totalEnabled = 0;
+        for (const section in linksData) {
+          for (const item of linksData[section]) {
+            let enabled = 3;
+            if (!item.video) enabled--;
+            if (!item.file) enabled--;
+            totalEnabled += enabled;
+          }
+        }
+        const percent = totalEnabled
+          ? Math.round((completedTasks / totalEnabled) * 100)
+          : 0;
 
         // عدل في شكل البار
         progressBar.style.width = percent + "%";
@@ -1388,12 +1381,21 @@
 
       async function checkSectionCompletion(section) {
         const userData = await getUserData();
-        const totalTasks = moduleData[section].count * tasks.length;
+        let totalEnabled = 0;
+        for (const item of linksData[section] || []) {
+          let enabled = 3;
+          if (!item.video) enabled--;
+          if (!item.file) enabled--;
+          totalEnabled += enabled;
+        }
         let completed = 0;
         Object.keys(userData.completedTasks || {}).forEach((k) => {
           if (k.startsWith(section)) completed++;
         });
-        if (completed >= totalTasks && !userData.completedSections?.[section]) {
+        if (
+          completed >= totalEnabled &&
+          !userData.completedSections?.[section]
+        ) {
           const userRef = doc(db, "users", username);
           await setDoc(
             userRef,
@@ -1448,13 +1450,7 @@
           let completedTasks = Object.values(data.completedTasks || {}).filter(
             Boolean
           ).length;
-          let totalTasks = 0;
-          for (const section in moduleData) {
-            totalTasks += moduleData[section].count * tasks.length;
-          }
-          const progressPercent = totalTasks
-            ? Math.round((completedTasks / totalTasks) * 100)
-            : 0;
+          let totalEnabled = 0;
 
           users.push({
             name,
