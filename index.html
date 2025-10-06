@@ -785,6 +785,7 @@
           { title: "النموذج 27", file: "https://t.me/c/2299629125/2/41957" },
           { title: "النموذج 28", file: "https://t.me/c/2299629125/2/41979" },
           { title: "النموذج 29", file: "https://t.me/c/2299629125/2/42398" },
+          { title: "النموذج 30", file: "https://t.me/c/2299629125/2/43285" },
         ],
         " حاسب": [
           {
@@ -1368,16 +1369,19 @@
         const progressBar = document.getElementById("progress-bar");
 
         const userData = await getUserData();
-        let completedTasks = Object.values(
-          userData.completedTasks || {}
-        ).filter(Boolean).length;
+        let completedTasks = 0;
         let totalEnabled = 0;
-        for (const section in linksData) {
-          for (const item of linksData[section]) {
-            let enabled = 3;
-            if (!item.video) enabled--;
-            if (!item.file) enabled--;
-            totalEnabled += enabled;
+        for (const item of linksData[selectedSection] || []) {
+          let enabled = 3;
+          if (!item.video) enabled--;
+          if (!item.file) enabled--;
+          totalEnabled += enabled;
+          // Count completed tasks for this section
+          for (let idx = 0; idx < 3; idx++) {
+            const taskKey = `${selectedSection}_item_${linksData[
+              selectedSection
+            ].indexOf(item)}_${idx}`;
+            if (userData.completedTasks?.[taskKey]) completedTasks++;
           }
         }
         const percent = totalEnabled
@@ -1456,11 +1460,21 @@
           const name = data.name || docSnap.id;
 
           // حساب عدد المهام المكتملة
-          // حساب عدد المهام المكتملة
           let completedTasks = Object.values(data.completedTasks || {}).filter(
             Boolean
           ).length;
           let totalEnabled = 0;
+          for (const section in linksData) {
+            for (const item of linksData[section]) {
+              let enabled = 3;
+              if (!item.video) enabled--;
+              if (!item.file) enabled--;
+              totalEnabled += enabled;
+            }
+          }
+          const progressPercent = totalEnabled
+            ? Math.round((completedTasks / totalEnabled) * 100)
+            : 0;
 
           users.push({
             name,
