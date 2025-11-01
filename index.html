@@ -672,11 +672,11 @@
       ];
 
       const moduleData = {
-        " معلومات عامة": { type: "models", icon: "💡", count: 20 },
+        " معلومات عامة": { type: "models", icon: "💡", count: 45 },
         " حاسب": { type: "models", icon: "💻", count: 22 }, // مجموع الفيديوهات + النماذج
         " انجليزي": { type: "models", icon: "🗣️", count: 22 },
-        " عربي": { type: "models", icon: "📘", count: 19 },
-        التربوي: { type: "models", icon: "📘", count: 19 },
+        " عربي": { type: "models", icon: "📚", count: 19 },
+        التربوي: { type: "models", icon: "👩‍🏫", count: 19 },
       };
 
       // ======================= Login =======================
@@ -720,10 +720,10 @@
           const btn = document.createElement("button");
           btn.className = "module-button" + (done ? " done" : "");
           btn.innerHTML = `
-        <span style="font-size:24px;margin-left:10px;">${moduleData[section].icon}</span>
-        <span style="font-size:18px;font-weight:700;color:#222;">${section}</span>
-        <span class="module-check">✅</span>
-      `;
+                        <span style="font-size:24px;margin-left:10px;">${moduleData[section].icon}</span>
+                        <span style="font-size:18px;font-weight:700;color:#222;">${section}</span>
+                        <span class="module-check">✅</span>
+                      `;
           btn.onclick = () => openModule(section);
           wrap.appendChild(btn);
         }
@@ -1559,16 +1559,16 @@
           const tr = document.createElement("tr");
           tr.className = "lb-row" + (i === 0 ? " top-1" : "");
           tr.innerHTML = `
-    <td>${rankText}</td>
-    <td>${u.name}</td>
-    <td>
-      <div class="progress-bar-container" style="width:100%; background:#eee; border-radius:5px; height:12px; position:relative;">
-        <div class="progress-bar" style="width:${u.progressPercent}%; background:#4caf50; height:100%; border-radius:5px; transition: width 0.5s;"></div>
-        <span style="position:absolute; right:5px; top:-2px; font-size:10px; font-weight:bold; color:#222;">${u.progressPercent}%</span>
-      </div>
-    </td>
-    <td>${badge}</td>
-  `;
+                    <td>${rankText}</td>
+                    <td>${u.name}</td>
+                    <td>
+                      <div class="progress-bar-container" style="width:100%; background:#eee; border-radius:5px; height:12px; position:relative;">
+                        <div class="progress-bar" style="width:${u.progressPercent}%; background:#4caf50; height:100%; border-radius:5px; transition: width 0.5s;"></div>
+                        <span style="position:absolute; right:5px; top:-2px; font-size:10px; font-weight:bold; color:#222;">${u.progressPercent}%</span>
+                      </div>
+                    </td>
+                    <td>${badge}</td>
+                  `;
           lbBody.appendChild(tr);
         });
       };
