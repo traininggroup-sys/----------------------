@@ -709,10 +709,11 @@
         "مذاكرة النموذج",
         "مشاهدة الفيديو",
         "حل الاستفتاءات",
-        /*"حل الاختبار بوقت",*/
+        " حل الاختبار بوقت ",
       ];
 
       const moduleData = {
+        " الجدرات السلوكية": { type: "models", icon: "📚", count: 19 },
         " معلومات عامة": { type: "models", icon: "💡", count: 45 },
         " حاسب": { type: "models", icon: "💻", count: 22 }, // مجموع الفيديوهات + النماذج
         " انجليزي": { type: "models", icon: "🗣️", count: 22 },
@@ -788,11 +789,22 @@
         document.getElementById("admin-tools").style.display =
           username === adminName ? "block" : "none";
         await generateModules(section);
-        await updateProgressBar();
+        await updateProgressBar(selectedSection);
         document.getElementById("loadingOverlay").classList.remove("show");
       };
       /*المحاوووور*/
       const linksData = {
+        " الجدرات السلوكية": [
+          {
+            title:
+              "شكل الامتحان  وازاي تحل الجدارات السلوكية بطريقة صحيحة 100%",
+            video: "https://t.me/c/2299629125/29338/29340",
+          },
+          {
+            title: "اختبار الجدارات السلوكية",
+            test: "https://t.me/c/2299629125/29338/29342",
+          },
+        ],
         " معلومات عامة": [
           {
             title: "محاور وكباري",
@@ -1450,6 +1462,14 @@
               header.appendChild(fileBtn);
             }
 
+            if (item.test) {
+              const testBtn = document.createElement("button");
+              testBtn.textContent = "فتح الاختبار";
+              testBtn.classList.add("module-btn");
+              testBtn.onclick = () => window.open(item.test, "_blank");
+              header.appendChild(testBtn);
+            }
+
             block.appendChild(header);
 
             tasks.forEach((task, idx) => {
@@ -1463,7 +1483,8 @@
 
               if (
                 (task === "مشاهدة الفيديو" && !item.video) ||
-                (task === "مذاكرة النموذج" && !item.file)
+                (task === "مذاكرة النموذج" && !item.file) ||
+                (task === "حل الاختبار" && !item.test)
               ) {
                 checkbox.disabled = true;
                 checkbox.title = "غير متاح لأنه لا يوجد " + task;
@@ -1480,7 +1501,7 @@
                   checkbox.checked
                 );
                 taskDiv.classList.toggle("completed", checkbox.checked);
-                updateProgressBar();
+                updateProgressBar(section);
                 const itemCompleted = tasks.every((_, tIdx) => {
                   const cb = document.querySelector(
                     `input[data-task="${section}_${sub.title}_item_${i}_${tIdx}"]`
@@ -1555,31 +1576,39 @@
       }
 
       // ======================= Progress Bar =======================
-      async function updateProgressBar() {
+      async function updateProgressBar(section = null) {
         const userData = await getUserData();
 
         let completedCount = 0;
         let totalCount = 0;
 
-        for (const section in linksData) {
-          const sectionData = linksData[section];
-          const allItems = Array.isArray(sectionData)
-            ? sectionData
-            : Object.values(sectionData).flat();
+        const sectionsToCheck = section ? [section] : Object.keys(linksData);
 
-          allItems.forEach((item, i) => {
-            tasks.forEach((task, idx) => {
-              const key = `${section}_item_${i}_${idx}`;
-              const enabled = !(
-                (task === "مشاهدة الفيديو" && !item.video) ||
-                (task === "مذاكرة النموذج" && !item.file)
-              );
-              if (enabled) {
-                totalCount++;
-                if (userData.completedTasks?.[key]) completedCount++;
-              }
-            });
-          });
+        for (const sec of sectionsToCheck) {
+          const sectionData = linksData[sec];
+          const allModules = Array.isArray(sectionData)
+            ? [{ title: sec, items: sectionData }]
+            : Object.entries(sectionData).map(([subTitle, items]) => ({
+                title: subTitle,
+                items,
+              }));
+
+          for (const sub of allModules) {
+            for (let i = 0; i < sub.items.length; i++) {
+              const item = sub.items[i];
+              tasks.forEach((task, idx) => {
+                const key = `${sec}_${sub.title}_item_${i}_${idx}`;
+                const enabled = !(
+                  (task === "مشاهدة الفيديو" && !item.video) ||
+                  (task === "مذاكرة النموذج" && !item.file)
+                );
+                if (enabled) {
+                  totalCount++;
+                  if (userData.completedTasks?.[key]) completedCount++;
+                }
+              });
+            }
+          }
         }
 
         const progressPercent =
@@ -1596,22 +1625,33 @@
         const userData = await getUserData();
 
         const sectionData = linksData[section];
-        const allItems = Array.isArray(sectionData)
-          ? sectionData
-          : Object.values(sectionData).flat(); // نجمع كل العناصر من الأقسام الفرعية
+        const allModules = Array.isArray(sectionData)
+          ? [{ title: section, items: sectionData }]
+          : Object.entries(sectionData).map(([subTitle, items]) => ({
+              title: subTitle,
+              items,
+            }));
 
-        // نحسب عدد العناصر المنجزة في القسم
         let completedCount = 0;
-        let totalCount = allItems.length * tasks.length;
+        let totalCount = 0;
 
-        allItems.forEach((item, i) => {
-          tasks.forEach((task, idx) => {
-            const key = `${section}_item_${i}_${idx}`;
-            if (userData.completedTasks?.[key]) completedCount++;
-          });
-        });
+        for (const sub of allModules) {
+          for (let i = 0; i < sub.items.length; i++) {
+            const item = sub.items[i];
+            tasks.forEach((task, idx) => {
+              const key = `${section}_${sub.title}_item_${i}_${idx}`;
+              const enabled = !(
+                (task === "مشاهدة الفيديو" && !item.video) ||
+                (task === "مذاكرة النموذج" && !item.file)
+              );
+              if (enabled) {
+                totalCount++;
+                if (userData.completedTasks?.[key]) completedCount++;
+              }
+            });
+          }
+        }
 
-        // لو الكل منجز
         if (completedCount === totalCount && totalCount > 0) {
           showBanner(`🎉 خلصت كل ${section}!`);
           launchConfetti(100, 4000);
