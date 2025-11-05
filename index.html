@@ -784,10 +784,16 @@
               const item = sub.items[i];
               tasks.forEach((task, idx) => {
                 const key = `${section}_${sub.title}_item_${i}_${idx}`;
-                const enabled = !(
-                  (task === "مشاهدة الفيديو" && !item.video) ||
-                  (task === "مذاكرة النموذج" && !item.file)
-                );
+                let enabled = true;
+                if (task === "مشاهدة الفيديو" && !item.video) enabled = false;
+                else if (task === "مذاكرة النموذج" && !item.file)
+                  enabled = false;
+                else if (
+                  (task === "حل الاستفتاءات" ||
+                    task === " حل الاختبار بوقت ") &&
+                  !item.test
+                )
+                  enabled = false;
                 if (enabled) {
                   totalCount++;
                   if (userData.completedTasks?.[key]) completedCount++;
@@ -1511,7 +1517,8 @@
               if (
                 (task === "مشاهدة الفيديو" && !item.video) ||
                 (task === "مذاكرة النموذج" && !item.file) ||
-                (task === "حل الاختبار" && !item.test)
+                ((task === "حل الاستفتاءات" || task === " حل الاختبار بوقت ") &&
+                  !item.test)
               ) {
                 checkbox.disabled = true;
                 checkbox.title = "غير متاح لأنه لا يوجد " + task;
@@ -1636,7 +1643,10 @@
                 const key = `${sec}_${sub.title}_item_${i}_${idx}`;
                 const enabled = !(
                   (task === "مشاهدة الفيديو" && !item.video) ||
-                  (task === "مذاكرة النموذج" && !item.file)
+                  (task === "مذاكرة النموذج" && !item.file) ||
+                  ((task === "حل الاستفتاءات" ||
+                    task === " حل الاختبار بوقت ") &&
+                    !item.test)
                 );
                 if (enabled) {
                   totalCount++;
@@ -1678,7 +1688,9 @@
               const key = `${section}_${sub.title}_item_${i}_${idx}`;
               const enabled = !(
                 (task === "مشاهدة الفيديو" && !item.video) ||
-                (task === "مذاكرة النموذج" && !item.file)
+                (task === "مذاكرة النموذج" && !item.file) ||
+                ((task === "حل الاستفتاءات" || task === " حل الاختبار بوقت ") &&
+                  !item.test)
               );
               if (enabled) {
                 totalCount++;
@@ -1747,14 +1759,16 @@
                 ? sectionData
                 : Object.values(sectionData).flat();
               for (const item of allItems) {
-                let enabled = 3;
-                if (!item.video) enabled--;
-                if (!item.file) enabled--;
+                // حساب المهام الممكنة بناءً على المهام المتاحة
+                let enabled = 0;
+                if (item.file) enabled++; // مذاكرة النموذج
+                if (item.video) enabled++; // مشاهدة الفيديو
+                if (item.test) enabled += 2; // حل الاستفتاءات و حل الاختبار بوقت
                 totalEnabled += enabled;
               }
             }
             const progressPercent = totalEnabled
-              ? Math.round((completedTasks / totalEnabled) * 100)
+              ? Math.min(Math.round((completedTasks / totalEnabled) * 100), 100)
               : 0;
 
             users.push({
