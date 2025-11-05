@@ -768,7 +768,34 @@
         wrap.innerHTML = "";
         const userData = await getUserData();
         for (const section in moduleData) {
-          const done = userData.completedSections?.[section] || false;
+          // Calculate if section is fully completed
+          let completedCount = 0;
+          let totalCount = 0;
+          const sectionData = linksData[section];
+          const allModules = Array.isArray(sectionData)
+            ? [{ title: section, items: sectionData }]
+            : Object.entries(sectionData).map(([subTitle, items]) => ({
+                title: subTitle,
+                items,
+              }));
+
+          for (const sub of allModules) {
+            for (let i = 0; i < sub.items.length; i++) {
+              const item = sub.items[i];
+              tasks.forEach((task, idx) => {
+                const key = `${section}_${sub.title}_item_${i}_${idx}`;
+                const enabled = !(
+                  (task === "مشاهدة الفيديو" && !item.video) ||
+                  (task === "مذاكرة النموذج" && !item.file)
+                );
+                if (enabled) {
+                  totalCount++;
+                  if (userData.completedTasks?.[key]) completedCount++;
+                }
+              });
+            }
+          }
+          const done = completedCount === totalCount && totalCount > 0;
           const btn = document.createElement("button");
           btn.className = "module-button" + (done ? " done" : "");
           btn.innerHTML = `
@@ -1571,6 +1598,15 @@
         await setDoc(
           userRef,
           { completedTasks: { [`${section}_${taskId}`]: done } },
+          { merge: true }
+        );
+      }
+
+      async function updateSectionCompletion(section, done) {
+        const userRef = doc(db, "users", username);
+        await setDoc(
+          userRef,
+          { completedSections: { [section]: done } },
           { merge: true }
         );
       }
