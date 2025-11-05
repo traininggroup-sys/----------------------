@@ -1610,7 +1610,11 @@
           ).length;
           let totalEnabled = 0;
           for (const section in linksData) {
-            for (const item of linksData[section]) {
+            const sectionData = linksData[section];
+            const allItems = Array.isArray(sectionData)
+              ? sectionData
+              : Object.values(sectionData).flat();
+            for (const item of allItems) {
               let enabled = 3;
               if (!item.video) enabled--;
               if (!item.file) enabled--;
