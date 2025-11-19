@@ -788,12 +788,7 @@
                 if (task === "مشاهدة الفيديو" && !item.video) enabled = false;
                 else if (task === "مذاكرة النموذج" && !item.file)
                   enabled = false;
-                else if (
-                  (task === "حل الاستفتاءات" ||
-                    task === " حل الاختبار بوقت ") &&
-                  !item.test
-                )
-                  enabled = false;
+                // حل الاستفتاءات و حل الاختبار بوقت متاحان دائماً
                 if (enabled) {
                   totalCount++;
                   if (userData.completedTasks?.[key]) completedCount++;
@@ -1536,9 +1531,7 @@
 
               if (
                 (task === "مشاهدة الفيديو" && !item.video) ||
-                (task === "مذاكرة النموذج" && !item.file) ||
-                ((task === "حل الاستفتاءات" || task === " حل الاختبار بوقت ") &&
-                  !item.test)
+                (task === "مذاكرة النموذج" && !item.file)
               ) {
                 checkbox.disabled = true;
                 checkbox.title = "غير متاح لأنه لا يوجد " + task;
