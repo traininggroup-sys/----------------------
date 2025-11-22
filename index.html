@@ -714,6 +714,8 @@
 
       const moduleData = {
         " الجدرات السلوكية": { type: "models", icon: "📚", count: 19 },
+        " الايكيو ": { type: "models", icon: "🧠", count: 19 },
+
         " معلومات عامة": { type: "models", icon: "💡", count: 45 },
         " حاسب": { type: "models", icon: "💻", count: 22 }, // مجموع الفيديوهات + النماذج
         " انجليزي": { type: "models", icon: "🗣️", count: 22 },
@@ -800,10 +802,10 @@
           const btn = document.createElement("button");
           btn.className = "module-button" + (done ? " done" : "");
           btn.innerHTML = `
-                                    <span style="font-size:24px;margin-left:10px;">${moduleData[section].icon}</span>
-                                    <span style="font-size:18px;font-weight:700;color:#222;">${section}</span>
-                                    <span class="module-check">✅</span>
-                                  `;
+                                         <span style="font-size:24px;margin-left:10px;">${moduleData[section].icon}</span>
+                                         <span style="font-size:18px;font-weight:700;color:#222;">${section}</span>
+                                         <span class="module-check">✅</span>
+                                       `;
           btn.onclick = () => openModule(section);
           wrap.appendChild(btn);
         }
@@ -831,6 +833,46 @@
           {
             title: "اختبار الجدارات السلوكية",
             test: "https://t.me/c/2299629125/29338/29342",
+          },
+        ],
+        " الايكيو ": [
+          {
+            title: " بداية اي كيو الفديو الاول",
+            video: "https://youtu.be/EwHGqrB29Jc?si=sced1OaLqFJw6iuB",
+          },
+          {
+            title: "قاعدة استبعاد الاضلاع المشترك والغير مشترك  ",
+            video:
+              "https://www.youtube.com/watch?v=zaX5UShuHGU&list=PLoBQk3vDshaNC9sC_csjWbPOQBMvWgrTB&index=10",
+          },
+          {
+            title: "السمكة واليد وباقي القواعد المهمة  ",
+            video:
+              "https://www.youtube.com/watch?v=mOzdFsCqcdY&list=PLoBQk3vDshaNC9sC_csjWbPOQBMvWgrTB&index=8",
+          },
+          {
+            title: " مكعبات الجزء الاول ",
+            video: "https://youtu.be/niB83n_SJw0?si=b8_vppHtgKsKkyEU",
+          },
+          {
+            title: " مكعبات الجزء التاني الاهم ",
+            video: "https://youtu.be/XTOq7S8ZbdY?si=6Q1r2fhp156ndaOG",
+          },
+          {
+            title: " مجموعة البتزا و عمر ",
+            video: "https://youtu.be/HNfCOXZ57Ak?si=oZH1EE-zIyMux5lS",
+          },
+          {
+            title: " عشر اشكال  مهمة ",
+            video: "https://youtu.be/FO8kwUQ0NeA?si=4ey3OOgIhuCXPRHa",
+          },
+          {
+            title: " اي كيو جه لعربي ",
+            video: "https://youtu.be/9YRSGLO--As?si=TMKWcnAF0sfaJ3Ww",
+          },
+          {
+            title: " شرح متتاليات الارقام ",
+            video: "https://t.me/c/2299629125/15163/55525",
           },
         ],
         " معلومات عامة": [
@@ -1810,16 +1852,16 @@
             const tr = document.createElement("tr");
             tr.className = "lb-row" + (i === 0 ? " top-1" : "");
             tr.innerHTML = `
-                                  <td>${rankText}</td>
-                                  <td>${u.name}</td>
-                                  <td>
-                                    <div class="progress-bar-container" style="width:100%; background:#eee; border-radius:5px; height:12px; position:relative;">
-                                      <div class="progress-bar" style="width:${u.progressPercent}%; background:#4caf50; height:100%; border-radius:5px; transition: width 0.5s;"></div>
-                                      <span style="position:absolute; right:5px; top:-2px; font-size:10px; font-weight:bold; color:#222;">${u.progressPercent}%</span>
-                                    </div>
-                                  </td>
-                                  <td>${badge}</td>
-                                `;
+                                       <td>${rankText}</td>
+                                       <td>${u.name}</td>
+                                       <td>
+                                         <div class="progress-bar-container" style="width:100%; background:#eee; border-radius:5px; height:12px; position:relative;">
+                                           <div class="progress-bar" style="width:${u.progressPercent}%; background:#4caf50; height:100%; border-radius:5px; transition: width 0.5s;"></div>
+                                           <span style="position:absolute; right:5px; top:-2px; font-size:10px; font-weight:bold; color:#222;">${u.progressPercent}%</span>
+                                         </div>
+                                       </td>
+                                       <td>${badge}</td>
+                                     `;
             lbBody.appendChild(tr);
           });
         } finally {
