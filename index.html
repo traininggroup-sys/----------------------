@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
   <head>
     <meta charset="UTF-8" />
@@ -579,7 +579,9 @@
         z-index: 9999;
         opacity: 0;
         visibility: hidden;
-        transition: opacity 0.3s, visibility 0.3s;
+        transition:
+          opacity 0.3s,
+          visibility 0.3s;
       }
       .loading-overlay.show {
         opacity: 1;
@@ -1071,7 +1073,7 @@
             {
               title: "النموذج 1",
               video: "https://youtu.be/evZEGltYYXs",
-              file: "https://t.me/c/2299629125/4/28648",
+              file: "https://t.me/c/2299629125/4/36459",
             },
             {
               title: "النموذج 2",
@@ -1632,13 +1634,13 @@
                 await updateTask(
                   section,
                   `${sub.title}_item_${i}_${idx}`,
-                  checkbox.checked
+                  checkbox.checked,
                 );
                 taskDiv.classList.toggle("completed", checkbox.checked);
                 updateProgressBar(section);
                 const itemCompleted = tasks.every((_, tIdx) => {
                   const cb = document.querySelector(
-                    `input[data-task="${section}_${sub.title}_item_${i}_${tIdx}"]`
+                    `input[data-task="${section}_${sub.title}_item_${i}_${tIdx}"]`,
                   );
                   return cb?.disabled || cb?.checked;
                 });
@@ -1686,7 +1688,7 @@
         linksData[selectedSection].pop();
         moduleData[selectedSection].count = Math.max(
           0,
-          moduleData[selectedSection].count - 1
+          moduleData[selectedSection].count - 1,
         );
         generateModules(selectedSection);
       };
@@ -1705,7 +1707,7 @@
         await setDoc(
           userRef,
           { completedTasks: { [`${section}_${taskId}`]: done } },
-          { merge: true }
+          { merge: true },
         );
       }
 
@@ -1714,7 +1716,7 @@
         await setDoc(
           userRef,
           { completedSections: { [section]: done } },
-          { merge: true }
+          { merge: true },
         );
       }
 
@@ -1850,7 +1852,7 @@
 
             // حساب عدد المهام المكتملة
             let completedTasks = Object.values(
-              data.completedTasks || {}
+              data.completedTasks || {},
             ).filter(Boolean).length;
             let totalEnabled = 0;
             for (const section in linksData) {
