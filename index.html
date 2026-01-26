@@ -1731,15 +1731,6 @@
         generateModules(selectedSection);
       };
 
-      // ======================= User Data =======================
-      async function getUserData() {
-        const userRef = doc(db, "users", username);
-        const snap = await getDoc(userRef);
-        return snap.exists()
-          ? snap.data()
-          : { completedTasks: {}, completedSections: {} };
-      }
-
       async function updateTask(section, taskId, done) {
         const userRef = doc(db, "users", username);
         await setDoc(
