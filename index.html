@@ -737,7 +737,7 @@
 
         try {
           const userRef = doc(db, "users", nameInput);
-          const snap = await getDoc(userRef);
+          const snap = await getDoc(userRef); // هنا السطر اللي بيعمل المشكلة
 
           if (snap.exists()) {
             const data = snap.data();
@@ -759,12 +759,36 @@
           document.getElementById("module-grid").style.display = "flex";
           renderModuleButtons();
         } catch (error) {
-          alert(error.message);
+          // --- تعديلنا هنا للإمساك بالخطأ بالتحديد ---
+          console.error("Firebase Error:", error); // عشان تشوف التفاصيل في الـ Console
+
+          if (
+            error.code === "unavailable" ||
+            error.message.includes("offline")
+          ) {
+            alert(
+              "❌ فشل الاتصال بقاعدة البيانات!\n\nغالباً بسبب:\n1. إضافة مانع إعلانات (AdBlocker) قوية.\n2. استخدام متصفح Brave.\n3. ضعف مؤقت في الإنترنت.\n\nجربي تفتحي من متصفح خفي (Incognito) أو اقفلي الـ AdBlocker.",
+            );
+          } else {
+            alert("حدث خطأ: " + error.message);
+          }
         } finally {
           // Hide loading overlay
           document.getElementById("loadingOverlay").classList.remove("show");
         }
       };
+
+      // فنكشن مساعدة لجلب البيانات مع معالجة الأخطاء
+      async function getUserData() {
+        try {
+          const userRef = doc(db, "users", username);
+          const snap = await getDoc(userRef);
+          return snap.exists() ? snap.data() : { completedTasks: {} };
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          return { completedTasks: {} }; // إرجاع داتا فاضية لو فشل عشان الموقع ميعلقش
+        }
+      }
 
       // ======================= Render Modules =======================
       async function renderModuleButtons() {
