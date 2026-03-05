@@ -986,6 +986,13 @@
         ],
 
         " حاسب": {
+          " نظام الحاسب⭐": [
+            {
+              title: "توضيح لنظام الحاسب",
+              video: "https://t.me/c/2299629125/64552/64555",
+              excludeTasks: ["حل الاستفتاءات", " حل الاختبار بوقت "],
+            },
+          ],
           "أساسيات الكمبيوتر⭐": [
             {
               title: "مقدم أساسيات الكمبيوتر",
@@ -1737,6 +1744,11 @@
             block.appendChild(header);
 
             tasks.forEach((task, idx) => {
+              // 1. الجزء الجديد: لو المهمة دي مكتوبة في قائمة الاستبعاد، اهرب وما تكملش رسمها
+              if (item.excludeTasks && item.excludeTasks.includes(task)) {
+                return;
+              }
+
               const taskDiv = document.createElement("div");
               taskDiv.className = "task";
 
@@ -1745,6 +1757,7 @@
               const taskKey = `${section}_${sub.title}_item_${i}_${idx}`;
               checkbox.checked = userData.completedTasks?.[taskKey] || false;
 
+              // 2. التأكد من المرفقات (فيديو أو ملف) كما هي في كودك الأصلي
               if (
                 (task === "مشاهدة الفيديو" && !item.video) ||
                 (task === "مذاكرة النموذج" && !item.file)
@@ -1753,6 +1766,8 @@
                 checkbox.title = "غير متاح لأنه لا يوجد " + task;
                 taskDiv.classList.add("disabled-task");
               }
+
+              // ... باقي الكود اللي عندك بتاع الـ EventListener والـ Label زي ما هو
 
               if (checkbox.checked) taskDiv.classList.add("completed");
               checkbox.setAttribute("data-task", taskKey);
@@ -1861,13 +1876,19 @@
               const item = sub.items[i];
               tasks.forEach((task, idx) => {
                 const key = `${sec}_${sub.title}_item_${i}_${idx}`;
-                const enabled = !(
-                  (task === "مشاهدة الفيديو" && !item.video) ||
-                  (task === "مذاكرة النموذج" && !item.file) ||
-                  ((task === "حل الاستفتاءات" ||
-                    task === " حل الاختبار بوقت ") &&
-                    !item.test)
-                );
+                // إضافة شرط الاستبعاد أولاً
+                const isExcluded =
+                  item.excludeTasks && item.excludeTasks.includes(task);
+
+                const enabled =
+                  !isExcluded &&
+                  !(
+                    (task === "مشاهدة الفيديو" && !item.video) ||
+                    (task === "مذاكرة النموذج" && !item.file) ||
+                    ((task === "حل الاستفتاءات" ||
+                      task === " حل الاختبار بوقت ") &&
+                      !item.test)
+                  );
                 if (enabled) {
                   totalCount++;
                   if (userData.completedTasks?.[key]) completedCount++;
